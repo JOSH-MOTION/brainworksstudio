@@ -1,99 +1,78 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminAuth, adminDb } from '@/lib/firebase-admin';
+import { auth } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
+import { collection, getDocs, query, orderBy, where } from 'firebase/firestore';
 
-export const dynamic = 'force-dynamic';
-
-export async function GET(request: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
-    // Check if Firebase Admin is initialized
-    if (!adminAuth || !adminDb) {
-      console.error('Firebase Admin not properly initialized');
-      return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
+    // Verify admin authentication
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'No authorization token' }, { status: 401 });
     }
 
-    const authHeader = request.headers.get('authorization');
-    if (!authHeader) {
-      return NextResponse.json({ error: 'No authorization header' }, { status: 401 });
-    }
-
-    const token = authHeader.split(' ')[1];
-    if (!token) {
-      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
-    }
-
-    // Verify the token
+    const token = authHeader.split('Bearer ')[1];
     let decodedToken;
+    
     try {
-      decodedToken = await adminAuth.verifyIdToken(token);
+      decodedToken = await auth.verifyIdToken(token);
     } catch (error) {
-      console.error('Token verification failed:', error);
-      return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
-    
-    // Check if user is admin
-    const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
-    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
-    }
-    
-    console.log('Admin fetching all bookings');
 
-    // Fetch all bookings with user information
-    const bookingsSnapshot = await adminDb.collection('bookings')
-      .orderBy('createdAt', 'desc')
-      .get();
-    
+    // Check if user is admin
+    const userDoc = await getDocs(query(collection(db, 'users'), where('uid', '==', decodedToken.uid)));
+    if (userDoc.empty || userDoc.docs[0].data().role !== 'admin') {
+      return NextResponse.json({ error: 'Unauthorized - Admin access required' }, { status: 403 });
+    }
+
+    // Fetch all bookings
+    const bookingsRef = collection(db, 'bookings');
+    const bookingsQuery = query(bookingsRef, orderBy('createdAt', 'desc'));
+    const bookingsSnapshot = await getDocs(bookingsQuery);
+
     const bookingsWithUserInfo = [];
-    
+
+    // For each booking, fetch the user information
     for (const doc of bookingsSnapshot.docs) {
       const bookingData = doc.data();
       
-      // Fetch user information for each booking
-      let userInfo = null;
-      if (bookingData.userId) {
-        try {
-          const userDoc = await adminDb.collection('users').doc(bookingData.userId).get();
-          if (userDoc.exists) {
-            const userData = userDoc.data();
-            userInfo = {
-              displayName: userData.displayName || 'Unknown User',
-              email: userData.email || 'No email',
-              phone: userData.phone || '',
-              profileImageUrl: userData.profileImageUrl || null,
-            };
-          }
-        } catch (error) {
-          console.error('Error fetching user info for booking:', doc.id, error);
-          userInfo = {
-            displayName: 'Unknown User',
-            email: 'Error loading email',
-            phone: '',
-            profileImageUrl: null,
-          };
-        }
-      }
+      // Fetch user info
+      const userQuery = query(collection(db, 'users'), where('uid', '==', bookingData.userId));
+      const userSnapshot = await getDocs(userQuery);
+      
+      const userInfo = userSnapshot.empty ? {
+        displayName: 'Unknown User',
+        email: 'No email',
+        phone: null,
+        profileImageUrl: null,
+      } : {
+        displayName: userSnapshot.docs[0].data().displayName || 'Unknown User',
+        email: userSnapshot.docs[0].data().email || 'No email',
+        phone: userSnapshot.docs[0].data().phone || null,
+        profileImageUrl: userSnapshot.docs[0].data().profileImageUrl || null,
+      };
 
       bookingsWithUserInfo.push({
         id: doc.id,
-        bookingId: bookingData.bookingId || doc.id,
+        bookingId: doc.id,
         userId: bookingData.userId,
-        userInfo: userInfo,
+        userInfo,
         serviceCategory: bookingData.serviceCategory,
-        startDateTime: bookingData.startDateTime?.toDate?.() || bookingData.startDateTime,
-        endDateTime: bookingData.endDateTime?.toDate?.() || bookingData.endDateTime,
-        location: bookingData.location,
-        additionalNotes: bookingData.additionalNotes,
-        adminNotes: bookingData.adminNotes,
-        status: bookingData.status,
+        startDateTime: bookingData.startDateTime,
+        endDateTime: bookingData.endDateTime,
+        location: bookingData.location || { address: 'No location specified' },
+        additionalNotes: bookingData.additionalNotes || '',
+        adminNotes: bookingData.adminNotes || '',
+        status: bookingData.status || 'pending',
         attachments: bookingData.attachments || [],
-        createdAt: bookingData.createdAt?.toDate?.() || bookingData.createdAt,
-        updatedAt: bookingData.updatedAt?.toDate?.() || bookingData.updatedAt,
+        createdAt: bookingData.createdAt,
+        updatedAt: bookingData.updatedAt || bookingData.createdAt,
       });
     }
 
-    console.log(`Found ${bookingsWithUserInfo.length} total bookings for admin view`);
-
     return NextResponse.json(bookingsWithUserInfo);
+
   } catch (error) {
     console.error('Error fetching admin bookings:', error);
     return NextResponse.json(

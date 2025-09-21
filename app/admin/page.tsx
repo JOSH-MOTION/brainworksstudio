@@ -2,16 +2,31 @@
 
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import Layout from '@/components/Layout';
+import { useEffect, useState } from 'react';
+import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, Calendar, Camera, MessageSquare, BarChart3 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Users, Calendar, Camera, MessageSquare, BarChart3, Shield, AlertCircle, CheckCircle, Clock, Settings } from 'lucide-react';
 import Link from 'next/link';
 
+interface AdminStats {
+  pendingBookings: number;
+  totalBookings: number;
+  totalUsers: number;
+  recentActivity: any[];
+}
+
 export default function AdminDashboard() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, loading, userProfile, firebaseUser } = useAuth();
   const router = useRouter();
+  const [stats, setStats] = useState<AdminStats>({
+    pendingBookings: 0,
+    totalBookings: 0,
+    totalUsers: 0,
+    recentActivity: [],
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -19,16 +34,49 @@ export default function AdminDashboard() {
     }
   }, [user, isAdmin, loading, router]);
 
-  if (loading) {
+  useEffect(() => {
+    if (user && isAdmin) {
+      fetchStats();
+    }
+  }, [user, isAdmin]);
+
+  const fetchStats = async () => {
+    try {
+      if (!firebaseUser) return;
+      
+      const token = await firebaseUser.getIdToken();
+      const response = await fetch('/api/admin/bookings', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const bookings = await response.json();
+        setStats({
+          pendingBookings: bookings.filter((b: any) => b.status === 'pending').length,
+          totalBookings: bookings.length,
+          totalUsers: 0, // You can add a separate endpoint for this
+          recentActivity: bookings.slice(0, 3),
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching admin stats:', error);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
+
+  if (loading || loadingStats) {
     return (
-      <Layout>
+      <AdminLayout>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-700 mx-auto"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-700 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
           </div>
         </div>
-      </Layout>
+      </AdminLayout>
     );
   }
 
@@ -37,25 +85,73 @@ export default function AdminDashboard() {
   }
 
   return (
-    <Layout>
+    <AdminLayout>
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Admin Header with Team Member Info */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-600">Manage your studio's operations and content</p>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="p-3 bg-red-100 rounded-full">
+              <Shield className="h-8 w-8 text-red-700" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Studio Management Dashboard</h1>
+              <p className="text-gray-600">Brain Works Studio Team Member Portal</p>
+            </div>
+          </div>
+          
+          {/* Admin Alert Section */}
+          {stats.pendingBookings > 0 && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+              <div className="flex-1">
+                <p className="font-medium text-red-800">
+                  {stats.pendingBookings} client booking{stats.pendingBookings !== 1 ? 's' : ''} require{stats.pendingBookings === 1 ? 's' : ''} your immediate attention
+                </p>
+                <p className="text-sm text-red-700">
+                  As a studio team member, please review and respond to pending requests promptly.
+                </p>
+              </div>
+              <Link href="/admin/bookings?status=pending">
+                <Button className="bg-red-600 hover:bg-red-700 text-white">
+                  Review Bookings
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
-        {/* Quick Stats */}
+        {/* Admin Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <Card className="border-l-4 border-l-red-500">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <div className="p-2 bg-red-100 rounded-full">
+                  <Clock className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="ml-4">
+                  <p className="text-sm font-medium text-gray-600">Pending Approvals</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.pendingBookings}</p>
+                </div>
+              </div>
+              {stats.pendingBookings > 0 && (
+                <div className="mt-2">
+                  <Badge variant="destructive" className="text-xs">
+                    Requires Action
+                  </Badge>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-blue-100 rounded-full">
-                  <Users className="h-6 w-6 text-blue-600" />
+                  <Calendar className="h-6 w-6 text-blue-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Users</p>
-                  <p className="text-2xl font-bold text-gray-900">--</p>
+                  <p className="text-sm font-medium text-gray-600">Total Bookings</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalBookings}</p>
                 </div>
               </div>
             </CardContent>
@@ -65,11 +161,11 @@ export default function AdminDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-green-100 rounded-full">
-                  <Calendar className="h-6 w-6 text-green-600" />
+                  <Users className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Pending Bookings</p>
-                  <p className="text-2xl font-bold text-gray-900">--</p>
+                  <p className="text-sm font-medium text-gray-600">Studio Clients</p>
+                  <p className="text-2xl font-bold text-gray-900">{stats.totalUsers || '--'}</p>
                 </div>
               </div>
             </CardContent>
@@ -79,24 +175,10 @@ export default function AdminDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-purple-100 rounded-full">
-                  <Camera className="h-6 w-6 text-purple-600" />
+                  <BarChart3 className="h-6 w-6 text-purple-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Portfolio Items</p>
-                  <p className="text-2xl font-bold text-gray-900">--</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <div className="p-2 bg-orange-100 rounded-full">
-                  <MessageSquare className="h-6 w-6 text-orange-600" />
-                </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">New Messages</p>
+                  <p className="text-sm font-medium text-gray-600">This Month</p>
                   <p className="text-2xl font-bold text-gray-900">--</p>
                 </div>
               </div>
@@ -104,105 +186,112 @@ export default function AdminDashboard() {
           </Card>
         </div>
 
-        {/* Management Sections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Portfolio Management */}
-          <Card className="hover:shadow-lg transition-shadow">
+        {/* Admin Management Sections */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          {/* Booking Management - Priority */}
+          <Card className="hover:shadow-lg transition-shadow border-l-4 border-l-red-500">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Camera className="h-5 w-5 text-amber-700" />
-                Portfolio Management
+              <CardTitle className="flex items-center gap-2 text-red-700">
+                <Calendar className="h-5 w-5" />
+                Client Booking Management
               </CardTitle>
               <CardDescription>
-                Upload, edit, and organize your portfolio items
+                Review, approve, and manage client photography session requests
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <Link href="/admin/portfolio">
-                  <Button className="w-full bg-amber-700 hover:bg-amber-800">
-                    Manage Portfolio
-                  </Button>
-                </Link>
-                <Link href="/admin/portfolio/upload">
-                  <Button variant="outline" className="w-full">
-                    Upload New Item
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Booking Management */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-green-700" />
-                Booking Management
-              </CardTitle>
-              <CardDescription>
-                Review and manage client booking requests
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
+                {stats.pendingBookings > 0 && (
+                  <div className="p-2 bg-red-50 rounded-md">
+                    <p className="text-sm font-medium text-red-800">
+                      {stats.pendingBookings} booking{stats.pendingBookings !== 1 ? 's' : ''} awaiting review
+                    </p>
+                  </div>
+                )}
                 <Link href="/admin/bookings">
-                  <Button className="w-full bg-green-700 hover:bg-green-800">
-                    View All Bookings
+                  <Button className="w-full bg-red-700 hover:bg-red-800">
+                    Manage All Bookings
                   </Button>
                 </Link>
                 <Link href="/admin/bookings?status=pending">
                   <Button variant="outline" className="w-full">
-                    Pending Requests
+                    Review Pending ({stats.pendingBookings})
                   </Button>
                 </Link>
               </div>
             </CardContent>
           </Card>
 
-          {/* User Management */}
+          {/* Client Management */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-700" />
-                User Management
+                Client Management
               </CardTitle>
               <CardDescription>
-                View and manage registered users
+                View and manage studio clients and team member accounts
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <Link href="/admin/users">
                   <Button className="w-full bg-blue-700 hover:bg-blue-800">
-                    View All Users
+                    View All Clients
                   </Button>
                 </Link>
                 <Link href="/admin/users?role=admin">
                   <Button variant="outline" className="w-full">
-                    Admin Users
+                    Team Members
                   </Button>
                 </Link>
               </div>
             </CardContent>
           </Card>
 
-          {/* Contact Messages */}
+          {/* Portfolio Management */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="h-5 w-5 text-purple-700" />
-                Contact Messages
+                <Camera className="h-5 w-5 text-purple-700" />
+                Portfolio Management
               </CardTitle>
               <CardDescription>
-                Review messages from contact form
+                Upload, edit, and organize studio portfolio items
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <Link href="/admin/portfolio">
+                  <Button className="w-full bg-purple-700 hover:bg-purple-800">
+                    Manage Portfolio
+                  </Button>
+                </Link>
+                <Link href="/admin/portfolio/upload">
+                  <Button variant="outline" className="w-full">
+                    Upload New Work
+                  </Button>
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Client Messages */}
+          <Card className="hover:shadow-lg transition-shadow">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="h-5 w-5 text-green-700" />
+                Client Messages
+              </CardTitle>
+              <CardDescription>
+                Review and respond to client contact form messages
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <Link href="/admin/contacts">
-                  <Button className="w-full bg-purple-700 hover:bg-purple-800">
-                    View Messages
+                  <Button className="w-full bg-green-700 hover:bg-green-800">
+                    View All Messages
                   </Button>
                 </Link>
                 <Link href="/admin/contacts?status=new">
@@ -214,15 +303,15 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Analytics */}
+          {/* Analytics & Reports */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-indigo-700" />
-                Analytics
+                Studio Analytics
               </CardTitle>
               <CardDescription>
-                View business metrics and reports
+                View business metrics, reports, and performance data
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -241,34 +330,78 @@ export default function AdminDashboard() {
             </CardContent>
           </Card>
 
-          {/* Settings */}
+          {/* Studio Settings */}
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5 text-gray-700" />
-                Settings
+                <Settings className="h-5 w-5 text-gray-700" />
+                Studio Settings
               </CardTitle>
               <CardDescription>
-                Configure studio settings and preferences
+                Configure studio settings, preferences, and team access
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <Link href="/admin/settings">
                   <Button className="w-full bg-gray-700 hover:bg-gray-800">
-                    Studio Settings
+                    Studio Configuration
                   </Button>
                 </Link>
-                <Link href="/admin/email-templates">
+                <Link href="/admin/team">
                   <Button variant="outline" className="w-full">
-                    Email Templates
+                    Team Management
                   </Button>
                 </Link>
               </div>
             </CardContent>
           </Card>
         </div>
+
+        {/* Recent Activity for Team Members */}
+        {stats.recentActivity.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Client Activity</CardTitle>
+              <CardDescription>
+                Latest client booking requests and studio activities requiring team attention
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {stats.recentActivity.map((booking: any) => (
+                  <div key={booking.id} className="flex items-center justify-between p-3 border border-gray-200 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 rounded-full">
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{booking.serviceCategory} Request</p>
+                        <p className="text-sm text-gray-600">
+                          Client: {booking.userInfo?.displayName || 'Unknown'} • {new Date(booking.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    <Badge className={`${
+                      booking.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      booking.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                      'bg-red-100 text-red-800'
+                    }`}>
+                      {booking.status === 'pending' ? 'Awaiting Review' : 
+                       booking.status === 'accepted' ? 'Approved' : 'Declined'}
+                    </Badge>
+                  </div>
+                ))}
+                <div className="text-center pt-2">
+                  <Link href="/admin/bookings">
+                    <Button variant="outline">View All Client Requests</Button>
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
-    </Layout>
+    </AdminLayout>
   );
 }

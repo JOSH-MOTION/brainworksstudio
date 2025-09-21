@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
-import Layout from '@/components/Layout';
+import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Calendar, Clock, MapPin, User, Search, Filter, CheckCircle, XCircle, Eye, Mail, Phone } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Search, Filter, CheckCircle, XCircle, Eye, Mail, Phone, Shield } from 'lucide-react';
 
 interface UserInfo {
   displayName: string;
@@ -194,12 +194,19 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <Layout>
+    <AdminLayout>
       <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
+        {/* Admin Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking Management</h1>
-          <p className="text-gray-600">Review and manage client booking requests</p>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-red-100 rounded-full">
+              <Shield className="h-6 w-6 text-red-700" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Booking Management</h1>
+              <p className="text-gray-600">Studio Team Member - Review and manage client booking requests</p>
+            </div>
+          </div>
         </div>
 
         {/* Stats Cards */}
