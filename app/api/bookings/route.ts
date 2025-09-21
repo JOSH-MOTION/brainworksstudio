@@ -1,11 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
-import { sendBookingConfirmation } from '@/lib/nodemailer';
+import { sendBookingConfirmation, createTransporter } from '@/lib/nodemailer';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.json();
+    
+    // Check if adminDb is available
+    if (!adminDb) {
+      console.error('Firebase Admin DB not initialized');
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 500 }
+      );
+    }
     
     // Upload attachments to Cloudinary if any
     const attachmentUrls = [];
@@ -38,35 +47,44 @@ export async function POST(request: NextRequest) {
     // Update with the generated ID
     await docRef.update({ bookingId: docRef.id });
 
-    // Send confirmation email
-    await sendBookingConfirmation(formData.userEmail, {
-      userName: formData.userName,
-      serviceCategory: formData.serviceCategory,
-      date: formData.date,
-      startTime: formData.startTime,
-      endTime: formData.endTime,
-      location: formData.address,
-    });
+    // Send confirmation email to user
+    try {
+      await sendBookingConfirmation(formData.userEmail, {
+        userName: formData.userName,
+        serviceCategory: formData.serviceCategory,
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: formData.endTime,
+        location: formData.address,
+      });
+    } catch (emailError) {
+      console.error('Error sending confirmation email:', emailError);
+      // Don't fail the booking if email fails
+    }
 
     // Send admin notification email
-    const { createTransporter } = require('@/lib/nodemailer');
-    const transporter = createTransporter();
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: process.env.GMAIL_USER, // Admin email
-      subject: 'New Booking Request - Brain Works Studio',
-      html: `
-        <h2>New Booking Request</h2>
-        <p><strong>Client:</strong> ${formData.userName}</p>
-        <p><strong>Email:</strong> ${formData.userEmail}</p>
-        <p><strong>Service:</strong> ${formData.serviceCategory}</p>
-        <p><strong>Date:</strong> ${formData.date}</p>
-        <p><strong>Time:</strong> ${formData.startTime} - ${formData.endTime}</p>
-        <p><strong>Location:</strong> ${formData.address}</p>
-        ${formData.additionalNotes ? `<p><strong>Notes:</strong> ${formData.additionalNotes}</p>` : ''}
-        <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/bookings">View in Admin Panel</a></p>
-      `,
-    });
+    try {
+      const transporter = createTransporter();
+      await transporter.sendMail({
+        from: process.env.GMAIL_USER,
+        to: process.env.GMAIL_USER, // Admin email
+        subject: 'New Booking Request - Brain Works Studio',
+        html: `
+          <h2>New Booking Request</h2>
+          <p><strong>Client:</strong> ${formData.userName}</p>
+          <p><strong>Email:</strong> ${formData.userEmail}</p>
+          <p><strong>Service:</strong> ${formData.serviceCategory}</p>
+          <p><strong>Date:</strong> ${formData.date}</p>
+          <p><strong>Time:</strong> ${formData.startTime} - ${formData.endTime}</p>
+          <p><strong>Location:</strong> ${formData.address}</p>
+          ${formData.additionalNotes ? `<p><strong>Notes:</strong> ${formData.additionalNotes}</p>` : ''}
+          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/bookings">View in Admin Panel</a></p>
+        `,
+      });
+    } catch (emailError) {
+      console.error('Error sending admin notification email:', emailError);
+      // Don't fail the booking if email fails
+    }
 
     return NextResponse.json({ success: true, bookingId: docRef.id });
   } catch (error) {
@@ -80,6 +98,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    if (!adminDb) {
+      return NextResponse.json(
+        { error: 'Database not available' },
+        { status: 500 }
+      );
+    }
+
     const bookingsSnapshot = await adminDb.collection('bookings')
       .orderBy('createdAt', 'desc')
       .get();

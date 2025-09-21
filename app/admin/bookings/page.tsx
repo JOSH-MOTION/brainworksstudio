@@ -11,17 +11,40 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Booking } from '@/types';
-import { Calendar, Clock, MapPin, User, Search, Filter, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { Calendar, Clock, MapPin, User, Search, Filter, CheckCircle, XCircle, Eye, Mail, Phone } from 'lucide-react';
+
+interface UserInfo {
+  displayName: string;
+  email: string;
+  phone?: string;
+  profileImageUrl?: string;
+}
+
+interface BookingWithUserInfo {
+  id: string;
+  bookingId: string;
+  userId: string;
+  userInfo: UserInfo;
+  serviceCategory: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  location: { address: string };
+  additionalNotes?: string;
+  adminNotes?: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  attachments?: string[];
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export default function AdminBookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [filteredBookings, setFilteredBookings] = useState<Booking[]>([]);
+  const [bookings, setBookings] = useState<BookingWithUserInfo[]>([]);
+  const [filteredBookings, setFilteredBookings] = useState<BookingWithUserInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
-  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [selectedBooking, setSelectedBooking] = useState<BookingWithUserInfo | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [adminNotes, setAdminNotes] = useState('');
   const [updating, setUpdating] = useState(false);
@@ -56,7 +79,10 @@ export default function AdminBookingsPage() {
       
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched bookings with user info:', data);
         setBookings(data);
+      } else {
+        console.error('Failed to fetch bookings:', response.status);
       }
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -70,7 +96,8 @@ export default function AdminBookingsPage() {
     
     if (searchTerm) {
       filtered = filtered.filter(booking => 
-        booking.userId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.userInfo?.displayName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.userInfo?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         booking.serviceCategory.toLowerCase().includes(searchTerm.toLowerCase()) ||
         booking.location.address.toLowerCase().includes(searchTerm.toLowerCase())
       );
@@ -107,7 +134,7 @@ export default function AdminBookingsPage() {
         // Update local state
         setBookings(prev => 
           prev.map(booking => 
-            booking.bookingId === bookingId 
+            booking.id === bookingId 
               ? { ...booking, status, adminNotes: notes, updatedAt: new Date() }
               : booking
           )
@@ -115,6 +142,8 @@ export default function AdminBookingsPage() {
         setDialogOpen(false);
         setSelectedBooking(null);
         setAdminNotes('');
+      } else {
+        console.error('Failed to update booking status');
       }
     } catch (error) {
       console.error('Error updating booking status:', error);
@@ -246,7 +275,7 @@ export default function AdminBookingsPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
-                    placeholder="Search by user, service, or location..."
+                    placeholder="Search by client name, email, service, or location..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -306,7 +335,7 @@ export default function AdminBookingsPage() {
               <div className="space-y-4">
                 {filteredBookings.map((booking) => (
                   <div 
-                    key={booking.bookingId} 
+                    key={booking.id} 
                     className="border border-gray-200 rounded-lg p-6 hover:shadow-sm transition-shadow cursor-pointer"
                     onClick={() => {
                       setSelectedBooking(booking);
@@ -314,21 +343,48 @@ export default function AdminBookingsPage() {
                       setDialogOpen(true);
                     }}
                   >
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                        <div className="flex items-center gap-2 mb-3">
                           <h3 className="text-lg font-semibold">{booking.serviceCategory}</h3>
                           <Badge className={getStatusColor(booking.status)}>
                             {getStatusText(booking.status)}
                           </Badge>
                         </div>
                         
-                        <div className="space-y-2 text-sm text-gray-600">
-                          <div className="flex items-center gap-2">
-                            <User className="h-4 w-4" />
-                            <span>User ID: {booking.userId}</span>
+                        {/* Client Information */}
+                        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                          <h4 className="font-medium mb-2 text-sm text-gray-700">Client Information</h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                            <div className="flex items-center gap-2">
+                              {booking.userInfo?.profileImageUrl ? (
+                                <img 
+                                  src={booking.userInfo.profileImageUrl} 
+                                  alt="Profile" 
+                                  className="w-6 h-6 rounded-full object-cover"
+                                />
+                              ) : (
+                                <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                                  <User className="h-3 w-3 text-gray-600" />
+                                </div>
+                              )}
+                              <span className="font-medium">{booking.userInfo?.displayName || 'Unknown User'}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Mail className="h-3 w-3 text-gray-400" />
+                              <span className="text-gray-600">{booking.userInfo?.email || 'No email'}</span>
+                            </div>
+                            {booking.userInfo?.phone && (
+                              <div className="flex items-center gap-2">
+                                <Phone className="h-3 w-3 text-gray-400" />
+                                <span className="text-gray-600">{booking.userInfo.phone}</span>
+                              </div>
+                            )}
                           </div>
-                          
+                        </div>
+
+                        {/* Booking Details */}
+                        <div className="space-y-2 text-sm text-gray-600">
                           <div className="flex items-center gap-2">
                             <Calendar className="h-4 w-4" />
                             <span>{new Date(booking.startDateTime).toLocaleDateString()}</span>
@@ -349,17 +405,28 @@ export default function AdminBookingsPage() {
                         </div>
 
                         {booking.additionalNotes && (
-                          <div className="mt-3 p-3 bg-gray-50 rounded-md">
-                            <p className="text-sm text-gray-700">
+                          <div className="mt-3 p-3 bg-blue-50 rounded-md">
+                            <p className="text-sm text-blue-700">
                               <strong>Client Notes:</strong> {booking.additionalNotes}
+                            </p>
+                          </div>
+                        )}
+
+                        {booking.adminNotes && (
+                          <div className="mt-3 p-3 bg-green-50 rounded-md">
+                            <p className="text-sm text-green-700">
+                              <strong>Admin Response:</strong> {booking.adminNotes}
                             </p>
                           </div>
                         )}
                       </div>
 
-                      <div className="text-sm text-gray-500 flex items-center gap-2">
+                      <div className="text-sm text-gray-500 flex items-center gap-2 flex-shrink-0">
                         <Eye className="h-4 w-4" />
-                        <span>Click to review</span>
+                        <div>
+                          <div>Submitted</div>
+                          <div>{new Date(booking.createdAt).toLocaleDateString()}</div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -371,13 +438,43 @@ export default function AdminBookingsPage() {
 
         {/* Booking Review Dialog */}
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Review Booking Request</DialogTitle>
             </DialogHeader>
             
             {selectedBooking && (
               <div className="space-y-6">
+                {/* Client Information */}
+                <div className="p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold mb-3">Client Information</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="flex items-center gap-2">
+                      {selectedBooking.userInfo?.profileImageUrl ? (
+                        <img 
+                          src={selectedBooking.userInfo.profileImageUrl} 
+                          alt="Profile" 
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-600" />
+                        </div>
+                      )}
+                      <div>
+                        <p className="font-medium">{selectedBooking.userInfo?.displayName || 'Unknown User'}</p>
+                        <p className="text-sm text-gray-600">{selectedBooking.userInfo?.email || 'No email'}</p>
+                      </div>
+                    </div>
+                    {selectedBooking.userInfo?.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <span>{selectedBooking.userInfo.phone}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 {/* Booking Details */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -396,7 +493,7 @@ export default function AdminBookingsPage() {
                 {selectedBooking.additionalNotes && (
                   <div>
                     <h4 className="font-semibold mb-2">Client Notes</h4>
-                    <div className="p-3 bg-gray-50 rounded-md">
+                    <div className="p-3 bg-blue-50 rounded-md">
                       <p className="text-sm">{selectedBooking.additionalNotes}</p>
                     </div>
                   </div>
@@ -430,26 +527,36 @@ export default function AdminBookingsPage() {
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-3">
-                  <Button
-                    onClick={() => updateBookingStatus(selectedBooking.bookingId, 'accepted', adminNotes)}
-                    disabled={updating}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    {updating ? 'Updating...' : 'Approve Booking'}
-                  </Button>
-                  
-                  <Button
-                    onClick={() => updateBookingStatus(selectedBooking.bookingId, 'rejected', adminNotes)}
-                    disabled={updating}
-                    variant="destructive"
-                    className="flex-1"
-                  >
-                    <XCircle className="h-4 w-4 mr-2" />
-                    {updating ? 'Updating...' : 'Decline Booking'}
-                  </Button>
-                </div>
+                {selectedBooking.status === 'pending' && (
+                  <div className="flex gap-3">
+                    <Button
+                      onClick={() => updateBookingStatus(selectedBooking.id, 'accepted', adminNotes)}
+                      disabled={updating}
+                      className="flex-1 bg-green-600 hover:bg-green-700"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      {updating ? 'Updating...' : 'Approve Booking'}
+                    </Button>
+                    
+                    <Button
+                      onClick={() => updateBookingStatus(selectedBooking.id, 'rejected', adminNotes)}
+                      disabled={updating}
+                      variant="destructive"
+                      className="flex-1"
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      {updating ? 'Updating...' : 'Decline Booking'}
+                    </Button>
+                  </div>
+                )}
+
+                {selectedBooking.status !== 'pending' && (
+                  <div className="p-3 bg-gray-100 rounded-md text-center">
+                    <p className="text-gray-600">
+                      This booking has already been {selectedBooking.status === 'accepted' ? 'approved' : 'declined'}.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </DialogContent>

@@ -2,45 +2,46 @@ import { initializeApp, getApps, cert } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 
-// Check if required environment variables are present
-const requiredEnvVars = {
-  FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID,
-  FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL,
-  FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY,
-};
+let adminDb: any = null;
+let adminAuth: any = null;
 
-// Validate environment variables
-const missingVars = Object.entries(requiredEnvVars)
-  .filter(([key, value]) => !value)
-  .map(([key]) => key);
-
-if (missingVars.length > 0) {
-  console.warn(`Missing Firebase Admin environment variables: ${missingVars.join(', ')}`);
-  console.warn('Firebase Admin SDK will not be initialized. Some server-side features may not work.');
-}
-
-// Only initialize if all required environment variables are present
-if (!getApps().length && missingVars.length === 0) {
+// Initialize Firebase Admin SDK
+if (!getApps().length) {
   try {
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+    const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
     
-    if (!privateKey || !privateKey.includes('-----BEGIN PRIVATE KEY-----')) {
-      throw new Error('FIREBASE_PRIVATE_KEY must be a valid PEM formatted private key');
+    if (!serviceAccountJson) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_JSON environment variable is not set');
     }
 
-  initializeApp({
-    credential: cert({
-      projectId: process.env.FIREBASE_PROJECT_ID,
-      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey,
-    }),
-  });
+    const serviceAccount = JSON.parse(serviceAccountJson);
+    
+    const app = initializeApp({
+      credential: cert(serviceAccount),
+    });
+
+    adminDb = getFirestore(app);
+    adminAuth = getAuth(app);
+    
+    console.log('Firebase Admin SDK initialized successfully');
   } catch (error) {
     console.error('Failed to initialize Firebase Admin SDK:', error);
-    console.error('Please check your Firebase environment variables in .env.local');
+    console.error('Please check your FIREBASE_SERVICE_ACCOUNT_JSON in .env.local');
+    
+    // Set to null to ensure no partial initialization
+    adminDb = null;
+    adminAuth = null;
+  }
+} else {
+  // If app already exists, just get the services
+  try {
+    adminDb = getFirestore();
+    adminAuth = getAuth();
+  } catch (error) {
+    console.error('Error getting Firebase services:', error);
+    adminDb = null;
+    adminAuth = null;
   }
 }
 
-// Export with fallback handling
-export const adminDb = missingVars.length === 0 ? getFirestore() : null;
-export const adminAuth = missingVars.length === 0 ? getAuth() : null;
+export { adminDb, adminAuth };

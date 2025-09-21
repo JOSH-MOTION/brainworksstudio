@@ -12,7 +12,6 @@ import {
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
 import { auth, db } from '@/lib/firebase'
 import { User } from '@/types'
-import { toast } from 'sonner'
 
 interface UseAuthReturn {
   user: User | null
@@ -24,6 +23,7 @@ interface UseAuthReturn {
   signOut: () => Promise<void>
   updateUserProfile: (userData: Partial<User>) => Promise<void>
   isAdmin: boolean
+  refreshUserProfile: () => Promise<void>
 }
 
 // Create Auth Context
@@ -31,8 +31,8 @@ const AuthContext = createContext<UseAuthReturn | undefined>(undefined)
 
 // Auth Provider Component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const auth = useAuthInternal()
-  return React.createElement(AuthContext.Provider, { value: auth }, children)
+  const authValue = useAuthInternal()
+  return React.createElement(AuthContext.Provider, { value: authValue }, children)
 }
 
 // Custom hook to use auth context
@@ -50,6 +50,23 @@ function useAuthInternal(): UseAuthReturn {
   const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const refreshUserProfile = async () => {
+    if (!firebaseUser || !db) return;
+
+    try {
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+      if (userDoc.exists()) {
+        const userData = userDoc.data()
+        setUser({
+          ...userData,
+          createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
+        } as User)
+      }
+    } catch (error) {
+      console.error('Error refreshing user profile:', error)
+    }
+  }
+
   useEffect(() => {
     // If Firebase is not initialized, set loading to false and return
     if (!auth) {
@@ -59,18 +76,29 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      console.log('Auth state changed:', firebaseUser?.uid || 'No user');
+      
       try {
         if (firebaseUser) {
           setFirebaseUser(firebaseUser)
+          
+          if (!db) {
+            console.warn('Firestore not initialized');
+            setLoading(false);
+            return;
+          }
+
           // Get user data from Firestore
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
           if (userDoc.exists()) {
             const userData = userDoc.data()
+            console.log('User data loaded:', userData.email, userData.role);
             setUser({
               ...userData,
-              createdAt: userData.createdAt?.toDate(),
+              createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
             } as User)
           } else {
+            console.log('User document does not exist, creating...');
             // Create user document if it doesn't exist
             const newUser: User = {
               uid: firebaseUser.uid,
@@ -83,12 +111,12 @@ function useAuthInternal(): UseAuthReturn {
             setUser(newUser)
           }
         } else {
+          console.log('User signed out');
           setUser(null)
           setFirebaseUser(null)
         }
       } catch (error) {
         console.error('Auth state change error:', error)
-        toast.error('Authentication error occurred')
       } finally {
         setLoading(false)
       }
@@ -98,6 +126,10 @@ function useAuthInternal(): UseAuthReturn {
   }, [])
 
   const signUp = async (email: string, password: string, userData: Partial<User>) => {
+    if (!auth || !db) {
+      throw new Error('Firebase not initialized');
+    }
+
     try {
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password)
       
@@ -118,9 +150,8 @@ function useAuthInternal(): UseAuthReturn {
       }
 
       await setDoc(doc(db, 'users', firebaseUser.uid), newUser)
-      toast.success('Account created successfully!')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to create account')
+      console.error('Signup error:', error);
       throw error
     }
   }
@@ -132,9 +163,8 @@ function useAuthInternal(): UseAuthReturn {
 
     try {
       await signInWithEmailAndPassword(auth, email, password)
-      toast.success('Signed in successfully!')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in')
+      console.error('Signin error:', error);
       throw error
     }
   }
@@ -146,9 +176,8 @@ function useAuthInternal(): UseAuthReturn {
 
     try {
       await firebaseSignOut(auth)
-      toast.success('Signed out successfully!')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to sign out')
+      console.error('Signout error:', error);
       throw error
     }
   }
@@ -159,16 +188,14 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     if (!user) {
-      toast.error('No user logged in to update profile');
-      return;
+      throw new Error('No user logged in to update profile');
     }
 
     try {
       await updateDoc(doc(db, 'users', user.uid), userData)
       setUser({ ...user, ...userData })
-      toast.success('Profile updated successfully!')
     } catch (error: any) {
-      toast.error(error.message || 'Failed to update profile')
+      console.error('Update profile error:', error);
       throw error
     }
   }
@@ -182,6 +209,7 @@ function useAuthInternal(): UseAuthReturn {
     signIn,
     signOut,
     updateUserProfile,
+    refreshUserProfile,
     isAdmin: user?.role === 'admin',
   }
 }
