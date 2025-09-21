@@ -7,7 +7,8 @@ import AdminLayout from '@/components/AdminLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, User, Clock, MapPin, FileText, Eye } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Calendar, User, Clock, MapPin, FileText, Check, X, MessageSquare, RefreshCw } from 'lucide-react';
 
 interface Booking {
   id: string;
@@ -22,7 +23,7 @@ interface Booking {
   serviceCategory: string;
   startDateTime: Date;
   endDateTime: Date;
-  location: string;
+  location: any;
   additionalNotes: string;
   adminNotes: string;
   status: string;
@@ -37,40 +38,104 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingBooking, setUpdatingBooking] = useState<string | null>(null);
+  const [declineNotes, setDeclineNotes] = useState<{ [key: string]: string }>({});
+  const [showDeclineForm, setShowDeclineForm] = useState<{ [key: string]: boolean }>({});
+
+  // Debug logging
+  useEffect(() => {
+    console.log('AdminBookingsPage - Auth state:', { 
+      user: !!user, 
+      isAdmin, 
+      authLoading,
+      firebaseUser: !!firebaseUser,
+      userEmail: user?.email 
+    });
+  }, [user, isAdmin, authLoading, firebaseUser]);
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
+      console.log('Redirecting to login - user:', !!user, 'isAdmin:', isAdmin);
       router.push('/auth/login');
     }
   }, [user, isAdmin, authLoading, router]);
 
   useEffect(() => {
-    if (user && isAdmin && firebaseUser) {
+    if (user && isAdmin && firebaseUser && !authLoading) {
+      console.log('Fetching bookings...');
       fetchBookings();
     }
-  }, [user, isAdmin, firebaseUser]);
+  }, [user, isAdmin, firebaseUser, authLoading]);
 
   const fetchBookings = async () => {
     try {
-      if (!firebaseUser) return;
+      if (!firebaseUser) {
+        console.error('No firebase user available');
+        return;
+      }
       
+      console.log('Getting ID token...');
       const token = await firebaseUser.getIdToken();
+      console.log('Making API request...');
+      
       const response = await fetch('/api/admin/bookings', {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
+      console.log('API response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch bookings');
+        const errorText = await response.text();
+        console.error('API error:', response.status, errorText);
+        throw new Error(`Failed to fetch bookings: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('Received bookings:', data.length, 'bookings');
       setBookings(data);
+      setError(null);
     } catch (err) {
+      console.error('Error fetching bookings:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateBookingStatus = async (bookingId: string, status: 'accepted' | 'rejected', adminNotes = '') => {
+    if (!firebaseUser) return;
+
+    setUpdatingBooking(bookingId);
+    try {
+      const token = await firebaseUser.getIdToken();
+      const response = await fetch(`/api/admin/bookings/${bookingId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status, adminNotes }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update booking status');
+      }
+
+      // Refresh bookings
+      await fetchBookings();
+      
+      // Clear decline form state
+      setShowDeclineForm(prev => ({ ...prev, [bookingId]: false }));
+      setDeclineNotes(prev => ({ ...prev, [bookingId]: '' }));
+      
+      alert(`Booking ${status === 'accepted' ? 'approved' : 'declined'} successfully!`);
+    } catch (error) {
+      console.error('Error updating booking:', error);
+      alert('Failed to update booking status. Please try again.');
+    } finally {
+      setUpdatingBooking(null);
     }
   };
 
@@ -78,8 +143,8 @@ export default function AdminBookingsPage() {
     switch (status) {
       case 'pending':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'confirmed':
       case 'accepted':
+      case 'confirmed':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'rejected':
       case 'cancelled':
@@ -87,6 +152,12 @@ export default function AdminBookingsPage() {
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
+  };
+
+  const getLocationText = (location: any) => {
+    if (typeof location === 'string') return location;
+    if (location?.address) return location.address;
+    return 'Location not specified';
   };
 
   // Loading state
@@ -97,6 +168,10 @@ export default function AdminBookingsPage() {
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-700 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading bookings...</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Auth: {authLoading ? 'Loading...' : 'Ready'} | 
+              Data: {loading ? 'Loading...' : 'Ready'}
+            </p>
           </div>
         </div>
       </AdminLayout>
@@ -108,14 +183,21 @@ export default function AdminBookingsPage() {
     return (
       <AdminLayout>
         <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
+          <div className="text-center max-w-md">
             <div className="text-red-600 mb-4">
               <p className="text-xl font-semibold">Error Loading Bookings</p>
-              <p className="text-gray-600">{error}</p>
+              <p className="text-gray-600 mt-2">{error}</p>
             </div>
             <Button onClick={fetchBookings} className="bg-red-700 hover:bg-red-800">
+              <RefreshCw className="h-4 w-4 mr-2" />
               Try Again
             </Button>
+            <div className="mt-4 text-sm text-gray-500">
+              <p>Debug info:</p>
+              <p>User: {user?.email || 'None'}</p>
+              <p>Admin: {isAdmin ? 'Yes' : 'No'}</p>
+              <p>Firebase User: {firebaseUser ? 'Available' : 'None'}</p>
+            </div>
           </div>
         </div>
       </AdminLayout>
@@ -124,7 +206,16 @@ export default function AdminBookingsPage() {
 
   // Auth check
   if (!user || !isAdmin) {
-    return null;
+    return (
+      <AdminLayout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-red-600">Access Denied</p>
+            <p className="text-gray-600">You need admin privileges to access this page.</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
   }
 
   // Main content
@@ -141,6 +232,10 @@ export default function AdminBookingsPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
+              <Button onClick={fetchBookings} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
               <Badge className="bg-blue-100 text-blue-800 px-3 py-1">
                 Total: {bookings.length}
               </Badge>
@@ -158,6 +253,10 @@ export default function AdminBookingsPage() {
               <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">No bookings found</p>
               <p className="text-gray-400">Client booking requests will appear here</p>
+              <Button onClick={fetchBookings} className="mt-4" variant="outline">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh Bookings
+              </Button>
             </CardContent>
           </Card>
         ) : (
@@ -195,7 +294,7 @@ export default function AdminBookingsPage() {
                       
                       <div className="flex items-center gap-3">
                         <MapPin className="h-5 w-5 text-gray-400" />
-                        <p className="text-sm">{booking.location || 'Location not specified'}</p>
+                        <p className="text-sm">{getLocationText(booking.location)}</p>
                       </div>
                     </div>
                     
@@ -258,26 +357,79 @@ export default function AdminBookingsPage() {
                   )}
                   
                   {/* Actions */}
-                  <div className="border-t pt-4 flex gap-2 flex-wrap">
-                    <Button className="bg-blue-600 hover:bg-blue-700" size="sm">
-                      <Eye className="h-4 w-4 mr-2" />
-                      View Details
-                    </Button>
-                    
-                    {booking.status === 'pending' && (
-                      <>
-                        <Button className="bg-green-600 hover:bg-green-700" size="sm">
-                          Approve
+                  <div className="border-t pt-4">
+                    {booking.status === 'pending' ? (
+                      <div className="space-y-4">
+                        <div className="flex gap-2 flex-wrap">
+                          <Button 
+                            className="bg-green-600 hover:bg-green-700" 
+                            size="sm"
+                            onClick={() => updateBookingStatus(booking.id, 'accepted')}
+                            disabled={updatingBooking === booking.id}
+                          >
+                            <Check className="h-4 w-4 mr-2" />
+                            {updatingBooking === booking.id ? 'Approving...' : 'Approve'}
+                          </Button>
+                          
+                          <Button 
+                            variant="outline" 
+                            className="border-red-200 text-red-600 hover:bg-red-50" 
+                            size="sm"
+                            onClick={() => setShowDeclineForm(prev => ({ ...prev, [booking.id]: !prev[booking.id] }))}
+                            disabled={updatingBooking === booking.id}
+                          >
+                            <X className="h-4 w-4 mr-2" />
+                            Decline
+                          </Button>
+                          
+                          <Button variant="outline" size="sm">
+                            <MessageSquare className="h-4 w-4 mr-2" />
+                            Contact Client
+                          </Button>
+                        </div>
+                        
+                        {/* Decline Form */}
+                        {showDeclineForm[booking.id] && (
+                          <div className="border rounded-lg p-4 bg-red-50">
+                            <p className="font-medium text-sm text-red-800 mb-2">Decline Booking</p>
+                            <Textarea
+                              placeholder="Reason for declining (optional)"
+                              value={declineNotes[booking.id] || ''}
+                              onChange={(e) => setDeclineNotes(prev => ({ ...prev, [booking.id]: e.target.value }))}
+                              rows={3}
+                              className="mb-3"
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                onClick={() => updateBookingStatus(booking.id, 'rejected', declineNotes[booking.id] || '')}
+                                className="bg-red-600 hover:bg-red-700"
+                                disabled={updatingBooking === booking.id}
+                              >
+                                {updatingBooking === booking.id ? 'Declining...' : 'Confirm Decline'}
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => setShowDeclineForm(prev => ({ ...prev, [booking.id]: false }))}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Badge className={getStatusBadgeColor(booking.status)}>
+                          {booking.status === 'accepted' ? 'Approved' : booking.status === 'rejected' ? 'Declined' : booking.status}
+                        </Badge>
+                        <Button variant="outline" size="sm">
+                          <MessageSquare className="h-4 w-4 mr-2" />
+                          Contact Client
                         </Button>
-                        <Button variant="outline" className="border-red-200 text-red-600 hover:bg-red-50" size="sm">
-                          Decline
-                        </Button>
-                      </>
+                      </div>
                     )}
-                    
-                    <Button variant="outline" size="sm">
-                      Contact Client
-                    </Button>
                   </div>
                 </CardContent>
               </Card>
