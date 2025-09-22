@@ -1,124 +1,104 @@
+// app/api/bookings/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
-import { sendBookingConfirmation, createTransporter } from '@/lib/nodemailer';
-import { uploadToCloudinary } from '@/lib/cloudinary';
+import { getFirestore, QueryDocumentSnapshot, DocumentData, CollectionReference, Query } from 'firebase-admin/firestore';
+import { getAuth } from 'firebase-admin/auth';
+import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
-export async function POST(request: NextRequest) {
+if (!getApps().length) {
   try {
-    const formData = await request.json();
-    
-    // Check if adminDb is available
-    if (!adminDb) {
-      console.error('Firebase Admin DB not initialized');
-      return NextResponse.json(
-        { error: 'Database not available' },
-        { status: 500 }
-      );
-    }
-    
-    // Upload attachments to Cloudinary if any
-    const attachmentUrls = [];
-    if (formData.attachments && formData.attachments.length > 0) {
-      for (const file of formData.attachments) {
-        const result = await uploadToCloudinary(file, 'bookings');
-        attachmentUrls.push(result.secure_url);
-      }
-    }
-
-    // Create booking document
-    const bookingData = {
-      userId: formData.userId,
-      serviceCategory: formData.serviceCategory,
-      startDateTime: new Date(`${formData.date}T${formData.startTime}`),
-      endDateTime: new Date(`${formData.date}T${formData.endTime}`),
-      location: {
-        address: formData.address,
-      },
-      attachments: attachmentUrls,
-      additionalNotes: formData.additionalNotes || '',
-      status: 'pending',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    // Add to Firestore
-    const docRef = await adminDb.collection('bookings').add(bookingData);
-    
-    // Update with the generated ID
-    await docRef.update({ bookingId: docRef.id });
-
-    // Send confirmation email to user
-    try {
-      await sendBookingConfirmation(formData.userEmail, {
-        userName: formData.userName,
-        serviceCategory: formData.serviceCategory,
-        date: formData.date,
-        startTime: formData.startTime,
-        endTime: formData.endTime,
-        location: formData.address,
-      });
-    } catch (emailError) {
-      console.error('Error sending confirmation email:', emailError);
-      // Don't fail the booking if email fails
-    }
-
-    // Send admin notification email
-    try {
-      const transporter = createTransporter();
-      await transporter.sendMail({
-        from: process.env.GMAIL_USER,
-        to: process.env.GMAIL_USER, // Admin email
-        subject: 'New Booking Request - Brain Works Studio',
-        html: `
-          <h2>New Booking Request</h2>
-          <p><strong>Client:</strong> ${formData.userName}</p>
-          <p><strong>Email:</strong> ${formData.userEmail}</p>
-          <p><strong>Service:</strong> ${formData.serviceCategory}</p>
-          <p><strong>Date:</strong> ${formData.date}</p>
-          <p><strong>Time:</strong> ${formData.startTime} - ${formData.endTime}</p>
-          <p><strong>Location:</strong> ${formData.address}</p>
-          ${formData.additionalNotes ? `<p><strong>Notes:</strong> ${formData.additionalNotes}</p>` : ''}
-          <p><a href="${process.env.NEXT_PUBLIC_APP_URL}/admin/bookings">View in Admin Panel</a></p>
-        `,
-      });
-    } catch (emailError) {
-      console.error('Error sending admin notification email:', emailError);
-      // Don't fail the booking if email fails
-    }
-
-    return NextResponse.json({ success: true, bookingId: docRef.id });
+    initializeApp({
+      credential: cert(JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_JSON!)),
+    });
+    console.log('Firebase Admin SDK initialized successfully');
   } catch (error) {
-    console.error('Error creating booking:', error);
+    console.error('Error initializing Firebase Admin SDK:', error);
+    throw new Error('Firebase Admin initialization failed');
+  }
+}
+
+const db = getFirestore();
+const auth = getAuth();
+
+export async function GET(req: NextRequest) {
+  try {
+    const authHeader = req.headers.get('Authorization');
+    console.log('Authorization header:', authHeader ? 'Present' : 'Missing');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized: Missing or invalid token' }, { status: 401 });
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    let decodedToken;
+    try {
+      decodedToken = await auth.verifyIdToken(token);
+      console.log('Token verified for user:', decodedToken.uid);
+    } catch (error) {
+      console.error('Token verification error:', error);
+      return NextResponse.json({ error: 'Unauthorized: Invalid token' }, { status: 401 });
+    }
+
+    const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+    console.log('User doc exists:', userDoc.exists, 'Role:', userDoc.data()?.role);
+    if (!userDoc.exists || userDoc.data()?.role !== 'admin') {
+      return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status');
+    console.log('Status filter:', status);
+
+    let bookingsQuery: CollectionReference<DocumentData> | Query<DocumentData> = db.collection('bookings');
+    if (status) {
+      bookingsQuery = bookingsQuery.where('status', '==', status);
+    }
+
+    const bookingsSnapshot = await bookingsQuery.get();
+    console.log('Bookings fetched:', bookingsSnapshot.size);
+    const bookings = bookingsSnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+      id: doc.id,
+      ...doc.data(),
+      date: doc.data().date ? doc.data().date.toDate().toISOString() : null,
+    }));
+
+    return NextResponse.json(bookings, { status: 200 });
+  } catch (error: any) {
+    console.error('Error fetching bookings:', error);
     return NextResponse.json(
-      { error: 'Failed to create booking' },
+      { error: 'Failed to fetch bookings', debug: error.message },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: NextRequest) {
+export async function POST(req: NextRequest) {
   try {
-    if (!adminDb) {
-      return NextResponse.json(
-        { error: 'Database not available' },
-        { status: 500 }
-      );
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized: Missing or invalid token' }, { status: 401 });
     }
 
-    const bookingsSnapshot = await adminDb.collection('bookings')
-      .orderBy('createdAt', 'desc')
-      .get();
-    
-    const bookings = bookingsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const token = authHeader.replace('Bearer ', '');
+    const decodedToken = await auth.verifyIdToken(token);
 
-    return NextResponse.json(bookings);
-  } catch (error) {
-    console.error('Error fetching bookings:', error);
+    const { date, type, clientId, status = 'pending' } = await req.json();
+    if (!date || !type || !clientId) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
+    const bookingRef = await db.collection('bookings').add({
+      date: new Date(date),
+      type,
+      clientId,
+      userId: decodedToken.uid,
+      status,
+      createdAt: new Date().toISOString(),
+    });
+
+    return NextResponse.json({ id: bookingRef.id, message: 'Booking created successfully' }, { status: 201 });
+  } catch (error: any) {
+    console.error('Error creating booking:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch bookings' },
+      { error: 'Failed to create booking', debug: error.message },
       { status: 500 }
     );
   }
