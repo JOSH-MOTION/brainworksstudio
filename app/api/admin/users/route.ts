@@ -1,6 +1,6 @@
 // app/api/admin/users/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { getFirestore } from 'firebase-admin/firestore';
+import { getFirestore, CollectionReference, Query, DocumentData } from 'firebase-admin/firestore';
 import { getAuth } from 'firebase-admin/auth';
 import { initializeApp, getApps, cert } from 'firebase-admin/app';
 
@@ -48,7 +48,8 @@ export async function GET(req: NextRequest) {
     const role = searchParams.get('role');
     console.log('Role filter:', role);
 
-    let usersQuery = db.collection('users');
+    // Explicitly type usersQuery as Query<DocumentData> | CollectionReference<DocumentData>
+    let usersQuery: Query<DocumentData> | CollectionReference<DocumentData> = db.collection('users');
     if (role) {
       usersQuery = usersQuery.where('role', '==', role);
     }
