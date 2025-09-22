@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import React, { useState, useEffect, createContext, useContext } from 'react'
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { 
   User as FirebaseUser, 
   signInWithEmailAndPassword, 
@@ -8,67 +8,66 @@ import {
   signOut as firebaseSignOut,
   onAuthStateChanged,
   updateProfile
-} from 'firebase/auth'
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore'
-import { auth, db } from '@/lib/firebase'
-import { User } from '@/types'
+} from 'firebase/auth';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import { User } from '@/types';
 
 interface UseAuthReturn {
-  user: User | null
-  firebaseUser: FirebaseUser | null
-  userProfile: User | null
-  loading: boolean
-  signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>
-  signIn: (email: string, password: string) => Promise<void>
-  signOut: () => Promise<void>
-  updateUserProfile: (userData: Partial<User>) => Promise<void>
-  isAdmin: boolean
-  refreshUserProfile: () => Promise<void>
+  user: User | null;
+  firebaseUser: FirebaseUser | null;
+  userProfile: User | null;
+  loading: boolean;
+  signUp: (email: string, password: string, userData: Partial<User>) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+  updateUserProfile: (userData: Partial<User>) => Promise<void>;
+  isAdmin: boolean;
+  refreshUserProfile: () => Promise<void>;
 }
 
 // Create Auth Context
-const AuthContext = createContext<UseAuthReturn | undefined>(undefined)
+const AuthContext = createContext<UseAuthReturn | undefined>(undefined);
 
 // Auth Provider Component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const authValue = useAuthInternal()
-  return React.createElement(AuthContext.Provider, { value: authValue }, children)
+  const authValue = useAuthInternal();
+  return React.createElement(AuthContext.Provider, { value: authValue }, children);
 }
 
 // Custom hook to use auth context
 export function useAuth(): UseAuthReturn {
-  const context = useContext(AuthContext)
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider')
+    throw new Error('useAuth must be used within an AuthProvider');
   }
-  return context
+  return context;
 }
 
 // Internal auth logic
 function useAuthInternal(): UseAuthReturn {
-  const [user, setUser] = useState<User | null>(null)
-  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [user, setUser] = useState<User | null>(null);
+  const [firebaseUser, setFirebaseUser] = useState<FirebaseUser | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const refreshUserProfile = async () => {
     if (!firebaseUser || !db) return;
 
     try {
-      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+      const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       if (userDoc.exists()) {
-        const userData = userDoc.data()
+        const userData = userDoc.data();
         setUser({
           ...userData,
           createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
-        } as User)
+        } as User);
       }
     } catch (error) {
-      console.error('Error refreshing user profile:', error)
+      console.error('Error refreshing user profile:', error);
     }
-  }
+  };
 
   useEffect(() => {
-    // If Firebase is not initialized, set loading to false and return
     if (!auth) {
       console.warn('Firebase Auth not initialized. Authentication features disabled.');
       setLoading(false);
@@ -80,7 +79,7 @@ function useAuthInternal(): UseAuthReturn {
       
       try {
         if (firebaseUser) {
-          setFirebaseUser(firebaseUser)
+          setFirebaseUser(firebaseUser);
           
           if (!db) {
             console.warn('Firestore not initialized');
@@ -88,42 +87,44 @@ function useAuthInternal(): UseAuthReturn {
             return;
           }
 
-          // Get user data from Firestore
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid))
+          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
           if (userDoc.exists()) {
-            const userData = userDoc.data()
+            const userData = userDoc.data();
             console.log('User data loaded:', userData.email, userData.role);
             setUser({
               ...userData,
               createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
-            } as User)
+            } as User);
           } else {
             console.log('User document does not exist, creating...');
-            // Create user document if it doesn't exist
             const newUser: User = {
               uid: firebaseUser.uid,
               email: firebaseUser.email!,
               displayName: firebaseUser.displayName || '',
               role: 'user',
               createdAt: new Date(),
-            }
-            await setDoc(doc(db, 'users', firebaseUser.uid), newUser)
-            setUser(newUser)
+              phone: null,
+              address: null,
+              location: null,
+              profileImageUrl: null,
+            };
+            await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+            setUser(newUser);
           }
         } else {
           console.log('User signed out');
-          setUser(null)
-          setFirebaseUser(null)
+          setUser(null);
+          setFirebaseUser(null);
         }
       } catch (error) {
-        console.error('Auth state change error:', error)
+        console.error('Auth state change error:', error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    })
+    });
 
-    return unsubscribe
-  }, [])
+    return unsubscribe;
+  }, []);
 
   const signUp = async (email: string, password: string, userData: Partial<User>) => {
     if (!auth || !db) {
@@ -131,30 +132,30 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     try {
-      const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password)
+      const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
       
       if (userData.displayName) {
-        await updateProfile(firebaseUser, { displayName: userData.displayName })
+        await updateProfile(firebaseUser, { displayName: userData.displayName });
       }
 
       const newUser: User = {
         uid: firebaseUser.uid,
         email: firebaseUser.email!,
         displayName: userData.displayName || '',
-        phone: userData.phone,
-        address: userData.address,
-        location: userData.location,
-        profileImageUrl: userData.profileImageUrl,
+        phone: userData.phone || null,
+        address: userData.address || null,
+        location: userData.location || null,
+        profileImageUrl: userData.profileImageUrl || null,
         role: userData.role || 'user',
         createdAt: new Date(),
-      }
+      };
 
-      await setDoc(doc(db, 'users', firebaseUser.uid), newUser)
+      await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
     } catch (error: any) {
       console.error('Signup error:', error);
-      throw error
+      throw error;
     }
-  }
+  };
 
   const signIn = async (email: string, password: string) => {
     if (!auth) {
@@ -162,12 +163,12 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     try {
-      await signInWithEmailAndPassword(auth, email, password)
+      await signInWithEmailAndPassword(auth, email, password);
     } catch (error: any) {
       console.error('Signin error:', error);
-      throw error
+      throw error;
     }
-  }
+  };
 
   const signOut = async () => {
     if (!auth) {
@@ -175,12 +176,12 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     try {
-      await firebaseSignOut(auth)
+      await firebaseSignOut(auth);
     } catch (error: any) {
       console.error('Signout error:', error);
-      throw error
+      throw error;
     }
-  }
+  };
 
   const updateUserProfile = async (userData: Partial<User>) => {
     if (!db) {
@@ -192,13 +193,13 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), userData)
-      setUser({ ...user, ...userData })
+      await updateDoc(doc(db, 'users', user.uid), userData);
+      setUser({ ...user, ...userData });
     } catch (error: any) {
       console.error('Update profile error:', error);
-      throw error
+      throw error;
     }
-  }
+  };
 
   return {
     user,
@@ -211,5 +212,5 @@ function useAuthInternal(): UseAuthReturn {
     updateUserProfile,
     refreshUserProfile,
     isAdmin: user?.role === 'admin',
-  }
+  };
 }

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Shield, Camera, User } from 'lucide-react';
+import { Shield } from 'lucide-react';
 
 export default function AdminSignupPage() {
   const [formData, setFormData] = useState({
@@ -52,14 +52,18 @@ export default function AdminSignupPage() {
     }
 
     try {
-      // Create admin user with role set to admin
       await signUp(formData.email, formData.password, {
         displayName: formData.displayName,
-        role: 'admin'
+        role: 'admin',
       });
       router.push('/admin');
     } catch (error: any) {
-      setError(error.message || 'An error occurred during admin signup');
+      setError(
+        error.message.includes('invalid-email') ? 'Invalid email address' :
+        error.message.includes('email-already-in-use') ? 'Email is already in use' :
+        error.message.includes('weak-password') ? 'Password is too weak (minimum 6 characters)' :
+        error.message || 'An error occurred during admin signup'
+      );
     } finally {
       setLoading(false);
     }
