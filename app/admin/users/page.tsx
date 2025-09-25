@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { User as UserIcon, RefreshCw, AlertCircle } from 'lucide-react';
-import AdminLayout from '@/components/AdminLayout';
+
 import Link from 'next/link';
 
 interface User {
@@ -86,33 +86,33 @@ export default function AdminUsersPage() {
 
   if (authLoading || loading) {
     return (
-      <AdminLayout>
+ 
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-red-700 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading users...</p>
           </div>
         </div>
-      </AdminLayout>
+     
     );
   }
 
   if (!user || !isAdmin) {
     return (
-      <AdminLayout>
+    
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <p className="text-red-600 text-xl font-semibold">Access Denied</p>
             <p className="text-gray-600 mt-2">You need admin privileges to access this page.</p>
           </div>
         </div>
-      </AdminLayout>
+     
     );
   }
 
   if (error) {
     return (
-      <AdminLayout>
+     
         <div className="min-h-screen flex items-center justify-center">
           <div className="max-w-2xl w-full text-center">
             <div className="text-red-600 mb-6">
@@ -131,12 +131,12 @@ export default function AdminUsersPage() {
             </Button>
           </div>
         </div>
-      </AdminLayout>
+     
     );
   }
 
   return (
-    <AdminLayout>
+   
       <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -231,6 +231,6 @@ export default function AdminUsersPage() {
           </Link>
         </div>
       </div>
-    </AdminLayout>
+   
   );
 }

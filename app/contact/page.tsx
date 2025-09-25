@@ -89,7 +89,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">Email</h3>
-                    <p className="text-gray-600">hello@brainworksstudio.com</p>
+                    <p className="text-gray-600">hello@brainworksstudio2.com</p>
                     <p className="text-sm text-gray-500">We'll respond within 24 hours</p>
                   </div>
                 </div>
@@ -100,7 +100,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-medium">Phone</h3>
-                    <p className="text-gray-600">(555) 123-4567</p>
+                    <p className="text-gray-600">+233 242403450</p>
                     <p className="text-sm text-gray-500">Mon-Fri, 9am-6pm EST</p>
                   </div>
                 </div>
@@ -139,7 +139,7 @@ export default function ContactPage() {
                   </p>
                   <Button variant="outline" className="w-full">
                     <Phone className="h-4 w-4 mr-2" />
-                    (555) 123-RUSH
+                    +233 242403450 
                   </Button>
                 </div>
               </CardContent>
@@ -211,7 +211,7 @@ export default function ContactPage() {
                           type="tel"
                           value={formData.phone}
                           onChange={handleChange}
-                          placeholder="(555) 123-4567"
+                          placeholder="+233 242403450"
                         />
                       </div>
                       

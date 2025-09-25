@@ -33,7 +33,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 
 **Gmail SMTP Configuration**
 ```
-GMAIL_USER=hello@brainworksstudio.com
+GMAIL_USER=hello@brainworksstudio2.com
 GMAIL_PASS=your_app_specific_password
 ```
 

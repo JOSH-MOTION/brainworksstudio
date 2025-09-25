@@ -432,14 +432,14 @@ export default function RootLayout({ children }: LayoutProps) {
                   <div className="space-y-2 text-blue-800">
                     <p>
                       Email:{' '}
-                      <a href="mailto:hello@brainworksstudio.com" className="hover:text-orange-500">
-                        hello@brainworksstudio.com
+                      <a href="mailto:hello@brainworksstudio2.com" className="hover:text-orange-500">
+                        hello@brainworksstudio2.com
                       </a>
                     </p>
                     <p>
                       Phone:{' '}
                       <a href="tel:+5551234567" className="hover:text-orange-500">
-                        (555) 123-4567
+                        +233 242403450
                       </a>
                     </p>
                     <p>Location: Your City, State</p>
