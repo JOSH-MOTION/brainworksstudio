@@ -57,10 +57,17 @@ function useAuthInternal(): UseAuthReturn {
       const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        console.log('Raw Firestore data:', userData); // Debug log
         setUser({
           ...userData,
+          phone: userData.phone ?? null, // Ensure null if undefined
+          address: userData.address ?? null,
+          location: userData.location ?? null,
+          profileImageUrl: userData.profileImageUrl ?? null,
           createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
         } as User);
+      } else {
+        console.warn('User document not found in Firestore');
       }
     } catch (error) {
       console.error('Error refreshing user profile:', error);
@@ -93,6 +100,10 @@ function useAuthInternal(): UseAuthReturn {
             console.log('User data loaded:', userData.email, userData.role);
             setUser({
               ...userData,
+              phone: userData.phone ?? null,
+              address: userData.address ?? null,
+              location: userData.location ?? null,
+              profileImageUrl: userData.profileImageUrl ?? null,
               createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
             } as User);
           } else {
@@ -123,13 +134,15 @@ function useAuthInternal(): UseAuthReturn {
       }
     });
 
-    return unsubscribe;
+    return () => unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, userData: Partial<User>) => {
     if (!auth || !db) {
       throw new Error('Firebase not initialized');
     }
+
+    console.log('Input userData:', userData); // Debug log
 
     try {
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
@@ -141,16 +154,18 @@ function useAuthInternal(): UseAuthReturn {
       const newUser: User = {
         uid: firebaseUser.uid,
         email: firebaseUser.email!,
-        displayName: userData.displayName || '',
-        phone: userData.phone || null,
-        address: userData.address || null,
-        location: userData.location || null,
-        profileImageUrl: userData.profileImageUrl || null,
-        role: userData.role || 'user',
+        displayName: userData.displayName ?? '',
+        phone: userData.phone ?? null,
+        address: userData.address ?? null,
+        location: userData.location ?? null,
+        profileImageUrl: userData.profileImageUrl ?? null,
+        role: userData.role ?? 'user',
         createdAt: new Date(),
       };
 
       await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+      console.log('Created new user:', newUser); // Debug log
+      setUser(newUser);
     } catch (error: any) {
       console.error('Signup error:', error);
       throw error;
@@ -193,8 +208,16 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     try {
-      await updateDoc(doc(db, 'users', user.uid), userData);
-      setUser({ ...user, ...userData });
+      const updatedData = {
+        ...userData,
+        phone: userData.phone ?? user.phone,
+        address: userData.address ?? user.address,
+        location: userData.location ?? user.location,
+        profileImageUrl: userData.profileImageUrl ?? user.profileImageUrl,
+      };
+      await updateDoc(doc(db, 'users', user.uid), updatedData);
+      setUser({ ...user, ...updatedData });
+      console.log('Updated user profile:', updatedData); // Debug log
     } catch (error: any) {
       console.error('Update profile error:', error);
       throw error;

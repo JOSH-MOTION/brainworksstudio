@@ -1,137 +1,284 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Camera, Users, Award, MapPin } from 'lucide-react';
+import Image from 'next/image';
+
+// Animation variants for sections
+const sectionVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
+// Animation variants for hero image
+const heroImageVariants = {
+  hidden: { opacity: 0, scale: 1.1 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: 'easeOut' } },
+};
+
+// Animation variants for cards
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.1, ease: 'easeOut' },
+  }),
+};
+
+// Animation variants for buttons
+const buttonVariants = {
+  hover: { scale: 1.05, transition: { duration: 0.2 } },
+  tap: { scale: 0.95 },
+};
 
 export default function Home() {
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-amber-700 via-orange-600 to-yellow-600 text-white">
-        <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
-          <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
-              Capture Your Perfect Moments
-            </h1>
-            <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto opacity-90">
-              Professional photography and videography services that bring your vision to life. 
-              From intimate portraits to grand events, we tell your story beautifully.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/portfolio">
-                <Button size="lg" variant="secondary" className="bg-white text-amber-800 hover:bg-gray-100">
-                  View Our Work
+      {/* Hero Section with Animated Image */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        className="relative min-h-[80vh] flex items-center justify-center text-white"
+      >
+        <motion.div
+          variants={heroImageVariants}
+          initial="hidden"
+          animate="visible"
+          className="absolute inset-0"
+        >
+          <Image
+            src="/hero-bg.jpg"
+            alt="Hero Background"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+        </motion.div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+          <motion.h1
+            className="text-4xl md:text-6xl font-bold mb-6 tracking-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Crafting Your Visual Legacy
+          </motion.h1>
+          <motion.p
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            Transform your moments into timeless art with our professional photography and videography services.
+          </motion.p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/portfolio">
+              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                <Button
+                  size="lg"
+                  className="bg-blue-600 text-white hover:bg-violet-600 transition-colors"
+                >
+                  Explore Portfolio
                 </Button>
-              </Link>
-              <Link href="/booking">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-amber-800">
-                  Book a Session
+              </motion.div>
+            </Link>
+            <Link href="/booking">
+              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
+                >
+                  Book Now
                 </Button>
-              </Link>
-            </div>
+              </motion.div>
+            </Link>
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Services Section */}
-      <section className="py-20 bg-white">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+        className="py-20 bg-white"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We specialize in creating stunning visual content across various photography and videography disciplines.
-            </p>
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              Our Expertise
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              Discover our range of professional photography and videography services tailored to your vision.
+            </motion.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow border-amber-200">
-                <CardHeader>
-                  <div className="mx-auto mb-4 p-3 bg-amber-100 rounded-full w-fit">
-                    <service.icon className="h-8 w-8 text-amber-700" />
-                  </div>
-                  <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription className="text-gray-600">
-                    {service.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
+              <motion.div
+                key={index}
+                custom={index}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={cardVariants}
+              >
+                <Card className="group border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white">
+                  <CardHeader>
+                    <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit group-hover:bg-violet-100 transition-colors">
+                      <service.icon className="h-8 w-8 text-blue-600" />
+                    </div>
+                    <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-600">{service.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
             ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* Why Choose Us Section */}
-      <section className="py-20 bg-amber-50">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+        className="py-20 bg-gray-50"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose Brain Works Studio</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              With years of experience and a passion for storytelling, we deliver exceptional results every time.
-            </p>
+            <motion.h2
+              className="text-3xl md:text-4xl font-bold text-gray-900 mb-4"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 0.5 }}
+            >
+              Why Brain Works Studio
+            </motion.h2>
+            <motion.p
+              className="text-lg text-gray-600 max-w-2xl mx-auto"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+            >
+              We bring creativity, expertise, and passion to every project, ensuring exceptional results.
+            </motion.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="mx-auto mb-4 p-3 bg-amber-700 rounded-full w-fit">
-                <Award className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Award-Winning Quality</h3>
-              <p className="text-gray-600">
-                Our work has been recognized with multiple industry awards and featured in prestigious publications.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="mx-auto mb-4 p-3 bg-amber-700 rounded-full w-fit">
-                <Users className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Expert Team</h3>
-              <p className="text-gray-600">
-                Our team of professional photographers and videographers bring creativity and technical expertise to every project.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="mx-auto mb-4 p-3 bg-amber-700 rounded-full w-fit">
-                <MapPin className="h-8 w-8 text-white" />
-              </div>
-              <h3 className="text-xl font-semibold mb-2">Flexible Locations</h3>
-              <p className="text-gray-600">
-                We travel to your desired location, whether it's a studio session, outdoor shoot, or special venue.
-              </p>
-            </div>
+            {[
+              {
+                icon: Award,
+                title: 'Award-Winning Excellence',
+                description:
+                  'Our work is recognized with industry awards and featured in top publications.',
+              },
+              {
+                icon: Users,
+                title: 'Skilled Professionals',
+                description:
+                  'Our team of creatives brings expertise and artistry to every project.',
+              },
+              {
+                icon: MapPin,
+                title: 'Versatile Locations',
+                description:
+                  'We capture your moments in studios, outdoors, or any location you choose.',
+              },
+            ].map((item, index) => (
+              <motion.div
+                key={index}
+                custom={index}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={cardVariants}
+              >
+                <div className="text-center">
+                  <div className="mx-auto mb-4 p-3 bg-blue-600 rounded-full w-fit group-hover:bg-violet-600 transition-colors">
+                    <item.icon className="h-8 w-8 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900">{item.title}</h3>
+                  <p className="text-gray-600">{item.description}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </motion.section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-amber-700 to-orange-600 text-white">
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+        className="py-20 bg-blue-600 text-white"
+      >
         <div className="max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Capture Your Story?</h2>
-          <p className="text-xl mb-8 opacity-90">
-            Let's discuss your vision and create something beautiful together. Get in touch today to book your session.
-          </p>
+          <motion.h2
+            className="text-3xl md:text-4xl font-bold mb-6"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            Let’s Create Your Story
+          </motion.h2>
+          <motion.p
+            className="text-lg mb-8 opacity-90"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            Connect with us to bring your vision to life with stunning photography and videography.
+          </motion.p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/booking">
-              <Button size="lg" variant="secondary" className="bg-white text-amber-800 hover:bg-gray-100">
-                Book Now
-              </Button>
+              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                <Button
+                  size="lg"
+                  className="bg-white text-blue-600 hover:bg-violet-600 hover:text-white transition-colors"
+                >
+                  Book Your Session
+                </Button>
+              </motion.div>
             </Link>
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-amber-800">
-                Get in Touch
-              </Button>
+              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-white text-white hover:bg-violet-600 hover:text-white transition-colors"
+                >
+                  Contact Us
+                </Button>
+              </motion.div>
             </Link>
           </div>
         </div>
-      </section>
+      </motion.section>
     </Layout>
   );
 }
@@ -139,32 +286,32 @@ export default function Home() {
 const services = [
   {
     title: 'Event Photography',
-    description: 'Capturing the energy and emotion of your special events, from corporate gatherings to celebrations.',
+    description: 'Capture the energy and emotion of your events, from corporate gatherings to celebrations.',
     icon: Camera,
   },
   {
     title: 'Portrait Sessions',
-    description: 'Professional headshots, family portraits, and personal branding photography that showcases your best.',
+    description: 'Professional headshots and family portraits that highlight your unique personality.',
     icon: Users,
   },
   {
     title: 'Product Photography',
-    description: 'High-quality product images that highlight your brand and drive sales across all platforms.',
+    description: 'High-quality images that showcase your products and elevate your brand.',
     icon: Award,
   },
   {
     title: 'Commercial Work',
-    description: 'Professional commercial photography and videography for businesses, marketing, and advertising.',
+    description: 'Professional photography and videography for marketing and advertising campaigns.',
     icon: MapPin,
   },
   {
     title: 'Wedding Photography',
-    description: 'Documenting your most precious moments with artistic vision and attention to every detail.',
+    description: 'Preserve your special day with artistic and heartfelt imagery.',
     icon: Camera,
   },
   {
     title: 'Video Production',
-    description: 'Creative video content including promotional videos, documentaries, and event coverage.',
+    description: 'Create compelling video content for promotions, events, and storytelling.',
     icon: Users,
   },
 ];
