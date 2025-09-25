@@ -26,13 +26,20 @@ export default function BookingPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   
-  const { user, userProfile } = useAuth();
+  const { user, firebaseUser, userProfile } = useAuth();
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSelectChange = (value: string) => {
+    setFormData({
+      ...formData,
+      serviceCategory: value,
     });
   };
 
@@ -54,26 +61,36 @@ export default function BookingPage() {
     setError('');
 
     try {
+      // Get user token for authentication
+      const token = await firebaseUser?.getIdToken();
+      if (!token) {
+        throw new Error('Authentication token not available');
+      }
+
       const bookingData = {
         ...formData,
-        userId: user.uid,
-        userName: userProfile?.displayName,
+        userName: userProfile?.displayName || user.displayName || 'User',
         userEmail: user.email,
-        attachments: attachments,
       };
 
-      const response = await fetch('/api/bookings', {
+      console.log('Submitting booking data:', bookingData);
+
+      const response = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(bookingData),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error('Failed to create booking');
+        throw new Error(result.error || 'Failed to create booking');
       }
 
+      console.log('Booking created successfully:', result);
       setSuccess(true);
       
       // Reset form
@@ -88,10 +105,11 @@ export default function BookingPage() {
       setAttachments([]);
       
       setTimeout(() => {
-        router.push('/dashboard');
+        router.push('/bookings');
       }, 2000);
       
     } catch (error: any) {
+      console.error('Booking creation error:', error);
       setError(error.message || 'An error occurred while creating the booking');
     } finally {
       setLoading(false);
@@ -132,7 +150,7 @@ export default function BookingPage() {
                 Thank you for your booking request. We'll review it and get back to you within 24 hours.
               </p>
               <p className="text-sm text-gray-500">
-                Redirecting to dashboard...
+                Redirecting to your bookings...
               </p>
             </CardContent>
           </Card>
@@ -156,7 +174,7 @@ export default function BookingPage() {
               {/* Service Category */}
               <div className="space-y-2">
                 <Label htmlFor="serviceCategory">Service Type</Label>
-                <Select onValueChange={(value) => setFormData({...formData, serviceCategory: value})}>
+                <Select onValueChange={handleSelectChange} value={formData.serviceCategory}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a service" />
                   </SelectTrigger>
@@ -183,6 +201,7 @@ export default function BookingPage() {
                     type="date"
                     value={formData.date}
                     onChange={handleChange}
+                    min={new Date().toISOString().split('T')[0]} // Prevent past dates
                     required
                   />
                 </div>
@@ -261,10 +280,24 @@ export default function BookingPage() {
                 <p className="text-sm text-gray-500">
                   Upload inspiration images or examples of what you're looking for
                 </p>
+                {attachments.length > 0 && (
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600">
+                      {attachments.length} file(s) selected:
+                    </p>
+                    <ul className="text-sm text-gray-500 mt-1">
+                      {attachments.map((file, index) => (
+                        <li key={index} className="truncate">
+                          {file.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {error && (
-                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md border border-red-200">
                   {error}
                 </div>
               )}
@@ -272,7 +305,7 @@ export default function BookingPage() {
               <Button 
                 type="submit" 
                 className="w-full bg-amber-700 hover:bg-amber-800 py-6 text-lg" 
-                disabled={loading}
+                disabled={loading || !formData.serviceCategory || !formData.date || !formData.startTime || !formData.endTime || !formData.address}
               >
                 {loading ? 'Submitting Booking...' : 'Submit Booking Request'}
               </Button>
