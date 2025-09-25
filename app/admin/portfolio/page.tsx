@@ -11,20 +11,27 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
-import { Camera, Plus, Edit, Trash2, Search, Filter } from 'lucide-react';
+import { Camera, Plus, Edit, Trash2, Search, Filter, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+
+interface Client {
+  id: string;
+  displayName: string;
+  email: string;
+}
 
 export default function AdminPortfolioPage() {
   const [portfolioItems, setPortfolioItems] = useState<PortfolioItem[]>([]);
   const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>([]);
+  const [clients, setClients] = useState<{ [key: string]: Client }>({});
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<PortfolioItem | null>(null);
   
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,8 +43,9 @@ export default function AdminPortfolioPage() {
   useEffect(() => {
     if (user && isAdmin) {
       fetchPortfolioItems();
+      fetchClients();
     }
-  }, [user, isAdmin]);
+  }, [user, isAdmin, firebaseUser]);
 
   useEffect(() => {
     filterItems();
@@ -57,6 +65,27 @@ export default function AdminPortfolioPage() {
     }
   };
 
+  const fetchClients = async () => {
+    try {
+      const token = await firebaseUser?.getIdToken();
+      const response = await fetch('/api/users/clients', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const clientMap = data.reduce((acc: { [key: string]: Client }, client: Client) => {
+          acc[client.id] = client;
+          return acc;
+        }, {});
+        setClients(clientMap);
+      }
+    } catch (error) {
+      console.error('Error fetching clients:', error);
+    }
+  };
+
   const filterItems = () => {
     let filtered = portfolioItems;
     
@@ -64,7 +93,9 @@ export default function AdminPortfolioPage() {
       filtered = filtered.filter(item => 
         item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
+        item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.clientId && clients[item.clientId]?.displayName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (item.clientId && clients[item.clientId]?.email?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
     
@@ -77,8 +108,12 @@ export default function AdminPortfolioPage() {
 
   const handleDelete = async (item: PortfolioItem) => {
     try {
+      const token = await firebaseUser?.getIdToken();
       const response = await fetch(`/api/portfolio/${item.id}`, {
         method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
       });
       
       if (response.ok) {
@@ -93,10 +128,12 @@ export default function AdminPortfolioPage() {
 
   const toggleFeatured = async (item: PortfolioItem) => {
     try {
+      const token = await firebaseUser?.getIdToken();
       const response = await fetch(`/api/portfolio/${item.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           featured: !item.featured,
@@ -157,7 +194,7 @@ export default function AdminPortfolioPage() {
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
-                    placeholder="Search by title, category, or tags..."
+                    placeholder="Search by title, category, tags, or client..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -243,7 +280,12 @@ export default function AdminPortfolioPage() {
                       {new Date(item.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  
+                  {item.clientId && clients[item.clientId] && (
+                    <div className="flex items-center gap-2 mb-2 text-sm text-gray-600">
+                      <User className="h-4 w-4" />
+                      <span>{clients[item.clientId].displayName || clients[item.clientId].email}</span>
+                    </div>
+                  )}
                   <div className="flex flex-wrap gap-1 mb-2">
                     {item.tags.slice(0, 3).map(tag => (
                       <Badge key={tag} variant="secondary" className="text-xs">

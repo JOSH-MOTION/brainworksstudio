@@ -42,6 +42,8 @@ export interface PortfolioItem {
   caption?: string;
   featured: boolean;
   createdAt: Date;
+   clientId?: string | null; // Add clientId
+   googleDriveFolderId?: string; // New: Google Drive folder ID for images
 }
 
 export interface Contact {
