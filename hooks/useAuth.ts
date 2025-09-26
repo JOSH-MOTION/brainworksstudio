@@ -1,3 +1,4 @@
+// hooks/useAuth.ts
 'use client';
 
 import React, { useState, useEffect, createContext, useContext } from 'react';
@@ -60,10 +61,10 @@ function useAuthInternal(): UseAuthReturn {
         console.log('Raw Firestore data:', userData); // Debug log
         setUser({
           ...userData,
-          phone: userData.phone ?? null, // Ensure null if undefined
-          address: userData.address ?? null,
-          location: userData.location ?? null,
-          profileImageUrl: userData.profileImageUrl ?? null,
+          phone: userData.phone ?? undefined, // Use undefined instead of null
+          address: userData.address ?? undefined,
+          location: userData.location ?? undefined,
+          profileImageUrl: userData.profileImageUrl ?? undefined,
           createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
         } as User);
       } else {
@@ -100,10 +101,10 @@ function useAuthInternal(): UseAuthReturn {
             console.log('User data loaded:', userData.email, userData.role);
             setUser({
               ...userData,
-              phone: userData.phone ?? null,
-              address: userData.address ?? null,
-              location: userData.location ?? null,
-              profileImageUrl: userData.profileImageUrl ?? null,
+              phone: userData.phone ?? undefined,
+              address: userData.address ?? undefined,
+              location: userData.location ?? undefined,
+              profileImageUrl: userData.profileImageUrl ?? undefined,
               createdAt: userData.createdAt?.toDate?.() || userData.createdAt,
             } as User);
           } else {
@@ -114,10 +115,10 @@ function useAuthInternal(): UseAuthReturn {
               displayName: firebaseUser.displayName || '',
               role: 'user',
               createdAt: new Date(),
-              phone: null,
-              address: null,
-              location: null,
-              profileImageUrl: null,
+              phone: undefined, // Use undefined instead of null
+              address: undefined,
+              location: undefined,
+              profileImageUrl: undefined,
             };
             await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
             setUser(newUser);
@@ -155,10 +156,10 @@ function useAuthInternal(): UseAuthReturn {
         uid: firebaseUser.uid,
         email: firebaseUser.email!,
         displayName: userData.displayName ?? '',
-        phone: userData.phone ?? null,
-        address: userData.address ?? null,
-        location: userData.location ?? null,
-        profileImageUrl: userData.profileImageUrl ?? null,
+        phone: userData.phone ?? undefined,
+        address: userData.address ?? undefined,
+        location: userData.location ?? undefined,
+        profileImageUrl: userData.profileImageUrl ?? undefined,
         role: userData.role ?? 'user',
         createdAt: new Date(),
       };
@@ -210,10 +211,10 @@ function useAuthInternal(): UseAuthReturn {
     try {
       const updatedData = {
         ...userData,
-        phone: userData.phone ?? user.phone,
-        address: userData.address ?? user.address,
-        location: userData.location ?? user.location,
-        profileImageUrl: userData.profileImageUrl ?? user.profileImageUrl,
+        phone: userData.phone ?? user.phone ?? undefined,
+        address: userData.address ?? user.address ?? undefined,
+        location: userData.location ?? user.location ?? undefined,
+        profileImageUrl: userData.profileImageUrl ?? user.profileImageUrl ?? undefined,
       };
       await updateDoc(doc(db, 'users', user.uid), updatedData);
       setUser({ ...user, ...updatedData });
