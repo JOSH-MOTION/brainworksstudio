@@ -1,11 +1,22 @@
+// app/api/contact/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
 import { createTransporter } from '@/lib/nodemailer';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!adminDb) {
+      console.error('Firebase Admin not initialized');
+      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+    }
+
     const formData = await request.json();
     
+    // Validate form data
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    }
+
     // Save contact to Firestore
     const contactData = {
       name: formData.name,
