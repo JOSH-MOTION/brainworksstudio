@@ -45,6 +45,17 @@ export function useAuth(): UseAuthReturn {
   return context;
 }
 
+// Utility to remove undefined fields for Firestore
+const cleanFirestoreData = (data: Record<string, any>): Record<string, any> => {
+  const cleaned: Record<string, any> = {};
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined) {
+      cleaned[key] = value;
+    }
+  });
+  return cleaned;
+};
+
 // Internal auth logic
 function useAuthInternal(): UseAuthReturn {
   const [user, setUser] = useState<User | null>(null);
@@ -61,7 +72,7 @@ function useAuthInternal(): UseAuthReturn {
         console.log('Raw Firestore data:', userData); // Debug log
         setUser({
           ...userData,
-          phone: userData.phone ?? undefined, // Use undefined instead of null
+          phone: userData.phone ?? undefined,
           address: userData.address ?? undefined,
           location: userData.location ?? undefined,
           profileImageUrl: userData.profileImageUrl ?? undefined,
@@ -115,12 +126,12 @@ function useAuthInternal(): UseAuthReturn {
               displayName: firebaseUser.displayName || '',
               role: 'user',
               createdAt: new Date(),
-              phone: undefined, // Use undefined instead of null
+              phone: undefined,
               address: undefined,
               location: undefined,
               profileImageUrl: undefined,
             };
-            await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+            await setDoc(doc(db, 'users', firebaseUser.uid), cleanFirestoreData(newUser));
             setUser(newUser);
           }
         } else {
@@ -164,7 +175,7 @@ function useAuthInternal(): UseAuthReturn {
         createdAt: new Date(),
       };
 
-      await setDoc(doc(db, 'users', firebaseUser.uid), newUser);
+      await setDoc(doc(db, 'users', firebaseUser.uid), cleanFirestoreData(newUser));
       console.log('Created new user:', newUser); // Debug log
       setUser(newUser);
     } catch (error: any) {
@@ -209,13 +220,13 @@ function useAuthInternal(): UseAuthReturn {
     }
 
     try {
-      const updatedData = {
+      const updatedData = cleanFirestoreData({
         ...userData,
         phone: userData.phone ?? user.phone ?? undefined,
         address: userData.address ?? user.address ?? undefined,
         location: userData.location ?? user.location ?? undefined,
         profileImageUrl: userData.profileImageUrl ?? user.profileImageUrl ?? undefined,
-      };
+      });
       await updateDoc(doc(db, 'users', user.uid), updatedData);
       setUser({ ...user, ...updatedData });
       console.log('Updated user profile:', updatedData); // Debug log
