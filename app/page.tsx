@@ -1,6 +1,7 @@
+// app/page.tsx
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, Variants, Easing } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,29 +10,47 @@ import { Camera, Users, Award, MapPin } from 'lucide-react';
 import Image from 'next/image';
 
 // Animation variants for sections
-const sectionVariants = {
+const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.6, 
+      ease: 'easeOut' as const // Explicitly type as Easing
+    } 
+  },
 };
 
 // Animation variants for hero image
-const heroImageVariants = {
+const heroImageVariants: Variants = {
   hidden: { opacity: 0, scale: 1.1 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: 'easeOut' } },
+  visible: { 
+    opacity: 1, 
+    scale: 1, 
+    transition: { 
+      duration: 1, 
+      ease: 'easeOut' as const 
+    } 
+  },
 };
 
 // Animation variants for cards
-const cardVariants = {
+const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.1, ease: 'easeOut' },
+    transition: { 
+      duration: 0.5, 
+      delay: i * 0.1, 
+      ease: 'easeOut' as const 
+    },
   }),
 };
 
 // Animation variants for buttons
-const buttonVariants = {
+const buttonVariants: Variants = {
   hover: { scale: 1.05, transition: { duration: 0.2 } },
   tap: { scale: 0.95 },
 };
@@ -193,7 +212,7 @@ export default function Home() {
                 icon: Award,
                 title: 'Award-Winning Excellence',
                 description:
-                  'Our work is recognized with industry awards and featured in top publications.',
+                  'Our work is recognized with postry awards and featured in top publications.',
               },
               {
                 icon: Users,
