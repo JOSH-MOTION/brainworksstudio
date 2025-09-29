@@ -1,4 +1,3 @@
-// app/page.tsx
 'use client';
 
 import { motion, Variants, Easing } from 'framer-motion';
@@ -123,7 +122,7 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* Services Section */}
+      {/* Services Section (Updated to Two Cards) */}
       <motion.section
         initial="hidden"
         whileInView="visible"
@@ -147,12 +146,27 @@ export default function Home() {
               whileInView={{ opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
             >
-              Discover our range of professional photography and videography services tailored to your vision.
+              Discover our professional photography and videography services tailored to your vision.
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.map((service, index) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[
+              {
+                title: 'Photography',
+                description: 'Timeless images capturing your moments with precision and creativity.',
+                image: '/images/photography-card.jpg',
+                link: '/photography',
+                icon: Camera,
+              },
+              {
+                title: 'Videography',
+                description: 'Cinematic storytelling through expertly crafted videos.',
+                image: '/images/videography-card.jpg',
+                link: '/videography',
+                icon: Users,
+              },
+            ].map((service, index) => (
               <motion.div
                 key={index}
                 custom={index}
@@ -161,17 +175,33 @@ export default function Home() {
                 viewport={{ once: true }}
                 variants={cardVariants}
               >
-                <Card className="group border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white">
-                  <CardHeader>
-                    <div className="mx-auto mb-4 p-3 bg-blue-100 rounded-full w-fit group-hover:bg-violet-100 transition-colors">
-                      <service.icon className="h-8 w-8 text-blue-600" />
-                    </div>
-                    <CardTitle className="text-xl text-gray-900">{service.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600">{service.description}</p>
-                  </CardContent>
-                </Card>
+                <Link href={service.link}>
+                  <Card className="group border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white">
+                    <CardHeader className="p-0">
+                      <Image
+                        src={service.image}
+                        alt={`${service.title} preview`}
+                        width={600}
+                        height={400}
+                        className="object-cover w-full h-64 group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <div className="flex items-center mb-4">
+                        <div className="p-3 bg-blue-100 rounded-full w-fit group-hover:bg-violet-100 transition-colors">
+                          <service.icon className="h-8 w-8 text-blue-600" />
+                        </div>
+                        <CardTitle className="text-2xl text-gray-900 ml-4">{service.title}</CardTitle>
+                      </div>
+                      <p className="text-gray-600 mb-4">{service.description}</p>
+                      <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+                        <Button className="bg-blue-600 text-white hover:bg-violet-600">
+                          Explore {service.title}
+                        </Button>
+                      </motion.div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             ))}
           </div>
@@ -301,36 +331,3 @@ export default function Home() {
     </Layout>
   );
 }
-
-const services = [
-  {
-    title: 'Event Photography',
-    description: 'Capture the energy and emotion of your events, from corporate gatherings to celebrations.',
-    icon: Camera,
-  },
-  {
-    title: 'Portrait Sessions',
-    description: 'Professional headshots and family portraits that highlight your unique personality.',
-    icon: Users,
-  },
-  {
-    title: 'Product Photography',
-    description: 'High-quality images that showcase your products and elevate your brand.',
-    icon: Award,
-  },
-  {
-    title: 'Commercial Work',
-    description: 'Professional photography and videography for marketing and advertising campaigns.',
-    icon: MapPin,
-  },
-  {
-    title: 'Wedding Photography',
-    description: 'Preserve your special day with artistic and heartfelt imagery.',
-    icon: Camera,
-  },
-  {
-    title: 'Video Production',
-    description: 'Create compelling video content for promotions, events, and storytelling.',
-    icon: Users,
-  },
-];
