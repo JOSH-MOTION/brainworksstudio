@@ -155,14 +155,14 @@ export default function Home() {
               {
                 title: 'Photography',
                 description: 'Timeless images capturing your moments with precision and creativity.',
-                image: '/images/photography-card.jpg',
+                image: '/Pic1.jpeg',
                 link: '/photography',
                 icon: Camera,
               },
               {
                 title: 'Videography',
                 description: 'Cinematic storytelling through expertly crafted videos.',
-                image: '/images/videography-card.jpg',
+                image: '/vid1.jpeg',
                 link: '/videography',
                 icon: Users,
               },

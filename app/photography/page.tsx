@@ -62,7 +62,7 @@ export default function PhotographyCategories() {
           className="absolute inset-0"
         >
           <Image
-            src="/images/photography-hero.jpg"
+            src="/Pic.jpeg"
             alt="Photography Hero"
             fill
             className="object-cover"

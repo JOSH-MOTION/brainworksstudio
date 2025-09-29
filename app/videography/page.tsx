@@ -103,7 +103,7 @@ export default function VideographyCategories() {
           className="absolute inset-0"
         >
           <Image
-            src="/images/videography-hero.jpg"
+            src="/vid.jpeg"
             alt="Videography Hero"
             fill
             className="object-cover"
