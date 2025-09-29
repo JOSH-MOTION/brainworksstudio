@@ -8,11 +8,12 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Camera, User, LogOut, Menu, Instagram, Twitter, Facebook, Send, X } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { Camera, User, LogOut, Menu, Instagram, Twitter, Facebook, Send } from 'lucide-react';
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Variants, Easing } from 'framer-motion';
 
+// Metadata
 export const metadata: Metadata = {
   title: 'Brain Works Studio',
   description: 'Professional photography and videography services',
@@ -24,21 +25,86 @@ interface LayoutProps {
   children: ReactNode;
 }
 
+// Animation variants for header
+const headerVariants: Variants = {
+  hidden: { opacity: 0, y: -50 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.5, 
+      ease: 'easeOut' as const // Explicitly type as Easing
+    } 
+  },
+};
+
+// Animation variants for mobile menu
+const mobileMenuVariants: Variants = {
+  hidden: { opacity: 0, x: '100%' },
+  visible: { 
+    opacity: 1, 
+    x: 0, 
+    transition: { 
+      duration: 0.3, 
+      ease: 'easeOut' as const 
+    } 
+  },
+  exit: { 
+    opacity: 0, 
+    x: '100%', 
+    transition: { 
+      duration: 0.2, 
+      ease: 'easeOut' as const 
+    } 
+  },
+};
+
+// Animation variants for nav links
+const navLinkVariants: Variants = {
+  hover: { scale: 1.05, color: '#F97316', transition: { duration: 0.2 } }, // orange-500
+  tap: { scale: 0.95 },
+};
+
+// Animation variants for footer sections
+const footerSectionVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { 
+      duration: 0.5, 
+      delay: i * 0.1, 
+      ease: 'easeOut' as const 
+    },
+  }),
+};
+
+// Animation variants for social icons
+const socialIconVariants: Variants = {
+  hover: { scale: 1.2, color: '#F97316', transition: { duration: 0.2 } }, // orange-500
+  tap: { scale: 0.9 },
+};
+
+// Animation variants for footer (previously sectionVariants)
+const footerVariants: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { 
+    opacity: 1, 
+    y: 0, 
+    transition: { 
+      duration: 0.6, 
+      ease: 'easeOut' as const 
+    } 
+  },
+};
+
 export default function RootLayout({ children }: LayoutProps) {
   const { user, userProfile, signOut, isAdmin } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [newsletterEmail, setNewsletterEmail] = useState('');
-  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-
-  // Handle scroll effect for navbar
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  // Removed conditional hiding for admin routes to ensure navbar visibility
+  // const isAdminRoute = pathname.startsWith('/admin');
 
   const handleNewsletterSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -60,187 +126,108 @@ export default function RootLayout({ children }: LayoutProps) {
     }
   };
 
-  const navigationItems = [
-    { href: '/', label: 'Home' },
-    { href: '/portfolio', label: 'Portfolio' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
-    { href: '/booking', label: 'Book Session' },
-  ];
-
   return (
     <html lang="en">
       <body className={`${inter.className} min-h-screen bg-white`}>
-        {/* Enhanced Navbar */}
         <motion.header
-          initial={{ y: -100 }}
-          animate={{ y: 0 }}
-          transition={{ duration: 0.6, ease: 'easeOut' }}
-          className={`fixed top-0 left-0 w-full z-50 transition-all duration-500 ${
-            scrolled
-              ? 'bg-white/95 backdrop-blur-md shadow-lg py-3'
-              : 'bg-transparent py-5'
-          }`}
+          initial="hidden"
+          animate="visible"
+          variants={headerVariants}
+          className="fixed top-0 left-0 w-full bg-white shadow-md z-50"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center h-16">
               {/* Logo */}
-              <Link href="/" className="flex items-center space-x-3 group">
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  whileTap={{ scale: 0.95 }}
-                  className={`p-2 rounded-xl transition-all duration-300 ${
-                    scrolled
-                      ? 'bg-gradient-to-br from-orange-500 to-blue-600'
-                      : 'bg-white/10 backdrop-blur-sm'
-                  }`}
-                >
-                  <Camera className="h-7 w-7 text-white" />
+              <Link href="/" className="flex items-center space-x-2">
+                <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                  <Camera className="h-8 w-8 text-orange-500" />
                 </motion.div>
-                <div>
-                  <span
-                    className={`text-xl font-bold transition-colors ${
-                      scrolled ? 'text-gray-900' : 'text-white'
-                    }`}
-                  >
-                    Brain Works Studio
-                  </span>
-                  <div
-                    className={`text-xs font-medium transition-colors ${
-                      scrolled ? 'text-orange-600' : 'text-orange-300'
-                    }`}
-                  >
-                    Professional Production team
-                  </div>
-                </div>
+                <span className="text-xl font-bold text-blue-900">Brain Works Studio</span>
               </Link>
 
               {/* Desktop Navigation */}
-              <nav className="hidden lg:flex items-center space-x-1">
-                {navigationItems.map((item) => (
-                  <motion.div
-                    key={item.href}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
+              <nav className="hidden md:flex items-center space-x-6">
+                {[
+                  { href: '/', label: 'Home' },
+                  { href: '/portfolio', label: 'Portfolio' },
+                  { href: '/about', label: 'About' },
+                  { href: '/contact', label: 'Contact' },
+                  { href: '/booking', label: 'Book Session' },
+                ].map((item) => (
+                  <motion.div key={item.href} variants={navLinkVariants} whileHover="hover" whileTap="tap">
                     <Link
                       href={item.href}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                        pathname === item.href
-                          ? scrolled
-                            ? 'bg-orange-50 text-orange-600'
-                            : 'bg-white/20 text-white'
-                          : scrolled
-                          ? 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
-                          : 'text-white hover:bg-white/10'
+                      className={`text-blue-900 hover:text-orange-500 transition-colors ${
+                        pathname === item.href ? 'text-orange-600 font-semibold' : ''
                       }`}
                     >
                       {item.label}
                     </Link>
                   </motion.div>
                 ))}
-              </nav>
-
-              {/* Desktop CTA Buttons */}
-              <div className="hidden lg:flex items-center space-x-3">
                 {user ? (
-                  <>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Link href="/dashboard">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className={`${
-                            scrolled
-                              ? 'text-gray-700 hover:bg-gray-100'
-                              : 'text-white hover:bg-white/10'
-                          }`}
-                        >
-                          Dashboard
-                        </Button>
+                  <div className="flex items-center space-x-4">
+                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                      <Link href="/dashboard" className="text-blue-900 hover:text-orange-500">
+                        Dashboard
                       </Link>
                     </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Link href="/bookings">
-                        <Button
-                          size="sm"
-                          className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30"
-                        >
-                          My Bookings
-                        </Button>
+                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                      <Link href="/bookings" className="text-blue-900 hover:text-orange-500">
+                        My Bookings
                       </Link>
                     </motion.div>
                     {isAdmin && (
-                      <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                        <Link href="/admin">
-                          <Button
-                            size="sm"
-                            className="bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800"
-                          >
-                            Admin
-                          </Button>
+                      <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                        <Link href="/admin" className="text-orange-600 hover:text-orange-500">
+                          Admin
                         </Link>
                       </motion.div>
                     )}
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
                       <Button
                         variant="outline"
                         size="sm"
-                        className={`${
-                          scrolled
-                            ? 'border-orange-300 text-orange-600 hover:bg-orange-50'
-                            : 'border-white/30 text-white bg-orange-500 hover:bg-white/10'
-                        }`}
+                        className="border-orange-600 text-orange-600 hover:bg-orange-500 hover:text-white"
                         onClick={signOut}
                       >
-                        <LogOut className="h-4 w-4 mr-2 "  />
+                        <LogOut className="h-4 w-4 mr-2" />
                         Logout
                       </Button>
                     </motion.div>
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <div className="flex items-center space-x-2">
+                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
                       <Link href="/auth/login">
                         <Button
-                          variant="ghost"
+                          variant="outline"
                           size="sm"
-                          className={`${
-                            scrolled
-                              ? 'text-gray-700 hover:bg-gray-100'
-                              : 'text-white hover:bg-white/10'
-                          }`}
+                          className="border-orange-600 text-orange-600 hover:bg-orange-500 hover:text-white"
                         >
                           Login
                         </Button>
                       </Link>
                     </motion.div>
-                    <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                      <Link href="/booking">
-                        <Button
-                          size="sm"
-                          className="bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-lg shadow-orange-500/30"
-                        >
-                          Book Session
+                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
+                      <Link href="/auth/signup">
+                        <Button size="sm" className="bg-orange-600 hover:bg-orange-500 text-white">
+                          Sign Up
                         </Button>
                       </Link>
                     </motion.div>
-                  </>
+                  </div>
                 )}
-              </div>
+              </nav>
 
               {/* Mobile Menu Button */}
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`lg:hidden p-2 rounded-lg transition-all ${
-                  scrolled
-                    ? 'text-gray-900 hover:bg-gray-100'
-                    : 'text-white hover:bg-white/10'
-                }`}
+                className="md:hidden p-2"
               >
-                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                <Menu className="h-6 w-6 text-orange-600" />
               </motion.button>
             </div>
 
@@ -248,31 +235,29 @@ export default function RootLayout({ children }: LayoutProps) {
             <AnimatePresence>
               {mobileMenuOpen && (
                 <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className={`lg:hidden mt-4 rounded-2xl overflow-hidden ${
-                    scrolled ? 'bg-white shadow-xl' : 'bg-gray-900/95 backdrop-blur-md'
-                  }`}
+                  variants={mobileMenuVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit="exit"
+                  className="md:hidden bg-white border-t border-orange-100 absolute top-16 left-0 w-full shadow-lg"
                 >
-                  <div className="py-4 space-y-2 px-2">
-                    {navigationItems.map((item) => (
+                  <div className="flex flex-col space-y-2 py-4 px-4">
+                    {[
+                      { href: '/', label: 'Home' },
+                      { href: '/portfolio', label: 'Portfolio' },
+                      { href: '/about', label: 'About' },
+                      { href: '/contact', label: 'Contact' },
+                      { href: '/booking', label: 'Book Session' },
+                    ].map((item) => (
                       <motion.div
                         key={item.href}
-                        whileHover={{ x: 5 }}
+                        whileHover={{ x: 10 }}
                         whileTap={{ scale: 0.95 }}
                       >
                         <Link
                           href={item.href}
-                          className={`block px-4 py-3 rounded-xl text-sm font-medium transition-all ${
-                            pathname === item.href
-                              ? scrolled
-                                ? 'bg-orange-50 text-orange-600'
-                                : 'bg-white/20 text-white'
-                              : scrolled
-                              ? 'text-gray-700 hover:bg-orange-50 hover:text-orange-600'
-                              : 'text-white hover:bg-white/10'
+                          className={`block px-4 py-2 text-blue-900 hover:bg-orange-50 hover:text-orange-500 ${
+                            pathname === item.href ? 'text-orange-600 font-semibold' : ''
                           }`}
                           onClick={() => setMobileMenuOpen(false)}
                         >
@@ -280,53 +265,92 @@ export default function RootLayout({ children }: LayoutProps) {
                         </Link>
                       </motion.div>
                     ))}
-                    <div className="pt-4 space-y-2 border-t border-gray-200/20">
-                      {user ? (
-                        <>
-                          <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                            <Button variant="outline" className="w-full">
-                              Dashboard
-                            </Button>
-                          </Link>
-                          <Link href="/bookings" onClick={() => setMobileMenuOpen(false)}>
-                            <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600">
-                              My Bookings
-                            </Button>
-                          </Link>
-                          {isAdmin && (
-                            <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
-                              <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700">
-                                Admin
-                              </Button>
-                            </Link>
-                          )}
-                          <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => {
-                              signOut();
-                              setMobileMenuOpen(false);
-                            }}
+                    {user ? (
+                      <>
+                        <motion.div whileHover={{ x: 10 }} whileTap={{ scale: 0.95 }}>
+                          <Link
+                            href="/dashboard"
+                            className="block px-4 py-2 text-blue-900 hover:bg-orange-50 hover:text-orange-500"
+                            onClick={() => setMobileMenuOpen(false)}
                           >
-                            <LogOut className="h-4 w-4 mr-2" />
-                            Logout
-                          </Button>
-                        </>
-                      ) : (
-                        <>
-                          <Link href="/booking" onClick={() => setMobileMenuOpen(false)}>
-                            <Button className="w-full bg-gradient-to-r from-orange-500 to-orange-600">
-                              Book Session
-                            </Button>
+                            Dashboard
                           </Link>
-                          <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                            <Button variant="outline" className="w-full">
-                              Login
-                            </Button>
+                        </motion.div>
+                        <motion.div whileHover={{ x: 10 }} whileTap={{ scale: 0.95 }}>
+                          <Link
+                            href="/bookings"
+                            className="block px-4 py-2 text-blue-900 hover:bg-orange-50 hover:text-orange-500"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            My Bookings
                           </Link>
-                        </>
-                      )}
-                    </div>
+                        </motion.div>
+                        {isAdmin && (
+                          <>
+                            {userProfile?.profileImageUrl && (
+                              <motion.img
+                                src={userProfile.profileImageUrl}
+                                alt="Profile"
+                                className="w-8 h-8 rounded-full object-cover border border-orange-200 mx-4 my-2"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.3 }}
+                              />
+                            )}
+                            <motion.div whileHover={{ x: 10 }} whileTap={{ scale: 0.95 }}>
+                              <Link
+                                href="/admin"
+                                className="block px-4 py-2 text-orange-600 hover:bg-orange-50 hover:text-orange-500"
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                Admin
+                              </Link>
+                            </motion.div>
+                            <motion.div whileHover={{ x: 10 }} whileTap={{ scale: 0.95 }}>
+                              <Link
+                                href="/admin/bookings"
+                                className="block px-4 py-2 text-orange-600 hover:bg-orange-50 hover:text-orange-500"
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                Manage Bookings
+                              </Link>
+                            </motion.div>
+                          </>
+                        )}
+                        <motion.button
+                          whileHover={{ x: 10 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => {
+                            signOut();
+                            setMobileMenuOpen(false);
+                          }}
+                          className="block text-left px-4 py-2 text-blue-900 hover:bg-orange-50 hover:text-orange-500"
+                        >
+                          Logout
+                        </motion.button>
+                      </>
+                    ) : (
+                      <>
+                        <motion.div whileHover={{ x: 10 }} whileTap={{ scale: 0.95 }}>
+                          <Link
+                            href="/auth/login"
+                            className="block px-4 py-2 text-blue-900 hover:bg-orange-50 hover:text-orange-500"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            Login
+                          </Link>
+                        </motion.div>
+                        <motion.div whileHover={{ x: 10 }} whileTap={{ scale: 0.95 }}>
+                          <Link
+                            href="/auth/signup"
+                            className="block px-4 py-2 text-orange-600 hover:bg-orange-50 hover:text-orange-500"
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            Sign Up
+                          </Link>
+                        </motion.div>
+                      </>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -335,27 +359,21 @@ export default function RootLayout({ children }: LayoutProps) {
         </motion.header>
 
         {/* Main Content */}
-        <main className="pt-0">{children}</main>
+        <main className="pt-16">{children}</main>
 
-        {/* Footer remains the same */}
         <motion.footer
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          variants={footerVariants}
           className="bg-white text-blue-900 border-t border-orange-200"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
               {/* Company Info */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0, duration: 0.5 }}
-                className="col-span-1 sm:col-span-2 lg:col-span-2"
-              >
+              <motion.div custom={0} variants={footerSectionVariants} className="col-span-1 sm:col-span-2 lg:col-span-2">
                 <div className="flex items-center space-x-2 mb-4">
-                  <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}>
+                  <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                     <Camera className="h-8 w-8 text-orange-600" />
                   </motion.div>
                   <span className="text-xl font-bold text-blue-900">Brain Works Studio</span>
@@ -364,31 +382,41 @@ export default function RootLayout({ children }: LayoutProps) {
                   Transforming moments into timeless art with professional photography and videography.
                 </p>
                 <div className="flex space-x-4">
-                  {[
-                    { icon: Instagram, href: 'https://instagram.com' },
-                    { icon: Twitter, href: 'https://twitter.com' },
-                    { icon: Facebook, href: 'https://facebook.com' },
-                  ].map((social, index) => (
-                    <motion.a
-                      key={index}
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.2, color: '#F97316' }}
-                      whileTap={{ scale: 0.9 }}
-                    >
-                      <social.icon className="h-6 w-6 text-blue-900" />
-                    </motion.a>
-                  ))}
+                  <motion.a
+                    href="https://instagram.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variants={socialIconVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <Instagram className="h-6 w-6 text-blue-900" />
+                  </motion.a>
+                  <motion.a
+                    href="https://twitter.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variants={socialIconVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <Twitter className="h-6 w-6 text-blue-900" />
+                  </motion.a>
+                  <motion.a
+                    href="https://facebook.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    variants={socialIconVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                  >
+                    <Facebook className="h-6 w-6 text-blue-900" />
+                  </motion.a>
                 </div>
               </motion.div>
 
               {/* Services */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-              >
+              <motion.div custom={1} variants={footerSectionVariants}>
                 <h3 className="text-lg font-semibold text-blue-900 mb-4">Our Services</h3>
                 <ul className="space-y-2 text-blue-800">
                   {[
@@ -411,11 +439,7 @@ export default function RootLayout({ children }: LayoutProps) {
               </motion.div>
 
               {/* Quick Links */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-              >
+              <motion.div custom={2} variants={footerSectionVariants}>
                 <h3 className="text-lg font-semibold text-blue-900 mb-4">Quick Links</h3>
                 <ul className="space-y-2 text-blue-800">
                   {[
@@ -439,11 +463,7 @@ export default function RootLayout({ children }: LayoutProps) {
               </motion.div>
 
               {/* Contact */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3, duration: 0.5 }}
-              >
+              <motion.div custom={3} variants={footerSectionVariants}>
                 <h3 className="text-lg font-semibold text-blue-900 mb-4">Contact Us</h3>
                 <div className="space-y-2 text-blue-800">
                   <p>
@@ -454,12 +474,37 @@ export default function RootLayout({ children }: LayoutProps) {
                   </p>
                   <p>
                     Phone:{' '}
-                    <a href="tel:+233242403450" className="hover:text-orange-500">
+                    <a href="tel:+5551234567" className="hover:text-orange-500">
                       +233 242403450
                     </a>
                   </p>
                   <p>Location: Your City, State</p>
                 </div>
+              </motion.div>
+
+              {/* Newsletter */}
+              <motion.div custom={4} variants={footerSectionVariants}>
+                <h3 className="text-lg font-semibold text-blue-900 mb-4">Stay Connected</h3>
+                <p className="text-blue-800 mb-4">Join our newsletter for updates, tips, and exclusive offers.</p>
+                <form onSubmit={handleNewsletterSubmit} className="flex flex-col space-y-2">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="bg-gray-50 text-blue-900 border-orange-300 focus:ring-orange-500"
+                    required
+                  />
+                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                    <Button
+                      type="submit"
+                      className="bg-orange-600 text-white hover:bg-orange-500"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Subscribe
+                    </Button>
+                  </motion.div>
+                </form>
               </motion.div>
             </div>
 
