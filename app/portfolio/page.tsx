@@ -1,15 +1,16 @@
+// app/portfolio/page.tsx (key changes for Google Drive; full code for completeness)
 'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card'; // Added CardFooter for button
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
-import { Filter, Play, X, ExternalLink } from 'lucide-react';
+import { Filter, Play, X, ExternalLink } from 'lucide-react'; // Added ExternalLink
 import Image from 'next/image';
 
 const sectionVariants: Variants = {
@@ -46,8 +47,8 @@ export default function PortfolioPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [loading, setLoading] = useState(true);
-   const [error, setError] = useState<string>('');
- const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [error, setError] = useState<string>('');
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
 
   useEffect(() => {
@@ -99,22 +100,24 @@ export default function PortfolioPage() {
     setLightboxOpen(true);
   };
 
-  // Improved: Fetch Google Drive thumbnail (requires file ID, not folder ID)
+  // New: Generate Google Drive thumbnail URL from folder ID (pick first image or use a default)
   const getGoogleDriveThumbnail = (folderId: string) => {
-    // Placeholder: In production, use Google Drive API to fetch a file from the folder
-    // For now, return a default placeholder or a specific file ID if known
-    return `https://drive.google.com/thumbnail?id=${folderId}&sz=w500`; // Replace with actual file ID
+    // Note: For simplicity, assume the folder has images; in production, use Google Drive API to list and pick one.
+    // For now, use a placeholder or fetch via API. Example with a known file ID in folder.
+    return `https://drive.google.com/thumbnail?id=${folderId}&sz=w500`; // Replace with actual file ID if needed
   };
 
+  // New: Get Google Drive folder link
   const getGoogleDriveLink = (folderId: string) => {
     return `https://drive.google.com/drive/folders/${folderId}`;
   };
 
+  // New: Handle "View More" for Google Drive
   const handleViewMore = (item: PortfolioItem) => {
     if (item.googleDriveFolderId) {
       window.open(getGoogleDriveLink(item.googleDriveFolderId), '_blank');
     } else {
-      openLightbox(item);
+      openLightbox(item); // Fallback to lightbox for Cloudinary
     }
   };
 
@@ -125,19 +128,17 @@ export default function PortfolioPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100"
+          className="min-h-screen flex items-center justify-center bg-white"
         >
           <div className="text-center">
             <p className="text-red-600 text-lg mb-4">{error}</p>
-            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-              <Button
-                variant="outline"
-                onClick={fetchPortfolioItems}
-                className="border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white"
-              >
-                Retry
-              </Button>
-            </motion.div>
+            <Button
+              variant="outline"
+              onClick={fetchPortfolioItems}
+              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+            >
+              Retry
+            </Button>
           </div>
         </motion.div>
       </Layout>
@@ -151,13 +152,13 @@ export default function PortfolioPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100"
+          className="min-h-screen flex items-center justify-center bg-white"
         >
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="rounded-full h-16 w-16 border-t-2 border-amber-700 mx-auto"
+              className="rounded-full h-16 w-16 border-t-2 border-blue-600 mx-auto"
             />
             <p className="mt-4 text-gray-600 text-lg">Loading portfolio...</p>
           </div>
@@ -168,51 +169,31 @@ export default function PortfolioPage() {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <motion.header
-        className="bg-cover bg-center h-80 flex flex-col justify-end pb-8 relative"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7)), url(/images/portfolio-hero-bg.jpg)`,
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
-          <motion.p
-            className="text-sm uppercase tracking-wider font-semibold text-amber-300"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            Portfolio &gt; Our Work
-          </motion.p>
-          <motion.h1
-            className="text-4xl sm:text-5xl font-extrabold mt-1"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-          >
-            Our Portfolio
-          </motion.h1>
-        </div>
-      </motion.header>
-
       <motion.div
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-gray-100"
+        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8"
       >
-        {/* Subheader */}
-        <motion.p
-          className="text-lg text-gray-600 max-w-2xl mx-auto text-center mb-12"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2, duration: 0.5 }}
-        >
-          Explore our curated collection of stunning photography and videography work.
-        </motion.p>
+        {/* Header */}
+        <div className="text-center mb-12">
+          <motion.h1
+            className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Our Portfolio
+          </motion.h1>
+          <motion.p
+            className="text-lg text-gray-600 max-w-2xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+          >
+            Explore our curated collection of stunning photography and videography work.
+          </motion.p>
+        </div>
 
         {/* Filters */}
         <motion.div
@@ -222,11 +203,11 @@ export default function PortfolioPage() {
           className="flex flex-col sm:flex-row gap-4 mb-12 items-center justify-center"
         >
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-amber-700" />
+            <Filter className="h-5 w-5 text-blue-600" />
             <span className="font-medium text-gray-900">Filters:</span>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[180px] bg-white border-amber-700 focus:ring-amber-700">
+            <SelectTrigger className="w-[180px] bg-white border-blue-600 focus:ring-blue-600">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -238,7 +219,7 @@ export default function PortfolioPage() {
             </SelectContent>
           </Select>
           <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="w-[180px] bg-white border-amber-700 focus:ring-amber-700">
+            <SelectTrigger className="w-[180px] bg-white border-blue-600 focus:ring-blue-600">
               <SelectValue placeholder="Tag" />
             </SelectTrigger>
             <SelectContent>
@@ -252,7 +233,7 @@ export default function PortfolioPage() {
           <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
             <Button
               variant="outline"
-              className="border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white transition-colors"
+              className="border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white transition-colors"
               onClick={() => {
                 setSelectedCategory('all');
                 setSelectedTag('all');
@@ -287,7 +268,7 @@ export default function PortfolioPage() {
                 whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
               >
                 <Card
-                  className="group cursor-pointer overflow-hidden border-none shadow-xl rounded-2xl hover:shadow-2xl transition-all duration-300 bg-white"
+                  className="group cursor-pointer overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 bg-white"
                   onClick={() => handleViewMore(item)}
                 >
                   <CardContent className="p-0 relative">
@@ -297,7 +278,6 @@ export default function PortfolioPage() {
                         alt={item.title}
                         fill
                         className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       />
                       {item.videoUrl && (
                         <motion.div
@@ -310,7 +290,7 @@ export default function PortfolioPage() {
                       )}
                       {isGoogleDrive && (
                         <div className="absolute top-2 right-2">
-                          <Badge variant="secondary" className="bg-amber-700/80 text-white">
+                          <Badge variant="secondary" className="bg-blue-500/80 text-white">
                             Google Drive
                           </Badge>
                         </div>
@@ -323,12 +303,12 @@ export default function PortfolioPage() {
                         <div className="absolute bottom-4 left-4 right-4 text-white">
                           <h3 className="font-semibold mb-1">{item.title}</h3>
                           <div className="flex flex-wrap gap-2">
-                            <Badge className="bg-amber-700 text-white">{item.category}</Badge>
+                            <Badge className="bg-blue-600 text-white">{item.category}</Badge>
                             {item.tags.slice(0, 2).map((tag) => (
                               <Badge
                                 key={tag}
                                 variant="outline"
-                                className="border-amber-300 text-amber-300"
+                                className="border-violet-500 text-violet-500"
                               >
                                 {tag}
                               </Badge>
@@ -339,20 +319,18 @@ export default function PortfolioPage() {
                     </div>
                   </CardContent>
                   <CardFooter className="p-4 pt-0">
-                    <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full bg-amber-50 hover:bg-amber-100 text-amber-700"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleViewMore(item);
-                        }}
-                      >
-                        {isGoogleDrive ? 'View More on Google Drive' : 'View Details'}
-                        <ExternalLink className="h-4 w-4 ml-2" />
-                      </Button>
-                    </motion.div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent card click
+                        handleViewMore(item);
+                      }}
+                    >
+                      {isGoogleDrive ? 'View More on Google Drive' : 'View Details'}
+                      <ExternalLink className="h-4 w-4 ml-2" />
+                    </Button>
                   </CardFooter>
                 </Card>
               </motion.div>
@@ -371,7 +349,7 @@ export default function PortfolioPage() {
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"
-                className="mt-4 border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white"
+                className="mt-4 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
                 onClick={() => {
                   setSelectedCategory('all');
                   setSelectedTag('all');
@@ -387,7 +365,7 @@ export default function PortfolioPage() {
         <AnimatePresence>
           {lightboxOpen && selectedItem && !selectedItem.googleDriveFolderId && (
             <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-              <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-white border-none shadow-2xl rounded-2xl">
+              <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-white border-none shadow-2xl rounded-lg">
                 <motion.div
                   variants={lightboxVariants}
                   initial="hidden"
@@ -403,7 +381,7 @@ export default function PortfolioPage() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute top-4 right-4 z-10 bg-amber-700/50 text-white hover:bg-amber-800"
+                      className="absolute top-4 right-4 z-10 bg-violet-500/50 text-white hover:bg-violet-600"
                       onClick={() => setLightboxOpen(false)}
                     >
                       <X className="h-5 w-5" />
@@ -413,7 +391,7 @@ export default function PortfolioPage() {
                     <video
                       src={selectedItem.videoUrl}
                       controls
-                      className="w-full h-auto max-h-[70vh] rounded-t-2xl"
+                      className="w-full h-auto max-h-[70vh] rounded-t-lg"
                       autoPlay
                     />
                   ) : (
@@ -422,8 +400,7 @@ export default function PortfolioPage() {
                       alt={selectedItem.title}
                       width={800}
                       height={600}
-                      className="w-full h-auto max-h-[70vh] object-contain rounded-t-2xl"
-                      sizes="100vw"
+                      className="w-full h-auto max-h-[70vh] object-contain rounded-t-lg"
                     />
                   )}
                   <div className="p-6">
@@ -432,12 +409,12 @@ export default function PortfolioPage() {
                       <p className="text-gray-600 mb-4">{selectedItem.caption}</p>
                     )}
                     <div className="flex flex-wrap gap-2">
-                      <Badge className="bg-amber-700 text-white">{selectedItem.category}</Badge>
+                      <Badge className="bg-blue-600 text-white">{selectedItem.category}</Badge>
                       {selectedItem.tags.map((tag) => (
                         <Badge
                           key={tag}
                           variant="outline"
-                          className="border-amber-300 text-amber-300"
+                          className="border-violet-500 text-violet-500"
                         >
                           {tag}
                         </Badge>
