@@ -19,14 +19,7 @@ const sectionVariants: Variants = {
 
 const cardVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.5,
-      ease: 'easeOut',
-    },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 const buttonVariants: Variants = {
@@ -67,7 +60,7 @@ export default function PortfolioPage() {
         throw new Error(errorData.error || 'Failed to fetch portfolio items');
       }
       const data = await response.json();
-      console.log('Portfolio items fetched:', data); // Debug: Verify imageUrls
+      console.log('Portfolio items fetched:', data);
       setPortfolioItems(data);
     } catch (error: any) {
       console.error('Error fetching portfolio items:', error);
@@ -136,7 +129,7 @@ export default function PortfolioPage() {
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="rounded-full h-16 w-16 border-t-2 border-navy-900 mx-auto"
+              className="rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"
             />
             <p className="mt-4 text-navy-900 text-lg">Loading portfolio...</p>
           </div>
@@ -153,7 +146,6 @@ export default function PortfolioPage() {
         variants={sectionVariants}
         className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8"
       >
-        {/* Header */}
         <div className="text-center mb-12">
           <motion.h1
             className="text-4xl md:text-5xl font-bold text-navy-900 mb-4 tracking-tight"
@@ -173,7 +165,6 @@ export default function PortfolioPage() {
           </motion.p>
         </div>
 
-        {/* Filters */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -222,7 +213,6 @@ export default function PortfolioPage() {
           </motion.div>
         </motion.div>
 
-        {/* Portfolio Grid */}
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           initial="hidden"
@@ -246,15 +236,15 @@ export default function PortfolioPage() {
                 <CardContent className="p-0 relative">
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <Image
-                      src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : '/placeholder-image.jpg'}
+                      src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.videoUrl ? '/video-placeholder.jpg' : '/placeholder-image.jpg'}
                       alt={item.title}
                       fill
                       className="object-cover transition-transform duration-300 group-hover:scale-105"
                       onError={(e) => {
-                        console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0]}`);
+                        console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
                         e.currentTarget.src = '/placeholder-image.jpg';
                       }}
-                      onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0]}`)}
+                      onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
                     />
                     {item.videoUrl && (
                       <motion.div
@@ -274,12 +264,9 @@ export default function PortfolioPage() {
                         <h3 className="font-semibold mb-1">{item.title}</h3>
                         <div className="flex flex-wrap gap-2">
                           <Badge className="bg-gold-500 text-white">{item.category}</Badge>
+                          <Badge className="bg-navy-100 text-navy-900">{item.type}</Badge>
                           {item.tags.slice(0, 2).map((tag) => (
-                            <Badge
-                              key={tag}
-                              variant="outline"
-                              className="border-gold-500 text-gold-500"
-                            >
+                            <Badge key={tag} variant="outline" className="border-gold-500 text-gold-500">
                               {tag}
                             </Badge>
                           ))}
@@ -329,7 +316,6 @@ export default function PortfolioPage() {
           </motion.div>
         )}
 
-        {/* Lightbox Modal */}
         <AnimatePresence>
           {lightboxOpen && selectedItem && (
             <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
@@ -356,19 +342,15 @@ export default function PortfolioPage() {
                     </Button>
                   </motion.div>
                   {selectedItem.videoUrl ? (
-                    <video
+                    <iframe
                       src={selectedItem.videoUrl}
-                      controls
-                      className="w-full h-auto max-h-[70vh] rounded-t-lg"
-                      autoPlay
+                      className="w-full h-[70vh] rounded-t-lg"
+                      allow="autoplay; encrypted-media"
+                      allowFullScreen
                     />
                   ) : (
                     <Image
-                      src={
-                        selectedItem.imageUrls && selectedItem.imageUrls.length > 0
-                          ? selectedItem.imageUrls[0]
-                          : '/placeholder-image.jpg'
-                      }
+                      src={selectedItem.imageUrls && selectedItem.imageUrls.length > 0 ? selectedItem.imageUrls[0] : '/placeholder-image.jpg'}
                       alt={selectedItem.title}
                       width={800}
                       height={600}
@@ -387,12 +369,9 @@ export default function PortfolioPage() {
                     )}
                     <div className="flex flex-wrap gap-2">
                       <Badge className="bg-gold-500 text-white">{selectedItem.category}</Badge>
+                      <Badge className="bg-navy-100 text-navy-900">{selectedItem.type}</Badge>
                       {selectedItem.tags.map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="outline"
-                          className="border-gold-500 text-gold-500"
-                        >
+                        <Badge key={tag} variant="outline" className="border-gold-500 text-gold-500">
                           {tag}
                         </Badge>
                       ))}

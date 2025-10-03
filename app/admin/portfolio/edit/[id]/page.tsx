@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useParams } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Upload } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase';
+import { PortfolioItem } from '@/types';
 
 const formElementVariants: Variants = {
   hidden: { opacity: 0, x: -20 },
@@ -35,10 +36,12 @@ const videographyCategories = [
   'Short Films / Creative Projects', 'Promotional', 'Social Media', 'Others'
 ];
 
-export default function UploadPortfolio() {
+export default function EditPortfolio() {
   const router = useRouter();
+  const { id } = useParams();
   const auth = getAuth(app);
 
+  const [portfolioItem, setPortfolioItem] = useState<PortfolioItem | null>(null);
   const [title, setTitle] = useState('');
   const [type, setType] = useState<'photography' | 'videography'>('photography');
   const [category, setCategory] = useState('');
@@ -50,8 +53,35 @@ export default function UploadPortfolio() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleUpload = async () => {
-    if (!title || !category || !clientName || (type === 'photography' && !files) || (type === 'videography' && !files && !videoUrl)) {
+  useEffect(() => {
+    const fetchPortfolioItem = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) throw new Error('User not authenticated');
+        const token = await user.getIdToken();
+        const response = await fetch(`/api/portfolio/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!response.ok) throw new Error('Failed to fetch portfolio item');
+        const data = await response.json();
+        setPortfolioItem(data);
+        setTitle(data.title);
+        setType(data.type);
+        setCategory(data.category);
+        setTags(data.tags.join(', '));
+        setCaption(data.caption || '');
+        setClientName(data.clientName || '');
+        setVideoUrl(data.videoUrl || '');
+      } catch (err: any) {
+        console.error('Fetch failed:', err);
+        setError(err.message || 'Failed to load portfolio item.');
+      }
+    };
+    fetchPortfolioItem();
+  }, [id]);
+
+  const handleUpdate = async () => {
+    if (!title || !category || !clientName) {
       setError('Please fill in all required fields.');
       return;
     }
@@ -71,7 +101,7 @@ export default function UploadPortfolio() {
       formData.append('tags', tags);
       formData.append('caption', caption);
       formData.append('clientName', clientName);
-      formData.append('featured', 'false');
+      formData.append('featured', portfolioItem?.featured ? 'true' : 'false');
       if (type === 'photography' && files) {
         for (let i = 0; i < files.length; i++) {
           formData.append('files', files[i]);
@@ -87,26 +117,37 @@ export default function UploadPortfolio() {
         }
       }
 
-      const response = await fetch('/api/portfolio', {
-        method: 'POST',
+      const response = await fetch(`/api/portfolio/${id}`, {
+        method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to upload portfolio');
+        throw new Error(errorData.error || 'Failed to update portfolio');
       }
 
-      alert('Portfolio uploaded successfully!');
+      alert('Portfolio updated successfully!');
       router.push('/admin');
     } catch (err: any) {
-      console.error('Upload failed:', err);
-      setError(err.message || 'Failed to upload portfolio. Please try again.');
+      console.error('Update failed:', err);
+      setError(err.message || 'Failed to update portfolio. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (!portfolioItem) {
+    return (
+      <div className="min-h-screen bg-navy-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
+          <p className="mt-4 text-navy-900">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-navy-50 p-6">
@@ -132,7 +173,7 @@ export default function UploadPortfolio() {
           transition={{ duration: 0.6 }}
           className="text-2xl font-bold text-navy-900 mb-6"
         >
-          Upload Portfolio
+          Edit Portfolio
         </motion.h2>
 
         <div className="space-y-6">
@@ -248,7 +289,7 @@ export default function UploadPortfolio() {
               initial="hidden"
               animate="visible"
             >
-              <Label htmlFor="images" className="text-navy-900">Upload Images *</Label>
+              <Label htmlFor="images" className="text-navy-900">Add More Images</Label>
               <Input
                 id="images"
                 type="file"
@@ -257,6 +298,7 @@ export default function UploadPortfolio() {
                 onChange={(e) => setFiles(e.target.files)}
                 className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
               />
+              <p className="text-sm text-navy-200 mt-2">Existing images: {portfolioItem.imageUrls.length}</p>
             </motion.div>
           )}
 
@@ -284,7 +326,7 @@ export default function UploadPortfolio() {
                 initial="hidden"
                 animate="visible"
               >
-                <Label htmlFor="videoFiles" className="text-navy-900">Upload Video (optional)</Label>
+                <Label htmlFor="videoFiles" className="text-navy-900">Replace Video (optional)</Label>
                 <Input
                   id="videoFiles"
                   type="file"
@@ -292,6 +334,7 @@ export default function UploadPortfolio() {
                   onChange={(e) => setFiles(e.target.files)}
                   className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
                 />
+                {portfolioItem.videoUrl && <p className="text-sm text-navy-200 mt-2">Existing video: {portfolioItem.videoUrl}</p>}
               </motion.div>
             </>
           )}
@@ -313,17 +356,17 @@ export default function UploadPortfolio() {
             animate="visible"
           >
             <Button
-              onClick={handleUpload}
+              onClick={handleUpdate}
               disabled={loading}
               className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold py-6"
             >
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                 {loading ? (
-                  'Uploading...'
+                  'Updating...'
                 ) : (
                   <>
                     <Upload className="h-5 w-5 mr-2" />
-                    Upload
+                    Update
                   </>
                 )}
               </motion.div>

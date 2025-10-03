@@ -35,15 +35,18 @@ export interface Booking {
 export interface PortfolioItem {
   id: string;
   title: string;
+  type: 'photography' | 'videography';
   category: string;
   tags: string[];
   imageUrls: string[];
-  videoUrl?: string;
-  caption?: string;
+  videoUrl: string | null;
+  caption: string | null;
+  clientName: string | null;
   featured: boolean;
-  createdAt: Date;
-   clientId?: string | null; // Add clientId
-    clientName: string | null; // Added to match Firestore
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  clientId: string | null;
 }
 
 export interface Contact {

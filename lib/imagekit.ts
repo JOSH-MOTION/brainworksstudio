@@ -1,5 +1,5 @@
-// lib/imagekit.ts
 import ImageKit from 'imagekit';
+
 
 // Initialize ImageKit client with environment variables
 const imagekit = new ImageKit({
@@ -22,7 +22,7 @@ export async function uploadToImageKit(file: File | Buffer, fileName: string): P
     let fileData: string | Buffer;
     if (file instanceof File) {
       const buffer = await file.arrayBuffer();
-      fileData = Buffer.from(buffer).toString('base64'); // Convert File to base64 string
+      fileData = Buffer.from(buffer); // Use Buffer directly, no base64 conversion
     } else {
       fileData = file; // Already a Buffer
     }
@@ -46,5 +46,19 @@ export async function uploadToImageKit(file: File | Buffer, fileName: string): P
       stack: error.stack,
     });
     throw new Error(`Failed to upload image to ImageKit: ${error.message}`);
+  }
+}
+
+// Server-side delete helper
+export async function deleteFromImageKit(fileId: string): Promise<void> {
+  try {
+    await imagekit.deleteFile(fileId);
+    console.log(`Deleted file ${fileId} from ImageKit`);
+  } catch (error: any) {
+    console.error('ImageKit deletion failed:', {
+      message: error.message,
+      stack: error.stack,
+    });
+    throw new Error(`Failed to delete file ${fileId} from ImageKit`);
   }
 }

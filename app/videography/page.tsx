@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import Link from 'next/link';
-import Image from 'next/image';
 import VideoPlayer from '@/components/VideoPlayer';
+import Image from 'next/image';
+import { PortfolioItem } from '@/types';
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
@@ -27,69 +26,56 @@ const cardVariants: Variants = {
   }),
 };
 
-const categories = [
-  {
-    title: 'Corporate',
-    image: '/images/corporate-video.jpg',
-    slug: 'corporate',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-1',
-  },
-  {
-    title: 'Event',
-    image: '/images/event-video.jpg',
-    slug: 'event',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-2',
-  },
-  {
-    title: 'Music Videos',
-    image: '/images/music-video.jpg',
-    slug: 'music-videos',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-3',
-  },
-  {
-    title: 'Commercials & Adverts',
-    image: '/images/commercial.jpg',
-    slug: 'commercials-adverts',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-4',
-  },
-  {
-    title: 'Documentary',
-    image: '/images/documentary-video.jpg',
-    slug: 'documentary',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-5',
-  },
-  {
-    title: 'Short Films / Creative Projects',
-    image: '/images/short-film.jpg',
-    slug: 'short-films-creative',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-6',
-  },
-  {
-    title: 'Promotional',
-    image: '/images/promotional.jpg',
-    slug: 'promotional',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-7',
-  },
-  {
-    title: 'Social Media',
-    image: '/images/social-media.jpg',
-    slug: 'social-media',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-8',
-  },
-  {
-    title: 'Others',
-    image: '/images/others-video.jpg',
-    slug: 'others',
-    youtubeUrl: 'https://www.youtube.com/embed/your-video-id-9',
-  },
-];
-
-export default function VideographyCategories() {
+export default function VideographyPortfolio({ params }: { params: { category: string } }) {
+  const { category } = params;
+  const [items, setItems] = useState<PortfolioItem[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(`/api/portfolio?type=videography&category=${encodeURIComponent(category)}`);
+        if (!response.ok) throw new Error('Failed to fetch portfolio items');
+        const data = await response.json();
+        console.log('Fetched videography items:', data);
+        setItems(data);
+      } catch (err: any) {
+        console.error('Fetch failed:', err);
+        setError('Failed to load portfolio items.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, [category]);
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
+            <p className="mt-4 text-navy-900">Loading...</p>
+          </div>
+          </div>
+        </Layout>
+      );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+          <p className="text-red-600">{error}</p>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
-      {/* Hero Section */}
       <motion.section
         initial="hidden"
         animate="visible"
@@ -103,75 +89,79 @@ export default function VideographyCategories() {
           className="absolute inset-0"
         >
           <Image
-            src="/vid.jpeg"
-            alt="Videography Hero"
+            src={`/images/${category}-video-hero.jpg`}
+            alt={`${category} Hero`}
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+          <div className="absolute inset-0 bg-navy-900 bg-opacity-50"></div>
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <motion.h1
-            className="text-3xl md:text-5xl font-bold mb-4 tracking-tight"
+            className="text-3xl md:text-5xl font-bold mb-4 tracking-tight capitalize text-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Videography Categories
+            {category.replace('-', ' ')} Videography
           </motion.h1>
           <motion.p
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90"
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90 text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Discover our cinematic videography services, from corporate to creative projects.
+            Explore our captivating portfolio of {category.replace('-', ' ')} videography.
           </motion.p>
         </div>
       </motion.section>
 
-      {/* Category Grid with Video Previews */}
       <motion.section
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={sectionVariants}
-        className="py-20 bg-gray-50"
+        className="py-20 bg-navy-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.map((category, index) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {items.map((item, index) => (
               <motion.div
-                key={category.slug}
+                key={item.id}
                 custom={index}
                 variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true }}
+                className="group cursor-pointer"
+                onClick={() => {
+                  if (item.videoUrl) {
+                    setSelectedVideo(item.videoUrl);
+                  } else if (item.imageUrls.length > 0) {
+                    console.warn(`No videoUrl for ${item.title}, falling back to imageUrls[0]`);
+                    setSelectedVideo(item.imageUrls[0]);
+                  }
+                }}
               >
-                <div className="relative">
-                  <Link href={`/videography/${category.slug}`}>
-                    <Card className="group border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white">
-                      <CardHeader className="p-0">
-                        <Image
-                          src={category.image}
-                          alt={`${category.title} preview`}
-                          width={400}
-                          height={300}
-                          className="object-cover w-full h-48 group-hover:scale-105 transition-transform duration-300"
-                        />
-                      </CardHeader>
-                      <CardContent className="p-4">
-                        <CardTitle className="text-xl text-gray-900">{category.title}</CardTitle>
-                      </CardContent>
-                    </Card>
-                  </Link>
-                  <div
-                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50 cursor-pointer"
-                    onClick={() => setSelectedVideo(category.youtubeUrl)}
-                  >
-                    <span className="text-white text-lg font-semibold">Play Preview</span>
+                <div className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                  <Image
+                    src={item.imageUrls[0] || '/video-placeholder.jpg'}
+                    alt={item.title}
+                    width={400}
+                    height={300}
+                    className="object-cover w-full h-64 group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      console.error(`Failed to load thumbnail for ${item.title}: ${item.imageUrls[0]}`);
+                      e.currentTarget.src = '/video-placeholder.jpg';
+                    }}
+                  />
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50">
+                    <span className="text-white text-lg font-semibold">Play</span>
+                  </div>
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="text-sm">{item.clientName}</p>
                   </div>
                 </div>
               </motion.div>

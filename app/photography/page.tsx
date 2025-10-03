@@ -1,275 +1,171 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import Lightbox from '@/components/Lightbox';
 import Image from 'next/image';
+import { PortfolioItem } from '@/types';
 
-// Animation variants for sections
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.8, ease: 'easeInOut', staggerChildren: 0.2 },
-  },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
-// Animation variants for hero content
-const heroContentVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.9, rotate: -10 },
+const heroImageVariants: Variants = {
+  hidden: { opacity: 0, scale: 1.1 },
   visible: {
     opacity: 1,
     scale: 1,
-    rotate: 0,
-    transition: { duration: 1, type: 'spring', stiffness: 120, damping: 15 },
+    transition: { duration: 1, ease: 'easeOut' as const }, // Explicitly type ease as a literal
   },
 };
 
-// Animation variants for hero children
-const heroChildVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: 'easeOut' },
-  },
-};
-
-// Animation variants for hero images
-const heroImageVariants: Variants = {
-  hidden: (direction: string) => ({
-    opacity: 0,
-    x: direction === 'left' ? -100 : direction === 'right' ? 100 : 0,
-    y: direction === 'top' ? -100 : direction === 'bottom' ? 100 : 0,
-    rotate: direction === 'left' || direction === 'right' ? 15 : 0,
-  }),
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    rotate: 0,
-    transition: { duration: 1.2, type: 'spring', stiffness: 100, damping: 20 },
-  },
-};
-
-// Animation variants for category cards
 const cardVariants: Variants = {
-  hidden: (i: number) => ({
-    opacity: 0,
-    scale: 0.8,
-    x: i % 2 === 0 ? -50 : 50,
-    rotateX: 20,
-  }),
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
-    scale: 1,
-    x: 0,
-    rotateX: 0,
-    transition: { duration: 0.8, delay: i * 0.15, type: 'spring', stiffness: 90 },
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.1, ease: 'easeOut' as const },
   }),
-  hover: {
-    scale: 1.05,
-    y: -10,
-    transition: { duration: 0.4, type: 'spring', stiffness: 130 },
-  },
 };
 
-// Animation variants for buttons
-const buttonVariants: Variants = {
-  hidden: { opacity: 0, x: -30 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-  hover: { scale: 1.15, rotate: 5, transition: { duration: 0.3 } },
-  tap: { scale: 0.9 },
-};
+export default function PhotographyPortfolio({ params }: { params: { category: string } }) {
+  const { category } = params;
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-// Animation variants for card overlay
-const overlayVariants: Variants = {
-  initial: { opacity: 0 },
-  hover: { opacity: 0.5, transition: { duration: 0.3 } },
-};
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch(`/api/portfolio?type=photography&category=${encodeURIComponent(category)}`);
+        if (!response.ok) throw new Error('Failed to fetch portfolio items');
+        const data = await response.json();
+        console.log('Fetched photography items:', data);
+        setItems(data);
+      } catch (err: any) {
+        console.error('Fetch failed:', err);
+        setError('Failed to load portfolio items.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItems();
+  }, [category]);
 
-const categories = [
-  { title: 'Corporate', image: '/Corperate1.jpg', slug: 'corporate' },
-  { title: 'Event', image: '/event.jpg', slug: 'event' },
-  { title: 'Portrait', image: '/potrait.jpg', slug: 'portrait' },
-  { title: 'Fashion', image: '/images/fashion.jpg', slug: 'fashion' },
-  { title: 'Product', image: '/images/product.jpg', slug: 'product' },
-  { title: 'Travel & Landscape', image: '/images/travel.jpg', slug: 'travel-landscape' },
-  { title: 'Documentary & Lifestyle', image: '/images/documentary.jpg', slug: 'documentary-lifestyle' },
-  { title: 'Creative/Artistic', image: '/images/creative.jpg', slug: 'creative-artistic' },
-  { title: 'Others', image: '/images/others.jpg', slug: 'others' },
-];
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
+            <p className="mt-4 text-navy-900">Loading...</p>
+          </div>
+          </div>
+        </Layout>
+      );
+  }
 
-export default function PhotographyCategories() {
+  if (error) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+          <p className="text-red-600">{error}</p>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
-      {/* Hero Section */}
       <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="relative min-h-[80vh] flex items-center justify-center text-white overflow-hidden"
+        className="relative min-h-[60vh] flex items-center justify-center text-white"
       >
-        {/* Background Image */}
         <motion.div
-          initial={{ opacity: 0, scale: 1.2 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease: 'easeInOut' }}
+          variants={heroImageVariants}
+          initial="hidden"
+          animate="visible"
           className="absolute inset-0"
         >
           <Image
-            src="/hero-bg.jpg"
-            alt="Photography Hero Background"
+            src={`/images/${category}-hero.jpg`}
+            alt={`${category} Hero`}
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-teal-900 bg-opacity-60" />
+          <div className="absolute inset-0 bg-navy-900 bg-opacity-50"></div>
         </motion.div>
-
-        {/* Floating Images */}
-        <motion.div
-          custom="left"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute top-10 left-10 w-48 h-64 hidden lg:block"
-        >
-          <Image
-            src="/photography-hero-img1.jpg"
-            alt="Photography Hero Image 1"
-            fill
-            className="object-cover rounded-lg shadow-2xl"
-          />
-        </motion.div>
-        <motion.div
-          custom="right"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute bottom-20 right-10 w-56 h-72 hidden lg:block"
-        >
-          <Image
-            src="/photography-hero-img2.jpg"
-            alt="Photography Hero Image 2"
-            fill
-            className="object-cover rounded-lg shadow-2xl"
-          />
-        </motion.div>
-        <motion.div
-          custom="top"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute top-20 right-1/3 w-40 h-56 hidden lg:block"
-        >
-          <Image
-            src="/photography-hero-img3.jpg"
-            alt="Photography Hero Image 3"
-            fill
-            className="object-cover rounded-lg shadow-2xl"
-          />
-        </motion.div>
-
-        {/* Hero Content */}
-        <motion.div
-          variants={heroContentVariants}
-          className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10"
-        >
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <motion.h1
-            variants={heroChildVariants}
-            className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-white drop-shadow-lg"
+            className="text-3xl md:text-5xl font-bold mb-4 tracking-tight capitalize text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
           >
-            Discover Our Photography
+            {category.replace('-', ' ')} Photography
           </motion.h1>
           <motion.p
-            variants={heroChildVariants}
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gray-100 drop-shadow-md"
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90 text-white"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
-            From corporate elegance to creative artistry, explore our diverse photography services.
+            Discover our stunning portfolio of {category.replace('-', ' ')} photography.
           </motion.p>
-          <motion.div variants={heroChildVariants}>
-            <Link href="/booking">
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
-                  size="lg"
-                  className="bg-coral-400 text-white hover:bg-coral-500 font-semibold shadow-md"
-                >
-                  Book a Session
-                </Button>
-              </motion.div>
-            </Link>
-          </motion.div>
-        </motion.div>
+        </div>
       </motion.section>
 
-      {/* Category Grid */}
       <motion.section
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={sectionVariants}
-        className="py-24 bg-gray-50"
+        className="py-20 bg-navy-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            variants={heroChildVariants}
-            className="text-center mb-12"
-          >
-            <h2 className="text-3xl md:text-4xl font-bold text-teal-900">Our Categories</h2>
-            <p className="text-lg text-gray-600 mt-4 max-w-xl mx-auto">
-              Browse our specialized photography services tailored to your vision.
-            </p>
-          </motion.div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((category, index) => (
+            {items.map((item, index) => (
               <motion.div
-                key={category.slug}
+                key={item.id}
                 custom={index}
                 variants={cardVariants}
                 initial="hidden"
                 whileInView="visible"
-                whileHover="hover"
                 viewport={{ once: true }}
+                className="group cursor-pointer"
+                onClick={() => setSelectedImage(item.imageUrls[0])}
               >
-                <Link href={`/photography/${category.slug}`}>
-                  <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
-                    <motion.div
-                      className="relative w-full h-48"
-                      whileHover={{ scale: 1.1 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <Image
-                        src={category.image}
-                        alt={`${category.title} preview`}
-                        fill
-                        className="object-cover"
-                      />
-                      <motion.div
-                        className="absolute inset-0 bg-teal-500"
-                        variants={overlayVariants}
-                        initial="initial"
-                        whileHover="hover"
-                      >
-                        <p className="text-white text-lg font-semibold flex items-center justify-center h-full opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                          {category.title}
-                        </p>
-                      </motion.div>
-                    </motion.div>
-                    <div className="p-4">
-                      <h3 className="text-xl font-semibold text-teal-900 text-center">
-                        {category.title}
-                      </h3>
-                    </div>
+                <div className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                  <Image
+                    src={item.imageUrls[0] || '/placeholder-image.jpg'}
+                    alt={item.title}
+                    width={400}
+                    height={300}
+                    className="object-cover w-full h-64 group-hover:scale-105 transition-transform duration-300"
+                    onError={(e) => {
+                      console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0]}`);
+                      e.currentTarget.src = '/placeholder-image.jpg';
+                    }}
+                  />
+                  <div className="absolute bottom-4 left-4 right-4 text-white">
+                    <h3 className="font-semibold">{item.title}</h3>
+                    <p className="text-sm">{item.clientName}</p>
                   </div>
-                </Link>
+                </div>
               </motion.div>
             ))}
           </div>
         </div>
       </motion.section>
+      {selectedImage && (
+        <Lightbox image={selectedImage} onClose={() => setSelectedImage(null)} />
+      )}
     </Layout>
   );
 }
