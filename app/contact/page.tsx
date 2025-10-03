@@ -1,13 +1,90 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
+import Link from 'next/link';
+
+// Animation variants for sections
+const sectionVariants: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.8, ease: 'easeInOut', staggerChildren: 0.2 },
+  },
+};
+
+// Animation variants for hero content
+const heroContentVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.8, type: 'spring', stiffness: 100, damping: 15 },
+  },
+};
+
+// Animation variants for hero children (text and button)
+const heroChildVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, delay: i * 0.2, ease: 'easeOut' },
+  }),
+};
+
+// Animation variants for hero text characters
+const textVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.5, delay: i * 0.05, ease: 'easeOut' },
+  }),
+};
+
+// Animation variants for contact info cards
+const infoCardVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8, rotateX: 20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    scale: 1,
+    rotateX: 0,
+    transition: { duration: 0.8, delay: i * 0.15, type: 'spring', stiffness: 90 },
+  }),
+  hover: {
+    scale: 1.05,
+    y: -10,
+    transition: { duration: 0.4, type: 'spring', stiffness: 130 },
+  },
+};
+
+// Animation variants for form elements
+const formElementVariants: Variants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.6, delay: i * 0.1, ease: 'easeOut' },
+  }),
+};
+
+// Animation variants for success message
+const successVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.8, type: 'spring', stiffness: 100, damping: 15 },
+  },
+};
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -61,175 +138,222 @@ export default function ContactPage() {
     }
   };
 
+  // Split the heading text for character-by-character animation
+  const headingText = "Let's Create Together".split('');
+
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Get in Touch</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Ready to capture your story? We'd love to hear about your project and discuss how we can bring your vision to life.
-          </p>
-        </div>
+      {/* Hero Section */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        className="relative min-h-[60vh] flex items-center justify-center bg-teal-900 text-white"
+      >
+        {/* Hero Content */}
+        <motion.div
+          variants={heroContentVariants}
+          className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10"
+        >
+          <motion.h1
+            className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-white"
+          >
+            {headingText.map((char, index) => (
+              <motion.span
+                key={index}
+                custom={index}
+                variants={textVariants}
+                initial="hidden"
+                animate="visible"
+                className="inline-block"
+              >
+                {char === ' ' ? '\u00A0' : char}
+              </motion.span>
+            ))}
+          </motion.h1>
+          <motion.p
+            custom={0}
+            variants={heroChildVariants}
+            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gold-100 drop-shadow-md"
+          >
+            Ready to bring your vision to life? Contact us to discuss your project and start crafting unforgettable visuals.
+          </motion.p>
+          <motion.div custom={1} variants={heroChildVariants}>
+            <Link href="#contact-form">
+              <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}>
+                <Button
+                  size="lg"
+                  className="bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold shadow-md"
+                >
+                  Get Started
+                </Button>
+              </motion.div>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Information */}
-          <div className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-                <CardDescription>
-                  Reach out to us through any of these channels
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-amber-100 rounded-full">
-                    <Mail className="h-5 w-5 text-amber-700" />
+      {/* Contact Section */}
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+        className="py-24 bg-navy-50"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Contact Information */}
+            <div className="lg:col-span-1 space-y-6">
+              {[
+                {
+                  icon: Mail,
+                  title: 'Email',
+                  value: 'hello@brainworksstudio2.com',
+                  note: 'Response within 24 hours',
+                },
+                {
+                  icon: Phone,
+                  title: 'Phone',
+                  value: '+233 242403450',
+                  note: 'Mon-Fri, 9am-6pm EST',
+                },
+                {
+                  icon: MapPin,
+                  title: 'Location',
+                  value: 'Your City, State',
+                  note: 'We travel to your location',
+                },
+                {
+                  icon: Clock,
+                  title: 'Business Hours',
+                  value: 'Mon-Fri: 9am-6pm\nWeekend: By appointment',
+                },
+              ].map((info, index) => (
+                <motion.div
+                  key={info.title}
+                  custom={index}
+                  variants={infoCardVariants}
+                  whileHover="hover"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                >
+                  <div className="bg-white rounded-xl shadow-md p-6 flex items-start gap-4 hover:bg-navy-100 transition-colors">
+                    <motion.div
+                      className="p-2 bg-gold-100 rounded-full"
+                      whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
+                    >
+                      <info.icon className="h-6 w-6 text-gold-500" />
+                    </motion.div>
+                    <div>
+                      <h3 className="font-semibold text-navy-900">{info.title}</h3>
+                      <p className="text-gray-600 whitespace-pre-line">{info.value}</p>
+                      <p className="text-sm text-gray-500">{info.note}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-medium">Email</h3>
-                    <p className="text-gray-600">hello@brainworksstudio2.com</p>
-                    <p className="text-sm text-gray-500">We'll respond within 24 hours</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-amber-100 rounded-full">
-                    <Phone className="h-5 w-5 text-amber-700" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Phone</h3>
-                    <p className="text-gray-600">+233 242403450</p>
-                    <p className="text-sm text-gray-500">Mon-Fri, 9am-6pm EST</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-amber-100 rounded-full">
-                    <MapPin className="h-5 w-5 text-amber-700" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Location</h3>
-                    <p className="text-gray-600">Your City, State</p>
-                    <p className="text-sm text-gray-500">We travel to your location</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-amber-100 rounded-full">
-                    <Clock className="h-5 w-5 text-amber-700" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium">Business Hours</h3>
-                    <p className="text-gray-600">Monday - Friday: 9am - 6pm</p>
-                    <p className="text-gray-600">Weekend: By appointment</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Emergency Contact */}
-            <Card className="mt-6">
-              <CardContent className="p-6">
-                <div className="text-center">
-                  <h3 className="font-semibold mb-2">Have an urgent project?</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    For time-sensitive bookings or emergency shoots, call our priority line
-                  </p>
-                  <Button variant="outline" className="w-full">
+                </motion.div>
+              ))}
+              {/* Emergency Contact */}
+              <motion.div
+                custom={4}
+                variants={infoCardVariants}
+                whileHover="hover"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="bg-white rounded-xl shadow-md p-6 text-center">
+                  <h3 className="font-semibold text-navy-900 mb-2">Urgent Project?</h3>
+                  <p className="text-sm text-gray-600 mb-4">Call our priority line for time-sensitive bookings.</p>
+                  <Button
+                    variant="outline"
+                    className="w-full border-gold-500 text-gold-500 hover:bg-gold-100"
+                  >
                     <Phone className="h-4 w-4 mr-2" />
-                    +233 242403450 
+                    +233 242403450
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </motion.div>
+            </div>
 
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Send us a Message</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll get back to you as soon as possible
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
+            {/* Contact Form */}
+            <motion.div
+              id="contact-form"
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="lg:col-span-2"
+            >
+              <div className="bg-white rounded-xl shadow-md p-6">
                 {success ? (
-                  <div className="text-center py-8">
-                    <div className="mx-auto mb-4 p-3 bg-green-100 rounded-full w-fit">
-                      <Send className="h-8 w-8 text-green-600" />
-                    </div>
-                    <h3 className="text-xl font-semibold text-green-600 mb-2">Message Sent!</h3>
+                  <motion.div
+                    variants={successVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="text-center py-8"
+                  >
+                    <motion.div
+                      className="mx-auto mb-4 p-3 bg-gold-100 rounded-full w-fit"
+                      animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
+                      transition={{ duration: 1.5, repeat: 1 }}
+                    >
+                      <Send className="h-8 w-8 text-gold-500" />
+                    </motion.div>
+                    <h3 className="text-xl font-semibold text-navy-900 mb-2">Message Sent!</h3>
                     <p className="text-gray-600">
                       Thank you for reaching out. We'll get back to you within 24 hours.
                     </p>
-                    <Button 
-                      onClick={() => setSuccess(false)} 
-                      variant="outline" 
-                      className="mt-4"
-                    >
-                      Send Another Message
-                    </Button>
-                  </div>
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                      <Button
+                        onClick={() => setSuccess(false)}
+                        variant="outline"
+                        className="mt-4 border-gold-500 text-gold-500 hover:bg-gold-100"
+                      >
+                        Send Another Message
+                      </Button>
+                    </motion.div>
+                  </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Name *</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          required
-                          placeholder="Your full name"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          required
-                          placeholder="your@email.com"
-                        />
-                      </div>
+                      {[
+                        { id: 'name', label: 'Name *', type: 'text', placeholder: 'Your full name', required: true },
+                        { id: 'email', label: 'Email *', type: 'email', placeholder: 'your@email.com', required: true },
+                        { id: 'phone', label: 'Phone', type: 'tel', placeholder: '+233 242403450', required: false },
+                        { id: 'subject', label: 'Subject *', type: 'text', placeholder: 'What can we help you with?', required: true },
+                      ].map((field, index) => (
+                        <motion.div
+                          key={field.id}
+                          custom={index}
+                          variants={formElementVariants}
+                          initial="hidden"
+                          whileInView="visible"
+                          viewport={{ once: true }}
+                        >
+                          <Label htmlFor={field.id} className="text-navy-900">{field.label}</Label>
+                          <Input
+                            id={field.id}
+                            name={field.id}
+                            type={field.type}
+                            value={formData[field.id as keyof typeof formData]}
+                            onChange={handleChange}
+                            required={field.required}
+                            placeholder={field.placeholder}
+                            className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
+                          />
+                        </motion.div>
+                      ))}
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          type="tel"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+233 242403450"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="subject">Subject *</Label>
-                        <Input
-                          id="subject"
-                          name="subject"
-                          value={formData.subject}
-                          onChange={handleChange}
-                          required
-                          placeholder="What can we help you with?"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
+                    <motion.div
+                      custom={4}
+                      variants={formElementVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                    >
+                      <Label htmlFor="message" className="text-navy-900">Message *</Label>
                       <Textarea
                         id="message"
                         name="message"
@@ -238,36 +362,47 @@ export default function ContactPage() {
                         required
                         placeholder="Tell us about your project, timeline, budget, and any specific requirements..."
                         rows={6}
+                        className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
                       />
-                    </div>
-
+                    </motion.div>
                     {error && (
-                      <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-red-600 text-sm bg-red-50 p-3 rounded-md"
+                      >
                         {error}
-                      </div>
+                      </motion.div>
                     )}
-
-                    <Button 
-                      type="submit" 
-                      className="w-full bg-amber-700 hover:bg-amber-800 py-6 text-lg" 
-                      disabled={loading}
+                    <motion.div
+                      custom={5}
+                      variants={formElementVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
                     >
-                      {loading ? (
-                        'Sending Message...'
-                      ) : (
-                        <>
-                          <Send className="h-5 w-5 mr-2" />
-                          Send Message
-                        </>
-                      )}
-                    </Button>
+                      <Button
+                        type="submit"
+                        className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 py-6 text-lg font-semibold"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          'Sending Message...'
+                        ) : (
+                          <>
+                            <Send className="h-5 w-5 mr-2" />
+                            Send Message
+                          </>
+                        )}
+                      </Button>
+                    </motion.div>
                   </form>
                 )}
-              </CardContent>
-            </Card>
+              </div>
+            </motion.div>
           </div>
         </div>
-      </div>
+      </motion.section>
     </Layout>
   );
 }

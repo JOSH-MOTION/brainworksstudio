@@ -37,13 +37,13 @@ export interface PortfolioItem {
   title: string;
   category: string;
   tags: string[];
-  imageUrl: string;
+  imageUrls: string[];
   videoUrl?: string;
   caption?: string;
   featured: boolean;
   createdAt: Date;
    clientId?: string | null; // Add clientId
-   googleDriveFolderId?: string; // New: Google Drive folder ID for images
+    clientName: string | null; // Added to match Firestore
 }
 
 export interface Contact {

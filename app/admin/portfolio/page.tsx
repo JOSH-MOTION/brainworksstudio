@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -30,7 +30,7 @@ export default function AdminPortfolioPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<PortfolioItem | null>(null);
-  
+
   const { user, isAdmin, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
 
@@ -56,7 +56,10 @@ export default function AdminPortfolioPage() {
       const response = await fetch('/api/portfolio');
       if (response.ok) {
         const data = await response.json();
+        console.log('Fetched portfolio items:', data); // Debug: Verify imageUrls
         setPortfolioItems(data);
+      } else {
+        throw new Error('Failed to fetch portfolio items');
       }
     } catch (error) {
       console.error('Error fetching portfolio items:', error);
@@ -70,7 +73,7 @@ export default function AdminPortfolioPage() {
       const token = await firebaseUser?.getIdToken();
       const response = await fetch('/api/users/clients', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
       if (response.ok) {
@@ -88,21 +91,24 @@ export default function AdminPortfolioPage() {
 
   const filterItems = () => {
     let filtered = portfolioItems;
-    
+
     if (searchTerm) {
-      filtered = filtered.filter(item => 
-        item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.clientId && clients[item.clientId]?.displayName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (item.clientId && clients[item.clientId]?.email?.toLowerCase().includes(searchTerm.toLowerCase()))
+      filtered = filtered.filter(
+        (item) =>
+          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.clientId &&
+            clients[item.clientId]?.displayName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          (item.clientId &&
+            clients[item.clientId]?.email?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
-    
+
     if (selectedCategory !== 'all') {
-      filtered = filtered.filter(item => item.category === selectedCategory);
+      filtered = filtered.filter((item) => item.category === selectedCategory);
     }
-    
+
     setFilteredItems(filtered);
   };
 
@@ -112,14 +118,16 @@ export default function AdminPortfolioPage() {
       const response = await fetch(`/api/portfolio/${item.id}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
       });
-      
+
       if (response.ok) {
-        setPortfolioItems(prev => prev.filter(p => p.id !== item.id));
+        setPortfolioItems((prev) => prev.filter((p) => p.id !== item.id));
         setDeleteDialogOpen(false);
         setItemToDelete(null);
+      } else {
+        throw new Error('Failed to delete portfolio item');
       }
     } catch (error) {
       console.error('Error deleting portfolio item:', error);
@@ -133,24 +141,26 @@ export default function AdminPortfolioPage() {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           featured: !item.featured,
         }),
       });
-      
+
       if (response.ok) {
-        setPortfolioItems(prev => 
-          prev.map(p => p.id === item.id ? { ...p, featured: !p.featured } : p)
+        setPortfolioItems((prev) =>
+          prev.map((p) => (p.id === item.id ? { ...p, featured: !p.featured } : p))
         );
+      } else {
+        throw new Error('Failed to update portfolio item');
       }
     } catch (error) {
       console.error('Error updating portfolio item:', error);
     }
   };
 
-  const categories = ['all', ...Array.from(new Set(portfolioItems.map(item => item.category)))];
+  const categories = ['all', ...Array.from(new Set(portfolioItems.map((item) => item.category)))];
 
   if (authLoading || loading) {
     return (
@@ -160,10 +170,10 @@ export default function AdminPortfolioPage() {
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-700 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading portfolio management...</p>
           </div>
-        </div>
-      </Layout>
-    );
-  }
+          </div>
+        </Layout>
+      );
+    }
 
   if (!user || !isAdmin) {
     return null;
@@ -201,14 +211,13 @@ export default function AdminPortfolioPage() {
                   />
                 </div>
               </div>
-              
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="w-[200px]">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map(category => (
+                  {categories.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category === 'all' ? 'All Categories' : category}
                     </SelectItem>
@@ -226,19 +235,22 @@ export default function AdminPortfolioPage() {
               <CardContent className="p-0">
                 <div className="aspect-square relative overflow-hidden rounded-t-lg">
                   <Image
-                    src={item.imageUrl || '/placeholder-image.jpg'}
+                    src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : '/placeholder-image.jpg'}
                     alt={item.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    onError={(e) => {
+                      console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0]}`);
+                      e.currentTarget.src = '/placeholder-image.jpg';
+                    }}
+                    onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0]}`)}
                   />
-                  
                   {/* Featured Badge */}
                   {item.featured && (
                     <div className="absolute top-2 left-2">
                       <Badge className="bg-amber-600 text-white">Featured</Badge>
                     </div>
                   )}
-                  
                   {/* Action Buttons */}
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
                     <div className="flex gap-1">
@@ -269,7 +281,6 @@ export default function AdminPortfolioPage() {
                     </div>
                   </div>
                 </div>
-                
                 <div className="p-4">
                   <h3 className="font-semibold mb-1 truncate">{item.title}</h3>
                   <div className="flex items-center justify-between mb-2">
@@ -287,7 +298,7 @@ export default function AdminPortfolioPage() {
                     </div>
                   )}
                   <div className="flex flex-wrap gap-1 mb-2">
-                    {item.tags.slice(0, 3).map(tag => (
+                    {item.tags.slice(0, 3).map((tag) => (
                       <Badge key={tag} variant="secondary" className="text-xs">
                         {tag}
                       </Badge>
@@ -298,7 +309,6 @@ export default function AdminPortfolioPage() {
                       </Badge>
                     )}
                   </div>
-                  
                   {item.caption && (
                     <p className="text-sm text-gray-600 line-clamp-2">{item.caption}</p>
                   )}
@@ -313,10 +323,9 @@ export default function AdminPortfolioPage() {
             <Camera className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No portfolio items found</h3>
             <p className="text-gray-600 mb-4">
-              {portfolioItems.length === 0 
-                ? "Start by uploading your first portfolio item!"
-                : "Try adjusting your search or filter criteria."
-              }
+              {portfolioItems.length === 0
+                ? 'Start by uploading your first portfolio item!'
+                : 'Try adjusting your search or filter criteria.'}
             </p>
             <Link href="/admin/portfolio/upload">
               <Button className="bg-amber-700 hover:bg-amber-800">
@@ -342,8 +351,8 @@ export default function AdminPortfolioPage() {
               <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={() => itemToDelete && handleDelete(itemToDelete)}
               >
                 Delete

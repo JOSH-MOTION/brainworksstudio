@@ -53,6 +53,8 @@
     "firebase": "^12.2.1",
     "firebase-admin": "^13.5.0",
     "framer-motion": "^12.23.21",
+    "imagekit": "^6.0.0",
+    "imagekitio-react": "^4.3.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.446.0",
     "next": "13.5.1",

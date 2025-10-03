@@ -1,6 +1,7 @@
 // app/api/portfolio/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
+import { uploadToImageKit } from '@/lib/imagekit';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,7 +15,7 @@ export async function GET() {
 
     console.log('GET /api/portfolio: Querying portfolio collection');
     const portfolioSnapshot = await adminDb.collection('portfolio')
-      .orderBy('createdAt', 'desc') // Single orderBy to avoid index requirement
+      .orderBy('createdAt', 'desc')
       .get();
 
     console.log(`GET /api/portfolio: Found ${portfolioSnapshot.size} items`);
@@ -25,9 +26,10 @@ export async function GET() {
         title: data.title,
         category: data.category,
         tags: data.tags || [],
-        imageUrl: data.imageUrl || null,
+        imageUrls: data.imageUrls || [], // Handle array of image URLs
         videoUrl: data.videoUrl || null,
         caption: data.caption || null,
+        clientName: data.clientName || null,
         featured: data.featured || false,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt,
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt,
@@ -57,7 +59,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     if (!adminAuth || !adminDb) {
-      console.error('Firebase Admin not properly initialized');
+      console.error('POST /api/portfolio: Firebase Admin not initialized');
       return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
     }
 
@@ -71,7 +73,7 @@ export async function POST(request: NextRequest) {
     try {
       decodedToken = await adminAuth.verifyIdToken(token);
     } catch (error) {
-      console.error('Token verification failed:', error);
+      console.error('POST /api/portfolio: Token verification failed:', error);
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
@@ -81,8 +83,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { title, category, tags, imageUrl, videoUrl, caption, featured, clientId } = body;
+    const formData = await request.formData();
+    const title = formData.get('title') as string;
+    const category = formData.get('category') as string;
+    const tags = formData.get('tags') as string;
+    const caption = formData.get('caption') as string;
+    const clientName = formData.get('clientName') as string;
+    const featured = formData.get('featured') === 'true';
+    const clientId = formData.get('clientId') as string | null;
+    const files = formData.getAll('files') as File[];
 
     if (!title?.trim()) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
@@ -90,17 +99,25 @@ export async function POST(request: NextRequest) {
     if (!category) {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
     }
-    if (!imageUrl) {
-      return NextResponse.json({ error: 'Image URL is required' }, { status: 400 });
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: 'At least one image is required' }, { status: 400 });
+    }
+
+    // Upload images to ImageKit
+    const imageUrls: string[] = [];
+    for (const file of files) {
+      const result = await uploadToImageKit(file, file.name);
+      imageUrls.push(result.url);
     }
 
     const portfolioItem = {
       title: title.trim(),
       category,
-      tags: Array.isArray(tags) ? tags : [],
-      imageUrl,
-      videoUrl: videoUrl || null,
+      tags: tags ? tags.split(',').map(t => t.trim()) : [],
+      imageUrls,
+      videoUrl: null, // Not used in this context
       caption: caption?.trim() || null,
+      clientName: clientName?.trim() || null,
       featured: Boolean(featured),
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -118,10 +135,10 @@ export async function POST(request: NextRequest) {
       updatedAt: createdData?.updatedAt?.toDate?.()?.toISOString() || createdData?.updatedAt,
     };
 
-    console.log('Portfolio item created successfully:', createdDoc.id);
+    console.log('POST /api/portfolio: Portfolio item created successfully:', createdDoc.id);
     return NextResponse.json(createdItem, { status: 201 });
-  } catch (error) {
-    console.error('Error creating portfolio item:', error);
-    return NextResponse.json({ error: 'Failed to create portfolio item' }, { status: 500 });
+  } catch (error: any) {
+    console.error('POST /api/portfolio: Error creating portfolio item:', error);
+    return NextResponse.json({ error: 'Failed to create portfolio item', debug: error.message }, { status: 500 });
   }
 }
