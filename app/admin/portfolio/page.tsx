@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
-import { Camera, Plus, Edit, Trash2, Search, Filter, User } from 'lucide-react';
+import { Camera, Plus, Edit, Trash2, Search, Filter, User, Eye } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -89,7 +89,6 @@ export default function AdminPortfolioPage() {
 
   const filterItems = () => {
     let filtered = portfolioItems;
-
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
@@ -103,11 +102,9 @@ export default function AdminPortfolioPage() {
             clients[item.clientId]?.email?.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
-
     if (selectedCategory !== 'all') {
       filtered = filtered.filter((item) => item.category === selectedCategory);
     }
-
     setFilteredItems(filtered);
   };
 
@@ -118,7 +115,6 @@ export default function AdminPortfolioPage() {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
-
       if (response.ok) {
         setPortfolioItems((prev) => prev.filter((p) => p.id !== item.id));
         setDeleteDialogOpen(false);
@@ -144,7 +140,6 @@ export default function AdminPortfolioPage() {
         },
         body: JSON.stringify({ featured: !item.featured }),
       });
-
       if (response.ok) {
         setPortfolioItems((prev) =>
           prev.map((p) => (p.id === item.id ? { ...p, featured: !p.featured } : p))
@@ -164,13 +159,13 @@ export default function AdminPortfolioPage() {
       <Layout>
         <div className="min-h-screen flex items-center justify-center bg-navy-50">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gold-500 mx-auto"></div>
-            <p className="mt-4 text-navy-900">Loading portfolio management...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
+            <p className="mt-4 text-navy-900 text-lg font-medium">Loading portfolio management...</p>
           </div>
-          </div>
-        </Layout>
-      );
-    }
+        </div>
+      </Layout>
+    );
+  }
 
   if (!user || !isAdmin) {
     return null;
@@ -178,21 +173,21 @@ export default function AdminPortfolioPage() {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-navy-50">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-navy-900 mb-2">Portfolio Management</h1>
-            <p className="text-navy-200">Manage your studio's portfolio items</p>
+            <h1 className="text-4xl font-extrabold text-navy-900 mb-2">Portfolio Management</h1>
+            <p className="text-lg text-navy-200">Manage your studio's portfolio items</p>
           </div>
           <Link href="/admin/portfolio/upload">
-            <Button className="bg-gold-500 hover:bg-gold-400 text-navy-900">
+            <Button className="bg-gold-500 hover:bg-gold-400 text-navy-900 rounded-lg px-6 py-2">
               <Plus className="h-4 w-4 mr-2" />
               Add New Item
             </Button>
           </Link>
         </div>
 
-        <Card className="mb-6">
+        <Card className="mb-6 border-none shadow-md bg-white rounded-lg">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
@@ -202,12 +197,12 @@ export default function AdminPortfolioPage() {
                     placeholder="Search by title, category, tags, or client..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-navy-200 focus:ring-gold-500"
+                    className="pl-10 border-navy-200 focus:ring-gold-500 rounded-lg"
                   />
                 </div>
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-[200px] border-navy-200 focus:ring-gold-500">
+                <SelectTrigger className="w-[200px] border-navy-200 focus:ring-gold-500 rounded-lg">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -225,11 +220,20 @@ export default function AdminPortfolioPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
-            <Card key={item.id} className="group hover:shadow-lg transition-all duration-300">
+            <Card
+              key={item.id}
+              className="group hover:shadow-xl transition-all duration-300 border-none bg-white rounded-lg"
+            >
               <CardContent className="p-0">
                 <div className="aspect-square relative overflow-hidden rounded-t-lg">
                   <Image
-                    src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.videoUrl ? '/video-placeholder.jpg' : '/placeholder-image.jpg'}
+                    src={
+                      item.imageUrls && item.imageUrls.length > 0
+                        ? item.imageUrls[0]
+                        : item.videoUrl
+                          ? '/video-placeholder.jpg'
+                          : '/placeholder-image.jpg'
+                    }
                     alt={item.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -244,18 +248,22 @@ export default function AdminPortfolioPage() {
                       <Badge className="bg-gold-500 text-white">Featured</Badge>
                     </div>
                   )}
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="flex gap-1">
                       <Button
                         size="sm"
                         variant="secondary"
                         onClick={() => toggleFeatured(item)}
-                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-navy-200"
+                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
                       >
                         <Camera className="h-4 w-4" />
                       </Button>
                       <Link href={`/admin/portfolio/edit/${item.id}`}>
-                        <Button size="sm" variant="secondary" className="h-8 w-8 p-0 bg-navy-100 hover:bg-navy-200">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
+                        >
                           <Edit className="h-4 w-4" />
                         </Button>
                       </Link>
@@ -266,15 +274,24 @@ export default function AdminPortfolioPage() {
                           setItemToDelete(item);
                           setDeleteDialogOpen(true);
                         }}
-                        className="h-8 w-8 p-0"
+                        className="h-8 w-8 p-0 bg-red-600 hover:bg-red-700 rounded-full"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
+                      <Link href={`/portfolio/${item.id}`}>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold mb-1 truncate text-navy-900">{item.title}</h3>
+                  <h3 className="font-semibold text-lg text-navy-900 mb-1 truncate">{item.title}</h3>
                   <div className="flex items-center justify-between mb-2">
                     <Badge variant="outline" className="text-xs text-navy-900 border-navy-200">
                       {item.category}
@@ -295,12 +312,19 @@ export default function AdminPortfolioPage() {
                   ) : null}
                   <div className="flex flex-wrap gap-1 mb-2">
                     {item.tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs bg-gold-100 text-navy-900">
+                      <Badge
+                        key={tag}
+                        variant="secondary"
+                        className="text-xs bg-gold-100 text-navy-900"
+                      >
                         {tag}
                       </Badge>
                     ))}
                     {item.tags.length > 3 && (
-                      <Badge variant="secondary" className="text-xs bg-gold-100 text-navy-900">
+                      <Badge
+                        variant="secondary"
+                        className="text-xs bg-gold-100 text-navy-900"
+                      >
                         +{item.tags.length - 3}
                       </Badge>
                     )}
@@ -324,7 +348,7 @@ export default function AdminPortfolioPage() {
                 : 'Try adjusting your search or filter criteria.'}
             </p>
             <Link href="/admin/portfolio/upload">
-              <Button className="bg-gold-500 hover:bg-gold-400 text-navy-900">
+              <Button className="bg-gold-500 hover:bg-gold-400 text-navy-900 rounded-lg px-6 py-2">
                 <Plus className="h-4 w-4 mr-2" />
                 Upload Portfolio Item
               </Button>
@@ -333,7 +357,7 @@ export default function AdminPortfolioPage() {
         )}
 
         <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-          <DialogContent>
+          <DialogContent className="bg-white rounded-lg">
             <DialogHeader>
               <DialogTitle>Delete Portfolio Item</DialogTitle>
             </DialogHeader>
@@ -343,19 +367,24 @@ export default function AdminPortfolioPage() {
               </p>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+                className="border-navy-200 text-navy-900 hover:bg-navy-100 rounded-lg"
+              >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => itemToDelete && handleDelete(itemToDelete)}
+                className="bg-red-600 hover:bg-red-700 rounded-lg"
               >
                 Delete
               </Button>
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </section>
     </Layout>
   );
 }

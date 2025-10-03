@@ -1,379 +1,359 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import Layout from '@/components/Layout';
+import { PortfolioItem } from '@/types';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Upload } from 'lucide-react';
-import { getAuth } from 'firebase/auth';
-import { app } from '@/lib/firebase';
-import { PortfolioItem } from '@/types';
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
-const formElementVariants: Variants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: 'easeOut' },
-  }),
-};
-
-const buttonVariants: Variants = {
-  hover: { scale: 1.05, transition: { duration: 0.3 } },
-  tap: { scale: 0.95 },
+const formVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
 };
 
 const photographyCategories = [
-  'Corporate', 'Event', 'Portrait', 'Fashion', 'Product', 'Travel & Landscape',
-  'Documentary & Lifestyle', 'Creative/Artistic', 'Others'
+  'Corporate',
+  'Event',
+  'Portrait',
+  'Fashion',
+  'Product',
+  'Travel & Landscape',
+  'Documentary & Lifestyle',
+  'Creative/Artistic',
+  'Others',
 ];
+
 const videographyCategories = [
-  'Corporate', 'Event', 'Music Videos', 'Commercials & Adverts', 'Documentary',
-  'Short Films / Creative Projects', 'Promotional', 'Social Media', 'Others'
+  'Corporate',
+  'Event',
+  'Music Videos',
+  'Commercials & Adverts',
+  'Documentary',
+  'Short Films / Creative Projects',
+  'Promotional',
+  'Social Media',
+  'Others',
 ];
 
-export default function EditPortfolio() {
+export default function EditPortfolio({ params }: { params: { id: string } }) {
+  const { id } = params;
   const router = useRouter();
-  const { id } = useParams();
-  const auth = getAuth(app);
-
-  const [portfolioItem, setPortfolioItem] = useState<PortfolioItem | null>(null);
-  const [title, setTitle] = useState('');
-  const [type, setType] = useState<'photography' | 'videography'>('photography');
-  const [category, setCategory] = useState('');
-  const [tags, setTags] = useState('');
-  const [caption, setCaption] = useState('');
-  const [clientName, setClientName] = useState('');
-  const [files, setFiles] = useState<FileList | null>(null);
-  const [videoUrl, setVideoUrl] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [item, setItem] = useState<PortfolioItem | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    title: '',
+    type: 'photography' as 'photography' | 'videography',
+    category: '',
+    tags: '',
+    caption: '',
+    clientName: '',
+    featured: false,
+    clientId: '',
+    files: [] as File[],
+    videoUrl: '',
+  });
+  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchPortfolioItem = async () => {
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async user => {
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          setToken(idToken);
+        } catch (err: any) {
+          console.error('Failed to get ID token:', err);
+          setError('Authentication failed');
+          setLoading(false);
+        }
+      } else {
+        setToken(null);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    const fetchItem = async () => {
       try {
-        const user = auth.currentUser;
-        if (!user) throw new Error('User not authenticated');
-        const token = await user.getIdToken();
-        const response = await fetch(`/api/portfolio/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const headers: HeadersInit = {};
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        const response = await fetch(`/api/portfolio/${id}`, { headers });
+        if (!response.ok) {
+          let errorMessage = 'Failed to fetch portfolio item';
+          try {
+            const contentType = response.headers.get('content-type');
+            if (contentType?.includes('application/json')) {
+              const errorData = await response.json();
+              errorMessage = errorData.error || errorMessage;
+            } else {
+              const text = await response.text();
+              console.error(`Non-JSON response: ${text.slice(0, 100)}...`);
+              errorMessage = `Server returned ${response.status}: ${response.statusText}`;
+            }
+          } catch (parseError: any) {
+            console.error('Error parsing response:', parseError);
+          }
+          throw new Error(errorMessage);
+        }
+        const data: PortfolioItem = await response.json();
+        console.log('Fetched portfolio item:', data);
+        setItem(data);
+        setFormData({
+          title: data.title || '',
+          type: data.type || 'photography',
+          category: data.category || '',
+          tags: data.tags?.join(', ') || '',
+          caption: data.caption || '',
+          clientName: data.clientName || '',
+          featured: data.featured || false,
+          clientId: data.clientId || '',
+          files: [],
+          videoUrl: data.videoUrl || '',
         });
-        if (!response.ok) throw new Error('Failed to fetch portfolio item');
-        const data = await response.json();
-        setPortfolioItem(data);
-        setTitle(data.title);
-        setType(data.type);
-        setCategory(data.category);
-        setTags(data.tags.join(', '));
-        setCaption(data.caption || '');
-        setClientName(data.clientName || '');
-        setVideoUrl(data.videoUrl || '');
       } catch (err: any) {
         console.error('Fetch failed:', err);
-        setError(err.message || 'Failed to load portfolio item.');
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     };
-    fetchPortfolioItem();
-  }, [id]);
+    fetchItem();
+  }, [id, token]);
 
-  const handleUpdate = async () => {
-    if (!title || !category || !clientName) {
-      setError('Please fill in all required fields.');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) {
+      setError('Authentication required to update portfolio item');
       return;
     }
-
     setLoading(true);
-    setError('');
-
     try {
-      const user = auth.currentUser;
-      if (!user) throw new Error('User not authenticated');
-      const token = await user.getIdToken();
-
-      const formData = new FormData();
-      formData.append('title', title);
-      formData.append('type', type);
-      formData.append('category', category);
-      formData.append('tags', tags);
-      formData.append('caption', caption);
-      formData.append('clientName', clientName);
-      formData.append('featured', portfolioItem?.featured ? 'true' : 'false');
-      if (type === 'photography' && files) {
-        for (let i = 0; i < files.length; i++) {
-          formData.append('files', files[i]);
-        }
-      } else if (type === 'videography') {
-        if (videoUrl) {
-          formData.append('videoUrl', videoUrl);
-        }
-        if (files) {
-          for (let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
-          }
-        }
-      }
+      const body = new FormData();
+      body.append('title', formData.title);
+      body.append('type', formData.type);
+      body.append('category', formData.category);
+      body.append('tags', formData.tags);
+      body.append('caption', formData.caption);
+      body.append('clientName', formData.clientName);
+      body.append('featured', String(formData.featured));
+      body.append('clientId', formData.clientId);
+      if (formData.videoUrl) body.append('videoUrl', formData.videoUrl);
+      formData.files.forEach(file => body.append('files', file));
 
       const response = await fetch(`/api/portfolio/${id}`, {
         method: 'PUT',
         headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+        body,
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update portfolio');
+        let errorMessage = 'Failed to update portfolio item';
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType?.includes('application/json')) {
+            const errorData = await response.json();
+            errorMessage = errorData.error || errorMessage;
+          } else {
+            const text = await response.text();
+            console.error(`Non-JSON response: ${text.slice(0, 100)}...`);
+            errorMessage = `Server returned ${response.status}: ${response.statusText}`;
+          }
+        } catch (parseError: any) {
+          console.error('Error parsing response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
-
-      alert('Portfolio updated successfully!');
-      router.push('/admin');
+      router.push('/admin/portfolio');
     } catch (err: any) {
       console.error('Update failed:', err);
-      setError(err.message || 'Failed to update portfolio. Please try again.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  if (!portfolioItem) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFormData({ ...formData, files: Array.from(e.target.files) });
+    }
+  };
+
+  if (loading) {
     return (
-      <div className="min-h-screen bg-navy-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
-          <p className="mt-4 text-navy-900">Loading...</p>
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
+            <p className="mt-4 text-navy-900">Loading...</p>
+          </div>
         </div>
-      </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+          <div className="text-center">
+            <p className="text-red-600">{error}</p>
+            <Button
+              onClick={() => router.push('/admin/portfolio')}
+              className="mt-4 bg-navy-900 text-white hover:bg-gold-500 hover:text-navy-900"
+            >
+              Back to Portfolio
+            </Button>
+          </div>
+        </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-navy-50 p-6">
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-4"
-        >
-          <button
-            onClick={() => router.push('/admin')}
-            className="flex items-center text-navy-900 hover:text-gold-500 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Admin
-          </button>
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-2xl font-bold text-navy-900 mb-6"
-        >
-          Edit Portfolio
-        </motion.h2>
-
-        <div className="space-y-6">
-          <motion.div
-            custom={0}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Label htmlFor="title" className="text-navy-900">Title *</Label>
-            <Input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
-              placeholder="Portfolio title"
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          <motion.div
-            custom={1}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Label htmlFor="type" className="text-navy-900">Type *</Label>
-            <Select value={type} onValueChange={(value: 'photography' | 'videography') => setType(value)}>
-              <SelectTrigger className="border-navy-200 focus:ring-gold-500">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="photography">Photography</SelectItem>
-                <SelectItem value="videography">Videography</SelectItem>
-              </SelectContent>
-            </Select>
-          </motion.div>
-
-          <motion.div
-            custom={2}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Label htmlFor="category" className="text-navy-900">Category *</Label>
-            <Select value={category} onValueChange={(value: string) => setCategory(value)}>
-              <SelectTrigger className="border-navy-200 focus:ring-gold-500">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {(type === 'photography' ? photographyCategories : videographyCategories).map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </motion.div>
-
-          <motion.div
-            custom={3}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Label htmlFor="tags" className="text-navy-900">Tags (comma separated)</Label>
-            <Input
-              id="tags"
-              type="text"
-              value={tags}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTags(e.target.value)}
-              placeholder="e.g., wedding, portrait"
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          <motion.div
-            custom={4}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Label htmlFor="caption" className="text-navy-900">Caption</Label>
-            <Textarea
-              id="caption"
-              value={caption}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCaption(e.target.value)}
-              placeholder="Describe your project..."
-              rows={4}
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          <motion.div
-            custom={5}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <Label htmlFor="clientName" className="text-navy-900">Client Name *</Label>
-            <Input
-              id="clientName"
-              type="text"
-              value={clientName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)}
-              placeholder="Client’s name"
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          {type === 'photography' && (
-            <motion.div
-              custom={6}
-              variants={formElementVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <Label htmlFor="images" className="text-navy-900">Add More Images</Label>
+    <Layout>
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={formVariants}
+        className="py-20 bg-navy-50"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-navy-900 mb-8">Edit Portfolio Item</h1>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <Label htmlFor="title" className="text-navy-900">Title</Label>
               <Input
-                id="images"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => setFiles(e.target.files)}
-                className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
+                id="title"
+                value={formData.title}
+                onChange={e => setFormData({ ...formData, title: e.target.value })}
+                className="border-navy-200 focus:border-gold-500"
+                required
               />
-              <p className="text-sm text-navy-200 mt-2">Existing images: {portfolioItem.imageUrls.length}</p>
-            </motion.div>
-          )}
-
-          {type === 'videography' && (
-            <>
-              <motion.div
-                custom={7}
-                variants={formElementVariants}
-                initial="hidden"
-                animate="visible"
+            </div>
+            <div>
+              <Label htmlFor="type" className="text-navy-900">Type</Label>
+              <Select
+                value={formData.type}
+                onValueChange={(value: 'photography' | 'videography') =>
+                  setFormData({ ...formData, type: value })
+                }
               >
-                <Label htmlFor="videoUrl" className="text-navy-900">YouTube Video URL (optional)</Label>
+                <SelectTrigger className="border-navy-200 focus:border-gold-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="photography">Photography</SelectItem>
+                  <SelectItem value="videography">Videography</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="category" className="text-navy-900">Category</Label>
+              <Select
+                value={formData.category}
+                onValueChange={value => setFormData({ ...formData, category: value })}
+              >
+                <SelectTrigger className="border-navy-200 focus:border-gold-500">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {(formData.type === 'photography' ? photographyCategories : videographyCategories).map(cat => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="tags" className="text-navy-900">Tags (comma-separated)</Label>
+              <Input
+                id="tags"
+                value={formData.tags}
+                onChange={e => setFormData({ ...formData, tags: e.target.value })}
+                className="border-navy-200 focus:border-gold-500"
+              />
+            </div>
+            <div>
+              <Label htmlFor="caption" className="text-navy-900">Caption</Label>
+              <Input
+                id="caption"
+                value={formData.caption}
+                onChange={e => setFormData({ ...formData, caption: e.target.value })}
+                className="border-navy-200 focus:border-gold-500"
+              />
+            </div>
+            <div>
+              <Label htmlFor="clientName" className="text-navy-900">Client Name</Label>
+              <Input
+                id="clientName"
+                value={formData.clientName}
+                onChange={e => setFormData({ ...formData, clientName: e.target.value })}
+                className="border-navy-200 focus:border-gold-500"
+              />
+            </div>
+            <div>
+              <Label htmlFor="clientId" className="text-navy-900">Client ID</Label>
+              <Input
+                id="clientId"
+                value={formData.clientId}
+                onChange={e => setFormData({ ...formData, clientId: e.target.value })}
+                className="border-navy-200 focus:border-gold-500"
+              />
+            </div>
+            <div>
+              <Label htmlFor="featured" className="text-navy-900">Featured</Label>
+              <Checkbox
+                id="featured"
+                checked={formData.featured}
+                onCheckedChange={checked => setFormData({ ...formData, featured: !!checked })}
+              />
+            </div>
+            {formData.type === 'videography' && (
+              <div>
+                <Label htmlFor="videoUrl" className="text-navy-900">Video URL</Label>
                 <Input
                   id="videoUrl"
-                  type="text"
-                  value={videoUrl}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVideoUrl(e.target.value)}
-                  placeholder="e.g., https://www.youtube.com/embed/your-video-id"
-                  className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
+                  value={formData.videoUrl}
+                  onChange={e => setFormData({ ...formData, videoUrl: e.target.value })}
+                  className="border-navy-200 focus:border-gold-500"
                 />
-              </motion.div>
-              <motion.div
-                custom={8}
-                variants={formElementVariants}
-                initial="hidden"
-                animate="visible"
-              >
-                <Label htmlFor="videoFiles" className="text-navy-900">Replace Video (optional)</Label>
-                <Input
-                  id="videoFiles"
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => setFiles(e.target.files)}
-                  className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-                />
-                {portfolioItem.videoUrl && <p className="text-sm text-navy-200 mt-2">Existing video: {portfolioItem.videoUrl}</p>}
-              </motion.div>
-            </>
-          )}
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-red-600 text-sm bg-red-50 p-3 rounded-md"
-            >
-              {error}
-            </motion.div>
-          )}
-
-          <motion.div
-            custom={9}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+              </div>
+            )}
+            <div>
+              <Label htmlFor="files" className="text-navy-900">Upload Additional Files</Label>
+              <Input
+                id="files"
+                type="file"
+                multiple
+                onChange={handleFileChange}
+                className="border-navy-200 focus:border-gold-500"
+              />
+            </div>
             <Button
-              onClick={handleUpdate}
-              disabled={loading}
-              className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold py-6"
+              type="submit"
+              disabled={loading || !token}
+              className="bg-navy-900 text-white hover:bg-gold-500 hover:text-navy-900"
             >
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                {loading ? (
-                  'Updating...'
-                ) : (
-                  <>
-                    <Upload className="h-5 w-5 mr-2" />
-                    Update
-                  </>
-                )}
-              </motion.div>
+              {loading ? 'Updating...' : 'Update Portfolio Item'}
             </Button>
-          </motion.div>
+          </form>
         </div>
-      </div>
-    </div>
+      </motion.section>
+    </Layout>
   );
 }

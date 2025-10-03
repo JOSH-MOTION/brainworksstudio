@@ -7,10 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
-import { Filter, Play, X } from 'lucide-react';
+import { Filter, Play } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
@@ -18,19 +18,13 @@ const sectionVariants: Variants = {
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 const buttonVariants: Variants = {
   hover: { scale: 1.05, transition: { duration: 0.2 } },
   tap: { scale: 0.95 },
-};
-
-const lightboxVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: 'easeOut' } },
-  exit: { opacity: 0, scale: 0.95, transition: { duration: 0.2 } },
 };
 
 export default function PortfolioPage() {
@@ -40,8 +34,6 @@ export default function PortfolioPage() {
   const [selectedTag, setSelectedTag] = useState<string>('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
-  const [lightboxOpen, setLightboxOpen] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<PortfolioItem | null>(null);
 
   useEffect(() => {
     fetchPortfolioItems();
@@ -72,25 +64,17 @@ export default function PortfolioPage() {
 
   const filterItems = () => {
     let filtered = portfolioItems;
-
     if (selectedCategory !== 'all') {
       filtered = filtered.filter((item) => item.category === selectedCategory);
     }
-
     if (selectedTag !== 'all') {
       filtered = filtered.filter((item) => item.tags.includes(selectedTag));
     }
-
     setFilteredItems(filtered);
   };
 
   const categories = ['all', ...Array.from(new Set(portfolioItems.map((item) => item.category)))];
   const tags = ['all', ...Array.from(new Set(portfolioItems.flatMap((item) => item.tags)))];
-
-  const openLightbox = (item: PortfolioItem) => {
-    setSelectedItem(item);
-    setLightboxOpen(true);
-  };
 
   if (error) {
     return (
@@ -103,13 +87,15 @@ export default function PortfolioPage() {
         >
           <div className="text-center">
             <p className="text-red-600 text-lg mb-4">{error}</p>
-            <Button
-              variant="outline"
-              onClick={fetchPortfolioItems}
-              className="border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white"
-            >
-              Retry
-            </Button>
+            <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
+              <Button
+                variant="outline"
+                onClick={fetchPortfolioItems}
+                className="border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg px-6 py-2"
+              >
+                Retry
+              </Button>
+            </motion.div>
           </div>
         </motion.div>
       </Layout>
@@ -131,7 +117,7 @@ export default function PortfolioPage() {
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"
             />
-            <p className="mt-4 text-navy-900 text-lg">Loading portfolio...</p>
+            <p className="mt-4 text-navy-900 text-lg font-medium">Loading portfolio...</p>
           </div>
         </motion.div>
       </Layout>
@@ -140,15 +126,15 @@ export default function PortfolioPage() {
 
   return (
     <Layout>
-      <motion.div
+      <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8"
+        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-navy-50"
       >
         <div className="text-center mb-12">
           <motion.h1
-            className="text-4xl md:text-5xl font-bold text-navy-900 mb-4 tracking-tight"
+            className="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -176,7 +162,7 @@ export default function PortfolioPage() {
             <span className="font-medium text-navy-900">Filters:</span>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[180px] bg-white border-navy-200 focus:ring-gold-500">
+            <SelectTrigger className="w-[180px] bg-white border-navy-200 focus:ring-gold-500 rounded-lg">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +174,7 @@ export default function PortfolioPage() {
             </SelectContent>
           </Select>
           <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="w-[180px] bg-white border-navy-200 focus:ring-gold-500">
+            <SelectTrigger className="w-[180px] bg-white border-navy-200 focus:ring-gold-500 rounded-lg">
               <SelectValue placeholder="Tag" />
             </SelectTrigger>
             <SelectContent>
@@ -202,7 +188,7 @@ export default function PortfolioPage() {
           <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
             <Button
               variant="outline"
-              className="border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white transition-colors"
+              className="border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg px-6 py-2"
               onClick={() => {
                 setSelectedCategory('all');
                 setSelectedTag('all');
@@ -215,8 +201,6 @@ export default function PortfolioPage() {
 
         <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-          initial="hidden"
-          animate="visible"
           variants={sectionVariants}
         >
           {filteredItems.map((item, index) => (
@@ -227,68 +211,72 @@ export default function PortfolioPage() {
               initial="hidden"
               animate="visible"
               transition={{ delay: index * 0.1 }}
-              whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
             >
-              <Card
-                className="group cursor-pointer overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-300 bg-white"
-                onClick={() => openLightbox(item)}
-              >
-                <CardContent className="p-0 relative">
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <Image
-                      src={item.imageUrls && item.imageUrls.length > 0 ? item.imageUrls[0] : item.videoUrl ? '/video-placeholder.jpg' : '/placeholder-image.jpg'}
-                      alt={item.title}
-                      fill
-                      className="object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
-                        e.currentTarget.src = '/placeholder-image.jpg';
-                      }}
-                      onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
-                    />
-                    {item.videoUrl && (
+              <Link href={`/portfolio/${item.id}`}>
+                <Card className="group cursor-pointer overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white rounded-lg">
+                  <CardContent className="p-0 relative">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <Image
+                        src={
+                          item.imageUrls && item.imageUrls.length > 0
+                            ? item.imageUrls[0]
+                            : item.videoUrl
+                              ? '/video-placeholder.jpg'
+                              : '/placeholder-image.jpg'
+                        }
+                        alt={item.title}
+                        fill
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
+                          e.currentTarget.src = '/placeholder-image.jpg';
+                        }}
+                        onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
+                      />
+                      {item.videoUrl && (
+                        <motion.div
+                          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          initial={{ opacity: 0 }}
+                          whileHover={{ opacity: 1 }}
+                        >
+                          <Play className="h-10 w-10 text-white" />
+                        </motion.div>
+                      )}
                       <motion.div
-                        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                        className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                         initial={{ opacity: 0 }}
                         whileHover={{ opacity: 1 }}
                       >
-                        <Play className="h-10 w-10 text-white" />
-                      </motion.div>
-                    )}
-                    <motion.div
-                      className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                    >
-                      <div className="absolute bottom-4 left-4 right-4 text-white">
-                        <h3 className="font-semibold mb-1">{item.title}</h3>
-                        <div className="flex flex-wrap gap-2">
-                          <Badge className="bg-gold-500 text-white">{item.category}</Badge>
-                          <Badge className="bg-navy-100 text-navy-900">{item.type}</Badge>
-                          {item.tags.slice(0, 2).map((tag) => (
-                            <Badge key={tag} variant="outline" className="border-gold-500 text-gold-500">
-                              {tag}
-                            </Badge>
-                          ))}
+                        <div className="absolute bottom-4 left-4 right-4 text-white">
+                          <h3 className="font-semibold mb-1 text-lg">{item.title}</h3>
+                          <div className="flex flex-wrap gap-2">
+                            <Badge className="bg-gold-500 text-white">{item.category}</Badge>
+                            <Badge className="bg-navy-100 text-navy-900">{item.type}</Badge>
+                            {item.tags.slice(0, 2).map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant="outline"
+                                className="border-gold-500 text-gold-500"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </motion.div>
-                  </div>
-                </CardContent>
-                <CardFooter className="p-4 pt-0">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openLightbox(item);
-                    }}
-                  >
-                    View Details
-                  </Button>
-                </CardFooter>
-              </Card>
+                      </motion.div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="p-4 pt-0">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg"
+                    >
+                      View Details
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </Link>
             </motion.div>
           ))}
         </motion.div>
@@ -300,11 +288,11 @@ export default function PortfolioPage() {
             transition={{ duration: 0.5 }}
             className="text-center py-12"
           >
-            <p className="text-navy-900 text-lg">No items found matching your filters.</p>
+            <p className="text-navy-900 text-lg font-medium">No items found matching your filters.</p>
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"
-                className="mt-4 border-navy-900 text-navy-900 hover:bg-navy-900 hover:text-white"
+                className="mt-4 border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg px-6 py-2"
                 onClick={() => {
                   setSelectedCategory('all');
                   setSelectedTag('all');
@@ -315,79 +303,7 @@ export default function PortfolioPage() {
             </motion.div>
           </motion.div>
         )}
-
-        <AnimatePresence>
-          {lightboxOpen && selectedItem && (
-            <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
-              <DialogContent className="max-w-4xl max-h-[90vh] p-0 bg-white border-none shadow-2xl rounded-lg">
-                <motion.div
-                  variants={lightboxVariants}
-                  initial="hidden"
-                  animate="visible"
-                  exit="exit"
-                  className="relative"
-                >
-                  <motion.div
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
-                  >
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute top-4 right-4 z-10 bg-navy-900/50 text-white hover:bg-navy-900"
-                      onClick={() => setLightboxOpen(false)}
-                    >
-                      <X className="h-5 w-5" />
-                    </Button>
-                  </motion.div>
-                  {selectedItem.videoUrl ? (
-                    <iframe
-                      src={selectedItem.videoUrl}
-                      className="w-full h-[70vh] rounded-t-lg"
-                      allow="autoplay; encrypted-media"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <Image
-                      src={selectedItem.imageUrls && selectedItem.imageUrls.length > 0 ? selectedItem.imageUrls[0] : '/placeholder-image.jpg'}
-                      alt={selectedItem.title}
-                      width={800}
-                      height={600}
-                      className="w-full h-auto max-h-[70vh] object-contain rounded-t-lg"
-                      onError={(e) => {
-                        console.error(`Failed to load lightbox image for ${selectedItem.title}: ${selectedItem.imageUrls[0]}`);
-                        e.currentTarget.src = '/placeholder-image.jpg';
-                      }}
-                      onLoad={() => console.log(`Successfully loaded lightbox image: ${selectedItem.imageUrls[0]}`)}
-                    />
-                  )}
-                  <div className="p-6">
-                    <h2 className="text-2xl font-bold text-navy-900 mb-2">{selectedItem.title}</h2>
-                    {selectedItem.caption && (
-                      <p className="text-navy-200 mb-4">{selectedItem.caption}</p>
-                    )}
-                    <div className="flex flex-wrap gap-2">
-                      <Badge className="bg-gold-500 text-white">{selectedItem.category}</Badge>
-                      <Badge className="bg-navy-100 text-navy-900">{selectedItem.type}</Badge>
-                      {selectedItem.tags.map((tag) => (
-                        <Badge key={tag} variant="outline" className="border-gold-500 text-gold-500">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                    {selectedItem.clientName && (
-                      <p className="text-navy-200 mt-4">
-                        <strong>Client:</strong> {selectedItem.clientName}
-                      </p>
-                    )}
-                  </div>
-                </motion.div>
-              </DialogContent>
-            </Dialog>
-          )}
-        </AnimatePresence>
-      </motion.div>
+      </motion.section>
     </Layout>
   );
 }

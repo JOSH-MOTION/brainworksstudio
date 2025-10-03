@@ -9,7 +9,7 @@ import { PortfolioItem } from '@/types';
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
 };
 
 const heroImageVariants: Variants = {
@@ -17,7 +17,7 @@ const heroImageVariants: Variants = {
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 1, ease: 'easeOut' as const }, // Explicitly type ease as a literal
+    transition: { duration: 1, ease: 'easeOut' as const },
   },
 };
 
@@ -30,8 +30,8 @@ const cardVariants: Variants = {
   }),
 };
 
-export default function PhotographyPortfolio({ params }: { params: { category: string } }) {
-  const { category } = params;
+export default function PhotographyPortfolio({ params }: { params: { category?: string } }) {
+  const category = params.category || 'all'; // Fallback to 'all' if category is undefined
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,7 +40,10 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
   useEffect(() => {
     const fetchItems = async () => {
       try {
-        const response = await fetch(`/api/portfolio?type=photography&category=${encodeURIComponent(category)}`);
+        const url = category === 'all'
+          ? '/api/portfolio?type=photography'
+          : `/api/portfolio?type=photography&category=${encodeURIComponent(category)}`;
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Failed to fetch portfolio items');
         const data = await response.json();
         console.log('Fetched photography items:', data);
@@ -63,9 +66,9 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
             <p className="mt-4 text-navy-900">Loading...</p>
           </div>
-          </div>
-        </Layout>
-      );
+        </div>
+      </Layout>
+    );
   }
 
   if (error) {
@@ -77,6 +80,8 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
       </Layout>
     );
   }
+
+  const displayCategory = category === 'all' ? 'All' : category.replace('-', ' ');
 
   return (
     <Layout>
@@ -93,22 +98,26 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
           className="absolute inset-0"
         >
           <Image
-            src={`/images/${category}-hero.jpg`}
-            alt={`${category} Hero`}
+            src={`/images/${category === 'all' ? 'photography' : category}-hero.jpg`}
+            alt={`${displayCategory} Hero`}
             fill
             className="object-cover"
             priority
+            onError={(e) => {
+              console.error(`Failed to load hero image for ${displayCategory}`);
+              e.currentTarget.src = '/placeholder-hero.jpg';
+            }}
           />
-          <div className="absolute inset-0 bg-navy-900 bg-opacity-50"></div>
+          <div className="absolute inset-0 bg-navy-900 bg-opacity-50 bg-teal-900"></div>
         </motion.div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center ">
           <motion.h1
             className="text-3xl md:text-5xl font-bold mb-4 tracking-tight capitalize text-white"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {category.replace('-', ' ')} Photography
+            {displayCategory} Photography
           </motion.h1>
           <motion.p
             className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90 text-white"
@@ -116,7 +125,7 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Discover our stunning portfolio of {category.replace('-', ' ')} photography.
+            Discover our stunning portfolio of {displayCategory.toLowerCase()} photography.
           </motion.p>
         </div>
       </motion.section>
@@ -130,36 +139,42 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {items.map((item, index) => (
-              <motion.div
-                key={item.id}
-                custom={index}
-                variants={cardVariants}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                className="group cursor-pointer"
-                onClick={() => setSelectedImage(item.imageUrls[0])}
-              >
-                <div className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
-                  <Image
-                    src={item.imageUrls[0] || '/placeholder-image.jpg'}
-                    alt={item.title}
-                    width={400}
-                    height={300}
-                    className="object-cover w-full h-64 group-hover:scale-105 transition-transform duration-300"
-                    onError={(e) => {
-                      console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0]}`);
-                      e.currentTarget.src = '/placeholder-image.jpg';
-                    }}
-                  />
-                  <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <p className="text-sm">{item.clientName}</p>
+            {items.length === 0 ? (
+              <p className="text-navy-900 text-center col-span-full">
+                No portfolio items found for this category.
+              </p>
+            ) : (
+              items.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="group cursor-pointer"
+                  onClick={() => setSelectedImage(item.imageUrls[0])}
+                >
+                  <div className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
+                    <Image
+                      src={item.imageUrls[0] || '/placeholder-image.jpg'}
+                      alt={item.title}
+                      width={400}
+                      height={300}
+                      className="object-cover w-full h-64 group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0]}`);
+                        e.currentTarget.src = '/placeholder-image.jpg';
+                      }}
+                    />
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <h3 className="font-semibold">{item.title}</h3>
+                      <p className="text-sm">{item.clientName}</p>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))
+            )}
           </div>
         </div>
       </motion.section>

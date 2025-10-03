@@ -47,6 +47,7 @@ export interface PortfolioItem {
   updatedAt: string;
   createdBy: string;
   clientId: string | null;
+  pin?: string;
 }
 
 export interface Contact {
