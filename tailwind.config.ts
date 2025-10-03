@@ -61,6 +61,20 @@ const config: Config = {
           '5': 'hsl(var(--chart-5))',
         },
       },
+       teal: {
+          50: '#F0FDFA',
+          100: '#E6FFFA',
+          200: '#B2F5EA',
+          500: '#38B2AC',
+          600: '#319795',
+          900: '#2D3748',
+        },
+        coral: {
+          50: '#FFF5F5',
+          500: '#F56565',
+          600: '#E53E3E',
+          900: '#742A2A',
+        },
       keyframes: {
         'accordion-down': {
           from: {

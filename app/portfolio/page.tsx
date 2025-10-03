@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PortfolioItem } from '@/types';
@@ -18,8 +18,8 @@ const sectionVariants: Variants = {
 };
 
 const cardVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: 'easeOut' } },
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
 };
 
 const buttonVariants: Variants = {
@@ -83,15 +83,15 @@ export default function PortfolioPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="min-h-screen flex items-center justify-center bg-navy-50"
+          className="min-h-screen flex items-center justify-center bg-gray-100"
         >
           <div className="text-center">
-            <p className="text-red-600 text-lg mb-4">{error}</p>
+            <p className="text-red-500 text-lg mb-4">{error}</p>
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"
                 onClick={fetchPortfolioItems}
-                className="border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg px-6 py-2"
+                className="border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full px-6 py-2"
               >
                 Retry
               </Button>
@@ -109,15 +109,15 @@ export default function PortfolioPage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5 }}
-          className="min-h-screen flex items-center justify-center bg-navy-50"
+          className="min-h-screen flex items-center justify-center bg-gray-100"
         >
           <div className="text-center">
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"
+              className="rounded-full h-16 w-16 border-t-2 border-teal-500 mx-auto"
             />
-            <p className="mt-4 text-navy-900 text-lg font-medium">Loading portfolio...</p>
+            <p className="mt-4 text-teal-900 text-lg font-medium">Loading portfolio...</p>
           </div>
         </motion.div>
       </Layout>
@@ -130,11 +130,11 @@ export default function PortfolioPage() {
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-navy-50"
+        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-gray-100"
       >
         <div className="text-center mb-12">
           <motion.h1
-            className="text-4xl md:text-5xl font-extrabold text-navy-900 mb-4 tracking-tight"
+            className="text-4xl md:text-5xl font-bold text-teal-900 mb-4 tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -142,12 +142,12 @@ export default function PortfolioPage() {
             Our Portfolio
           </motion.h1>
           <motion.p
-            className="text-lg text-navy-200 max-w-2xl mx-auto"
+            className="text-lg text-gray-600 max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            Explore our curated collection of stunning photography and videography work.
+            Discover our collection of stunning photography and videography work.
           </motion.p>
         </div>
 
@@ -158,11 +158,11 @@ export default function PortfolioPage() {
           className="flex flex-col sm:flex-row gap-4 mb-12 items-center justify-center"
         >
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-navy-900" />
-            <span className="font-medium text-navy-900">Filters:</span>
+            <Filter className="h-5 w-5 text-teal-900" />
+            <span className="font-medium text-teal-900">Filters:</span>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[180px] bg-white border-navy-200 focus:ring-gold-500 rounded-lg">
+            <SelectTrigger className="w-[180px] bg-white border-teal-200 focus:ring-teal-500 rounded-full shadow-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -174,7 +174,7 @@ export default function PortfolioPage() {
             </SelectContent>
           </Select>
           <Select value={selectedTag} onValueChange={setSelectedTag}>
-            <SelectTrigger className="w-[180px] bg-white border-navy-200 focus:ring-gold-500 rounded-lg">
+            <SelectTrigger className="w-[180px] bg-white border-teal-200 focus:ring-teal-500 rounded-full shadow-sm">
               <SelectValue placeholder="Tag" />
             </SelectTrigger>
             <SelectContent>
@@ -188,7 +188,7 @@ export default function PortfolioPage() {
           <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
             <Button
               variant="outline"
-              className="border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg px-6 py-2"
+              className="border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full px-6 py-2 shadow-sm"
               onClick={() => {
                 setSelectedCategory('all');
                 setSelectedTag('all');
@@ -200,7 +200,8 @@ export default function PortfolioPage() {
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(200px,auto)]"
+          style={{ gridTemplateRows: 'masonry' }}
           variants={sectionVariants}
         >
           {filteredItems.map((item, index) => (
@@ -213,68 +214,59 @@ export default function PortfolioPage() {
               transition={{ delay: index * 0.1 }}
             >
               <Link href={`/portfolio/${item.id}`}>
-                <Card className="group cursor-pointer overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 bg-white rounded-lg">
-                  <CardContent className="p-0 relative">
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <Image
-                        src={
-                          item.imageUrls && item.imageUrls.length > 0
-                            ? item.imageUrls[0]
-                            : item.videoUrl
-                              ? '/video-placeholder.jpg'
-                              : '/placeholder-image.jpg'
-                        }
-                        alt={item.title}
-                        fill
-                        className="object-cover transition-transform duration-300 group-hover:scale-105"
-                        onError={(e) => {
-                          console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
-                          e.currentTarget.src = '/placeholder-image.jpg';
-                        }}
-                        onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
-                      />
-                      {item.videoUrl && (
-                        <motion.div
-                          className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                          initial={{ opacity: 0 }}
-                          whileHover={{ opacity: 1 }}
+                <Card className="group cursor-pointer overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-300 bg-white rounded-xl">
+                  <div className="relative w-full max-h-96 overflow-hidden">
+                    <Image
+                      src={
+                        item.imageUrls && item.imageUrls.length > 0
+                          ? item.imageUrls[0]
+                          : item.videoUrl
+                            ? '/video-placeholder.jpg'
+                            : '/placeholder-image.jpg'
+                      }
+                      alt={item.title}
+                      width={400}
+                      height={300}
+                      className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
+                        e.currentTarget.src = '/placeholder-image.jpg';
+                      }}
+                      onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
+                    />
+                    {item.videoUrl && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-teal-900/40">
+                        <Play className="h-12 w-12 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg text-teal-900 mb-2">{item.title}</h3>
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <Badge className="bg-coral-500 text-white hover:bg-coral-600 transition-colors">
+                        {item.category}
+                      </Badge>
+                      <Badge className="bg-teal-100 text-teal-900 hover:bg-teal-200 transition-colors">
+                        {item.type}
+                      </Badge>
+                      {item.tags.slice(0, 2).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="outline"
+                          className="border-coral-500 text-coral-500 hover:bg-coral-100 transition-colors"
                         >
-                          <Play className="h-10 w-10 text-white" />
-                        </motion.div>
-                      )}
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                        initial={{ opacity: 0 }}
-                        whileHover={{ opacity: 1 }}
-                      >
-                        <div className="absolute bottom-4 left-4 right-4 text-white">
-                          <h3 className="font-semibold mb-1 text-lg">{item.title}</h3>
-                          <div className="flex flex-wrap gap-2">
-                            <Badge className="bg-gold-500 text-white">{item.category}</Badge>
-                            <Badge className="bg-navy-100 text-navy-900">{item.type}</Badge>
-                            {item.tags.slice(0, 2).map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="outline"
-                                className="border-gold-500 text-gold-500"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
+                          {tag}
+                        </Badge>
+                      ))}
                     </div>
-                  </CardContent>
-                  <CardFooter className="p-4 pt-0">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="w-full border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg"
+                      className="w-full border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full"
                     >
                       View Details
                     </Button>
-                  </CardFooter>
+                  </div>
                 </Card>
               </Link>
             </motion.div>
@@ -288,11 +280,11 @@ export default function PortfolioPage() {
             transition={{ duration: 0.5 }}
             className="text-center py-12"
           >
-            <p className="text-navy-900 text-lg font-medium">No items found matching your filters.</p>
+            <p className="text-teal-900 text-lg font-medium">No items found matching your filters.</p>
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"
-                className="mt-4 border-navy-900 text-navy-900 hover:bg-gold-500 hover:text-white transition-colors rounded-lg px-6 py-2"
+                className="mt-4 border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full px-6 py-2"
                 onClick={() => {
                   setSelectedCategory('all');
                   setSelectedTag('all');

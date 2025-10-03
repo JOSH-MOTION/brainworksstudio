@@ -12,77 +12,67 @@ import Link from 'next/link';
 
 // Animation variants for sections
 const sectionVariants: Variants = {
-  hidden: { opacity: 0, y: 50 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: 'easeInOut', staggerChildren: 0.2 },
+    transition: { duration: 0.7, ease: 'easeOut', staggerChildren: 0.15 },
   },
 };
 
 // Animation variants for hero content
 const heroContentVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
+  hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.8, type: 'spring', stiffness: 100, damping: 15 },
+    transition: { duration: 0.6, type: 'spring', stiffness: 120, damping: 20 },
   },
 };
 
-// Animation variants for hero children (text and button)
-const heroChildVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay: i * 0.2, ease: 'easeOut' },
-  }),
-};
-
-// Animation variants for hero text characters
-const textVariants: Variants = {
+// Animation variants for hero words
+const wordVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: (i: number) => ({
+  visible: (index: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.05, ease: 'easeOut' },
+    transition: { duration: 0.5, delay: index * 0.1, ease: 'easeOut' },
   }),
 };
 
 // Animation variants for contact info cards
 const infoCardVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8, rotateX: 20 },
-  visible: (i: number) => ({
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
+  visible: (index: number) => ({
     opacity: 1,
     scale: 1,
-    rotateX: 0,
-    transition: { duration: 0.8, delay: i * 0.15, type: 'spring', stiffness: 90 },
+    y: 0,
+    transition: { duration: 0.6, delay: index * 0.1, type: 'spring', stiffness: 100 },
   }),
   hover: {
-    scale: 1.05,
-    y: -10,
-    transition: { duration: 0.4, type: 'spring', stiffness: 130 },
+    scale: 1.03,
+    y: -5,
+    transition: { duration: 0.3, type: 'spring', stiffness: 150 },
   },
 };
 
 // Animation variants for form elements
 const formElementVariants: Variants = {
-  hidden: { opacity: 0, x: -20 },
-  visible: (i: number) => ({
+  hidden: { opacity: 0, x: -15 },
+  visible: (index: number) => ({
     opacity: 1,
     x: 0,
-    transition: { duration: 0.6, delay: i * 0.1, ease: 'easeOut' },
+    transition: { duration: 0.5, delay: index * 0.1, ease: 'easeOut' },
   }),
 };
 
 // Animation variants for success message
 const successVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
+  hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.8, type: 'spring', stiffness: 100, damping: 15 },
+    transition: { duration: 0.6, type: 'spring', stiffness: 110, damping: 20 },
   },
 };
 
@@ -138,8 +128,8 @@ export default function ContactPage() {
     }
   };
 
-  // Split the heading text for character-by-character animation
-  const headingText = "Let's Create Together".split('');
+  // Split the heading text into words for animation
+  const headingText = 'Connect With Us'.split(' ');
 
   return (
     <Layout>
@@ -148,44 +138,41 @@ export default function ContactPage() {
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="relative min-h-[60vh] flex items-center justify-center bg-teal-900 text-white"
+        className="relative min-h-[40vh] flex items-center justify-center bg-teal-50"
       >
-        {/* Hero Content */}
         <motion.div
           variants={heroContentVariants}
-          className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10"
+          className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1
-            className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6 text-white"
-          >
-            {headingText.map((char, index) => (
+          <motion.h1 className="text-3xl md:text-4xl font-bold text-teal-900 mb-4">
+            {headingText.map((word, index) => (
               <motion.span
                 key={index}
                 custom={index}
-                variants={textVariants}
+                variants={wordVariants}
                 initial="hidden"
                 animate="visible"
-                className="inline-block"
+                className="inline-block mr-2"
               >
-                {char === ' ' ? '\u00A0' : char}
+                {word}
               </motion.span>
             ))}
           </motion.h1>
           <motion.p
             custom={0}
-            variants={heroChildVariants}
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto text-gold-100 drop-shadow-md"
+            variants={wordVariants}
+            className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6"
           >
-            Ready to bring your vision to life? Contact us to discuss your project and start crafting unforgettable visuals.
+            Let's collaborate to capture your vision. Reach out today!
           </motion.p>
-          <motion.div custom={1} variants={heroChildVariants}>
+          <motion.div custom={1} variants={wordVariants}>
             <Link href="#contact-form">
-              <motion.div whileHover={{ scale: 1.1, rotate: 5 }} whileTap={{ scale: 0.9 }}>
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                   size="lg"
-                  className="bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold shadow-md"
+                  className="bg-coral-500 text-white hover:bg-coral-600 font-semibold py-2 px-6 rounded-full"
                 >
-                  Get Started
+                  Contact Us
                 </Button>
               </motion.div>
             </Link>
@@ -199,12 +186,12 @@ export default function ContactPage() {
         whileInView="visible"
         viewport={{ once: true }}
         variants={sectionVariants}
-        className="py-24 bg-navy-50"
+        className="py-12 bg-white"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
             {/* Contact Information */}
-            <div className="lg:col-span-1 space-y-6">
+            <div className="lg:col-span-2 space-y-4">
               {[
                 {
                   icon: Mail,
@@ -239,17 +226,17 @@ export default function ContactPage() {
                   whileInView="visible"
                   viewport={{ once: true }}
                 >
-                  <div className="bg-white rounded-xl shadow-md p-6 flex items-start gap-4 hover:bg-navy-100 transition-colors">
+                  <div className="bg-teal-50 rounded-xl shadow-sm p-5 flex items-start gap-3 hover:bg-teal-100 transition-colors border border-coral-100">
                     <motion.div
-                      className="p-2 bg-gold-100 rounded-full"
-                      whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
+                      className="p-2 bg-coral-50 rounded-full"
+                      whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
                     >
-                      <info.icon className="h-6 w-6 text-gold-500" />
+                      <info.icon className="h-5 w-5 text-coral-500" />
                     </motion.div>
                     <div>
-                      <h3 className="font-semibold text-navy-900">{info.title}</h3>
-                      <p className="text-gray-600 whitespace-pre-line">{info.value}</p>
-                      <p className="text-sm text-gray-500">{info.note}</p>
+                      <h3 className="font-semibold text-teal-900 text-base">{info.title}</h3>
+                      <p className="text-gray-600 text-sm">{info.value}</p>
+                      <p className="text-xs text-gray-500">{info.note}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -263,12 +250,12 @@ export default function ContactPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <div className="bg-white rounded-xl shadow-md p-6 text-center">
-                  <h3 className="font-semibold text-navy-900 mb-2">Urgent Project?</h3>
-                  <p className="text-sm text-gray-600 mb-4">Call our priority line for time-sensitive bookings.</p>
+                <div className="bg-teal-50 rounded-xl shadow-sm p-5 text-center border border-coral-100">
+                  <h3 className="font-semibold text-teal-900 text-base mb-2">Urgent Project?</h3>
+                  <p className="text-xs text-gray-600 mb-3">Reach out for time-sensitive bookings.</p>
                   <Button
                     variant="outline"
-                    className="w-full border-gold-500 text-gold-500 hover:bg-gold-100"
+                    className="w-full border-coral-500 text-coral-500 hover:bg-coral-50 rounded-full text-sm py-1"
                   >
                     <Phone className="h-4 w-4 mr-2" />
                     +233 242403450
@@ -284,9 +271,9 @@ export default function ContactPage() {
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true }}
-              className="lg:col-span-2"
+              className="lg:col-span-3"
             >
-              <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="bg-teal-50 rounded-xl shadow-sm p-6 border border-coral-100">
                 {success ? (
                   <motion.div
                     variants={successVariants}
@@ -295,28 +282,28 @@ export default function ContactPage() {
                     className="text-center py-8"
                   >
                     <motion.div
-                      className="mx-auto mb-4 p-3 bg-gold-100 rounded-full w-fit"
-                      animate={{ rotate: [0, 10, -10, 0], scale: [1, 1.1, 1] }}
-                      transition={{ duration: 1.5, repeat: 1 }}
+                      className="mx-auto mb-4 p-3 bg-coral-50 rounded-full w-fit"
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 1, repeat: 1 }}
                     >
-                      <Send className="h-8 w-8 text-gold-500" />
+                      <Send className="h-6 w-6 text-coral-500" />
                     </motion.div>
-                    <h3 className="text-xl font-semibold text-navy-900 mb-2">Message Sent!</h3>
-                    <p className="text-gray-600">
-                      Thank you for reaching out. We'll get back to you within 24 hours.
+                    <h3 className="text-lg font-semibold text-teal-900 mb-2">Message Sent!</h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      We've received your message and will respond soon.
                     </p>
                     <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                       <Button
                         onClick={() => setSuccess(false)}
                         variant="outline"
-                        className="mt-4 border-gold-500 text-gold-500 hover:bg-gold-100"
+                        className="border-coral-500 text-coral-500 hover:bg-coral-50 rounded-full text-sm py-1"
                       >
                         Send Another Message
                       </Button>
                     </motion.div>
                   </motion.div>
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {[
                         { id: 'name', label: 'Name *', type: 'text', placeholder: 'Your full name', required: true },
@@ -332,7 +319,7 @@ export default function ContactPage() {
                           whileInView="visible"
                           viewport={{ once: true }}
                         >
-                          <Label htmlFor={field.id} className="text-navy-900">{field.label}</Label>
+                          <Label htmlFor={field.id} className="text-teal-900 font-medium text-sm">{field.label}</Label>
                           <Input
                             id={field.id}
                             name={field.id}
@@ -341,7 +328,7 @@ export default function ContactPage() {
                             onChange={handleChange}
                             required={field.required}
                             placeholder={field.placeholder}
-                            className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
+                            className="border-coral-200 focus:ring-teal-500 focus:border-teal-500 rounded-md text-sm"
                           />
                         </motion.div>
                       ))}
@@ -353,23 +340,23 @@ export default function ContactPage() {
                       whileInView="visible"
                       viewport={{ once: true }}
                     >
-                      <Label htmlFor="message" className="text-navy-900">Message *</Label>
+                      <Label htmlFor="message" className="text-teal-900 font-medium text-sm">Message *</Label>
                       <Textarea
                         id="message"
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
                         required
-                        placeholder="Tell us about your project, timeline, budget, and any specific requirements..."
-                        rows={6}
-                        className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
+                        placeholder="Tell us about your project, timeline, or requirements..."
+                        rows={5}
+                        className="border-coral-200 focus:ring-teal-500 focus:border-teal-500 rounded-md text-sm"
                       />
                     </motion.div>
                     {error && (
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className="text-red-600 text-sm bg-red-50 p-3 rounded-md"
+                        className="text-coral-600 text-xs bg-coral-50 p-2 rounded-md"
                       >
                         {error}
                       </motion.div>
@@ -383,14 +370,14 @@ export default function ContactPage() {
                     >
                       <Button
                         type="submit"
-                        className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 py-6 text-lg font-semibold"
+                        className="w-full bg-teal-500 text-white hover:bg-teal-600 py-2 text-sm font-semibold rounded-full"
                         disabled={loading}
                       >
                         {loading ? (
                           'Sending Message...'
                         ) : (
                           <>
-                            <Send className="h-5 w-5 mr-2" />
+                            <Send className="h-4 w-4 mr-2" />
                             Send Message
                           </>
                         )}

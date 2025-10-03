@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,89 +8,165 @@ import { Camera, Award, Users, Heart, Star, MapPin } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
+// Animation variants for sections
+const sectionVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: 'easeOut', staggerChildren: 0.1 },
+  },
+};
+
+// Animation variants for hero content
+const heroContentVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, type: 'spring', stiffness: 130, damping: 20 },
+  },
+};
+
+// Animation variants for hero words
+const wordVariants: Variants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: index * 0.08, ease: 'easeOut' },
+  }),
+};
+
+// Animation variants for cards
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: (index: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, delay: index * 0.08, ease: 'easeOut' },
+  }),
+  hover: {
+    scale: 1.02,
+    y: -3,
+    transition: { duration: 0.3, type: 'spring', stiffness: 140 },
+  },
+};
+
+// Animation variants for stats
+const statVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: (index: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.3, delay: index * 0.08, type: 'spring', stiffness: 110 },
+  }),
+};
+
 export default function AboutPage() {
+  // Split the heading text into words for animation
+  const headingText = 'Our Creative Journey'.split(' ');
+
   return (
     <Layout>
-     {/* Hero Section */}
-<motion.header
-  className="bg-cover bg-center h-80 flex flex-col justify-end pb-8 relative"
-  style={{
-    backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.7)), url('./hero-bg.jpg')`,
-  }}
-  initial={{ opacity: 0 }}
-  animate={{ opacity: 1 }}
-  transition={{ duration: 0.8 }}
->
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
-    <motion.p
-      className="text-sm uppercase tracking-wider font-semibold text-amber-300"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.2 }}
-    >
-      Services &gt; Booking &gt; Billing
-    </motion.p>
-    <motion.h1
-      className="text-4xl sm:text-5xl font-extrabold mt-1"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: 0.4 }}
-    >
-      Billing details
-    </motion.h1>
-  </div>
-</motion.header>
-
+      {/* Hero Section */}
+      <motion.section
+        initial="hidden"
+        animate="visible"
+        variants={sectionVariants}
+        className="relative min-h-[35vh] flex items-center justify-center bg-teal-50"
+      >
+        <motion.div
+          variants={heroContentVariants}
+          className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+        >
+          <motion.h1 className="text-3xl md:text-4xl font-bold text-teal-900 mb-4">
+            {headingText.map((word, index) => (
+              <motion.span
+                key={index}
+                custom={index}
+                variants={wordVariants}
+                initial="hidden"
+                animate="visible"
+                className="inline-block mr-2"
+              >
+                {word}
+              </motion.span>
+            ))}
+          </motion.h1>
+          <motion.p
+            custom={0}
+            variants={wordVariants}
+            className="text-base md:text-lg text-gray-600 max-w-xl mx-auto mb-6"
+          >
+            Learn about our passion for crafting timeless visual stories.
+          </motion.p>
+          <motion.div custom={1} variants={wordVariants}>
+            <Link href="#contact">
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Button
+                  size="lg"
+                  className="bg-coral-500 text-white hover:bg-coral-600 font-semibold py-2 px-6 rounded-full"
+                >
+                  Connect With Us
+                </Button>
+              </motion.div>
+            </Link>
+          </motion.div>
+        </motion.div>
+      </motion.section>
 
       {/* Main Content Section */}
-      <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-[calc(100vh-320px)] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
         <motion.div
           className="max-w-7xl mx-auto"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={sectionVariants}
         >
           {/* Our Story Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 items-center">
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
+              custom={0}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Story</h2>
-              <div className="space-y-4 text-gray-600">
+              <h2 className="text-xl font-bold text-teal-900 mb-3">Our Story</h2>
+              <div className="space-y-2 text-gray-600 text-sm">
                 <p>
-                  Founded in 2018, Brain Works Studio began as a small team of passionate photographers 
-                  who believed that every image should tell a story. What started as a shared love for 
-                  capturing authentic moments has grown into a full-service photography and videography studio.
+                  Since 2018, Brain Works Studio has grown from a small team of photographers into a full-service studio, driven by a love for authentic storytelling through photography and videography.
                 </p>
                 <p>
-                  We specialize in creating visual narratives that resonate with emotion and authenticity. 
-                  From intimate portrait sessions to large-scale commercial productions, our approach remains 
-                  the same: understand our clients' vision and exceed their expectations.
+                  We specialize in everything from intimate portraits to large-scale commercial projects, always prioritizing your vision. Our work has earned accolades and been featured in leading publications.
                 </p>
                 <p>
-                  Today, we're proud to have captured thousands of precious moments for families, couples, 
-                  businesses, and artists throughout the region. Our work has been featured in numerous 
-                  publications and has earned recognition from industry peers.
+                  Our mission is simple: create visuals that capture the essence of every moment, whether personal or professional.
                 </p>
               </div>
             </motion.div>
-            
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4 }}
+              custom={1}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <Card className="overflow-hidden shadow-xl rounded-2xl border-none">
+              <Card className="overflow-hidden shadow-sm rounded-xl border border-coral-100">
                 <CardContent className="p-0">
                   <div className="aspect-[4/3] relative">
                     <Image
-                      src="/images/about-story.jpg"
+                      src="/Pic3.jpeg"
                       alt="Photography Studio"
                       fill
                       className="object-cover"
                       sizes="(max-width: 1024px) 100vw, 50vw"
+                      onError={(e) => {
+                        console.error('Failed to load about story image');
+                        e.currentTarget.src = '/placeholder-story.jpg';
+                      }}
                     />
                   </div>
                 </CardContent>
@@ -99,34 +175,38 @@ export default function AboutPage() {
           </div>
 
           {/* Values Section */}
-          <div className="mb-20">
+          <div className="mb-12">
             <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              className="text-center mb-6"
+              custom={0}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Values</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                These core values guide everything we do, from initial consultation to final delivery.
+              <h2 className="text-xl font-bold text-teal-900 mb-2">Our Values</h2>
+              <p className="text-sm text-gray-600 max-w-lg mx-auto">
+                Core principles that shape our creative process.
               </p>
             </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {values.map((value, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  custom={index}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
                 >
-                  <Card className="text-center border-amber-200 hover:shadow-xl transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="mx-auto mb-4 p-3 bg-amber-100 rounded-full w-fit">
-                        <value.icon className="h-8 w-8 text-amber-700" />
+                  <Card className="text-center bg-teal-50 rounded-xl shadow-sm border border-coral-100 hover:bg-teal-100 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="mx-auto mb-2 p-2 bg-coral-50 rounded-full w-fit">
+                        <value.icon className="h-5 w-5 text-coral-500" />
                       </div>
-                      <h3 className="text-xl font-semibold mb-3">{value.title}</h3>
-                      <p className="text-gray-600">{value.description}</p>
+                      <h3 className="text-sm font-semibold text-teal-900 mb-1">{value.title}</h3>
+                      <p className="text-gray-600 text-xs">{value.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -135,42 +215,49 @@ export default function AboutPage() {
           </div>
 
           {/* Team Section */}
-          <div className="mb-20">
+          <div className="mb-12">
             <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              className="text-center mb-6"
+              custom={0}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                Our talented team of photographers, videographers, and creative professionals 
-                bring diverse skills and perspectives to every project.
+              <h2 className="text-xl font-bold text-teal-900 mb-2">Meet Our Team</h2>
+              <p className="text-sm text-gray-600 max-w-lg mx-auto">
+                Passionate creatives dedicated to your vision.
               </p>
             </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {teamMembers.map((member, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  custom={index}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
                 >
-                  <Card className="text-center hover:shadow-xl transition-all duration-300">
-                    <CardContent className="p-6">
-                      <div className="w-32 h-32 mx-auto mb-4 relative rounded-full overflow-hidden">
+                  <Card className="text-center bg-teal-50 rounded-xl shadow-sm border border-coral-100 hover:bg-teal-100 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="w-20 h-20 mx-auto mb-2 relative rounded-full overflow-hidden">
                         <Image
                           src={`/images/team-${index + 1}.jpg`}
                           alt={member.name}
                           fill
-                          className="object-cover"
-                          sizes="128px"
+                          className="object-contain"
+                          sizes="80px"
+                          onError={(e) => {
+                            console.error(`Failed to load team image for ${member.name}`);
+                            e.currentTarget.src = '/placeholder-team.jpg';
+                          }}
                         />
                       </div>
-                      <h3 className="text-xl font-semibold mb-1">{member.name}</h3>
-                      <p className="text-amber-700 font-medium mb-3">{member.role}</p>
-                      <p className="text-gray-600 text-sm">{member.description}</p>
+                      <h3 className="text-sm font-semibold text-teal-900 mb-1">{member.name}</h3>
+                      <p className="text-coral-500 text-xs font-medium mb-1">{member.role}</p>
+                      <p className="text-gray-600 text-xs">{member.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -180,49 +267,52 @@ export default function AboutPage() {
 
           {/* Statistics Section */}
           <motion.div
-            className="bg-gradient-to-r from-amber-700 to-orange-600 text-white rounded-2xl p-12 mb-20"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            className="bg-teal-600 rounded-xl p-8 mb-12 border border-coral-100"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={sectionVariants}
           >
-            <div className="text-center mb-8">
-              <h2 className="text-3xl font-bold mb-4">Our Impact</h2>
-              <p className="text-xl opacity-90">
-                Numbers that reflect our commitment to excellence and client satisfaction
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-white mb-2">Our Impact</h2>
+              <p className="text-sm text-teal-50">
+                Milestones that reflect our dedication to excellence.
               </p>
             </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
               {stats.map((stat, index) => (
                 <motion.div
                   key={index}
+                  custom={index}
+                  variants={statVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
                   className="text-center"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
                 >
-                  <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
-                  <div className="text-lg opacity-90">{stat.label}</div>
+                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">{stat.number}</div>
+                  <div className="text-xs text-teal-50">{stat.label}</div>
                 </motion.div>
               ))}
             </div>
           </motion.div>
 
           {/* Service Areas */}
-          <div className="mb-20">
+          <div className="mb-12">
             <motion.div
-              className="text-center mb-12"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
+              className="text-center mb-6"
+              custom={0}
+              variants={cardVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
             >
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Service Areas</h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                We proudly serve clients throughout the region and are available for destination projects.
+              <h2 className="text-xl font-bold text-teal-900 mb-2">Service Areas</h2>
+              <p className="text-sm text-gray-600 max-w-lg mx-auto">
+                From local to global, we're here for your projects.
               </p>
             </motion.div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {[
                 {
                   title: 'Local Service Area',
@@ -239,15 +329,18 @@ export default function AboutPage() {
               ].map((area, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
+                  custom={index}
+                  variants={cardVariants}
+                  whileHover="hover"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
                 >
-                  <Card className="text-center hover:shadow-xl transition-all duration-300">
-                    <CardContent className="p-6">
-                      <MapPin className="h-8 w-8 text-amber-700 mx-auto mb-3" />
-                      <h3 className="font-semibold mb-2">{area.title}</h3>
-                      <p className="text-gray-600 text-sm">{area.description}</p>
+                  <Card className="text-center bg-teal-50 rounded-xl shadow-sm border border-coral-100 hover:bg-teal-100 transition-colors">
+                    <CardContent className="p-4">
+                      <MapPin className="h-5 w-5 text-coral-500 mx-auto mb-2" />
+                      <h3 className="text-sm font-semibold text-teal-900 mb-1">{area.title}</h3>
+                      <p className="text-gray-600 text-xs">{area.description}</p>
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -257,34 +350,37 @@ export default function AboutPage() {
 
           {/* CTA Section */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+            custom={0}
+            variants={cardVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
           >
-            <Card className="bg-amber-50 border-amber-200 shadow-xl rounded-2xl">
-              <CardContent className="p-12 text-center">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Ready to Work Together?</h2>
-                <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                  Let's discuss your vision and create something beautiful together. 
-                  We'd love to hear about your project and how we can help bring it to life.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link href="/booking">
-                      <Button size="lg" className="bg-amber-700 hover:bg-amber-800">
-                        Book a Session
-                      </Button>
-                    </Link>
-                  </motion.div>
-                  <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                    <Link href="/contact">
-                      <Button size="lg" variant="outline" className="bg-amber-50 hover:bg-amber-100 text-amber-700">
-                        Get in Touch
-                      </Button>
-                    </Link>
-                  </motion.div>
-                </div>
-              </CardContent>
+            <Card className="bg-teal-50 border-coral-100 shadow-sm rounded-xl p-6 text-center">
+              <h2 className="text-xl font-bold text-teal-900 mb-2">Ready to Collaborate?</h2>
+              <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto">
+                Let's create something extraordinary together.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/booking">
+                    <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white rounded-full">
+                      Book a Session
+                    </Button>
+                  </Link>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link href="/contact">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-coral-500 text-coral-500 hover:bg-coral-50 rounded-full"
+                    >
+                      Contact Us
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
             </Card>
           </motion.div>
         </motion.div>
@@ -296,22 +392,22 @@ export default function AboutPage() {
 const values = [
   {
     title: 'Authenticity',
-    description: 'We capture genuine moments and emotions, creating images that tell your true story.',
+    description: 'We capture genuine moments that reflect your unique story.',
     icon: Heart,
   },
   {
     title: 'Excellence',
-    description: 'We strive for perfection in every shot, using the latest techniques and equipment.',
+    description: 'We pursue perfection in every frame with top-tier techniques.',
     icon: Star,
   },
   {
     title: 'Collaboration',
-    description: 'We work closely with our clients to understand their vision and exceed expectations.',
+    description: 'We partner with you to bring your vision to life.',
     icon: Users,
   },
   {
     title: 'Innovation',
-    description: 'We stay current with industry trends and continuously evolve our creative approach.',
+    description: 'We embrace new trends to keep our work fresh and creative.',
     icon: Award,
   },
 ];
@@ -320,17 +416,17 @@ const teamMembers = [
   {
     name: 'Sarah Johnson',
     role: 'Lead Photographer & Founder',
-    description: 'With over 8 years of experience, Sarah specializes in portrait and wedding photography with a focus on natural light and candid moments.',
+    description: 'Sarah specializes in portrait and wedding photography, focusing on natural light and candid moments.',
   },
   {
     name: 'Michael Chen',
     role: 'Commercial Photographer',
-    description: 'Michael brings technical precision to product and architectural photography, with expertise in lighting and post-production.',
+    description: 'Michael excels in product and architectural photography with a keen eye for detail.',
   },
   {
     name: 'Emma Rodriguez',
     role: 'Videographer & Editor',
-    description: 'Emma creates compelling video content from concept to final cut, specializing in storytelling through motion and sound.',
+    description: 'Emma crafts compelling video stories from concept to final edit.',
   },
 ];
 
