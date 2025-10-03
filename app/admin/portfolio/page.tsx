@@ -11,9 +11,12 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
-import { Camera, Plus, Edit, Trash2, Search, Filter, User, Eye } from 'lucide-react';
+import { Camera, Plus, Edit, Trash2, Search, Filter, User, Eye, Link as LinkIcon, Download, Lock } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Client {
   id: string;
@@ -30,6 +33,12 @@ export default function AdminPortfolioPage() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<PortfolioItem | null>(null);
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [itemToSetPin, setItemToSetPin] = useState<PortfolioItem | null>(null);
+  const [newPin, setNewPin] = useState('');
+  const [pinError, setPinError] = useState('');
+  const [copyingId, setCopyingId] = useState<string | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   const { user, isAdmin, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -132,13 +141,12 @@ export default function AdminPortfolioPage() {
   const toggleFeatured = async (item: PortfolioItem) => {
     try {
       const token = await firebaseUser?.getIdToken();
+      const formData = new FormData();
+      formData.append('featured', String(!item.featured));
       const response = await fetch(`/api/portfolio/${item.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ featured: !item.featured }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       });
       if (response.ok) {
         setPortfolioItems((prev) =>
@@ -149,6 +157,87 @@ export default function AdminPortfolioPage() {
       }
     } catch (error) {
       console.error('Error updating portfolio item:', error);
+    }
+  };
+
+  const copyClientUrl = (item: PortfolioItem) => {
+    const url = `${window.location.origin}/client/portfolio/${item.id}`;
+    navigator.clipboard.writeText(url).then(() => {
+      setCopyingId(item.id);
+      setTimeout(() => setCopyingId(null), 2000);
+      alert(`Client URL copied: ${url}${item.pin ? `\nPIN: ${item.pin}` : ''}`);
+    }).catch((err) => {
+      console.error('Failed to copy URL:', err);
+      alert('Failed to copy URL. Please try again.');
+    });
+  };
+
+  const downloadMedia = async (item: PortfolioItem) => {
+    setDownloadingId(item.id);
+    try {
+      if (item.videoUrl) {
+        if (item.videoUrl.includes('youtube.com') || item.videoUrl.includes('vimeo.com')) {
+          window.open(item.videoUrl, '_blank');
+        } else {
+          window.location.href = item.videoUrl;
+        }
+      } else if (item.imageUrls.length > 0) {
+        const zip = new JSZip();
+        const folder = zip.folder(item.title || 'portfolio-item');
+
+        for (let i = 0; i < item.imageUrls.length; i++) {
+          const url = item.imageUrls[i];
+          const response = await fetch(url);
+          if (!response.ok) {
+            console.error(`Failed to fetch image: ${url}`);
+            continue;
+          }
+          const blob = await response.blob();
+          const fileName = url.split('/').pop()?.split('?')[0] || `image-${i + 1}.jpg`;
+          folder?.file(fileName, blob);
+        }
+
+        const content = await zip.generateAsync({ type: 'blob' });
+        saveAs(content, `${item.title || 'portfolio-item'}.zip`);
+      }
+    } catch (error) {
+      console.error('Download error:', error);
+      alert('Failed to download media. Please try again.');
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  const setPin = async () => {
+    if (!itemToSetPin) return;
+    if (!newPin || newPin.length < 4) {
+      setPinError('PIN must be at least 4 characters');
+      return;
+    }
+    try {
+      const token = await firebaseUser?.getIdToken();
+      const formData = new FormData();
+      formData.append('pin', newPin);
+      const response = await fetch(`/api/portfolio/${itemToSetPin.id}`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      if (response.ok) {
+        setPortfolioItems((prev) =>
+          prev.map((p) => (p.id === itemToSetPin.id ? { ...p, pin: newPin } : p))
+        );
+        setPinDialogOpen(false);
+        setItemToSetPin(null);
+        setNewPin('');
+        setPinError('');
+        alert('PIN set successfully!');
+      } else {
+        throw new Error('Failed to set PIN');
+      }
+    } catch (error) {
+      console.error('Error setting PIN:', error);
+      setPinError('Failed to set PIN. Please try again.');
     }
   };
 
@@ -248,6 +337,11 @@ export default function AdminPortfolioPage() {
                       <Badge className="bg-gold-500 text-white">Featured</Badge>
                     </div>
                   )}
+                  {item.pin && (
+                    <div className="absolute top-2 left-16">
+                      <Badge className="bg-navy-900 text-white">PIN Protected</Badge>
+                    </div>
+                  )}
                   <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="flex gap-1">
                       <Button
@@ -278,7 +372,7 @@ export default function AdminPortfolioPage() {
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
-                      <Link href={`/portfolio/${item.id}`}>
+                      <Link href={`/client/portfolio/${item.id}`}>
                         <Button
                           size="sm"
                           variant="secondary"
@@ -287,6 +381,46 @@ export default function AdminPortfolioPage() {
                           <Eye className="h-4 w-4" />
                         </Button>
                       </Link>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => copyClientUrl(item)}
+                              disabled={copyingId === item.id}
+                              className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
+                            >
+                              <LinkIcon className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent className="bg-navy-900 text-white p-2 rounded-lg">
+                            <p>Copy client URL: {`${window.location.origin}/client/portfolio/${item.id}`}</p>
+                            {item.pin && <p>PIN: {item.pin}</p>}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => downloadMedia(item)}
+                        disabled={downloadingId === item.id || (!item.imageUrls.length && !item.videoUrl)}
+                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
+                      >
+                        <Download className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => {
+                          setItemToSetPin(item);
+                          setNewPin(item.pin || '');
+                          setPinDialogOpen(true);
+                        }}
+                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
+                      >
+                        <Lock className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -332,6 +466,17 @@ export default function AdminPortfolioPage() {
                   {item.caption && (
                     <p className="text-sm text-navy-200 line-clamp-2">{item.caption}</p>
                   )}
+                  <div className="mt-2 text-sm text-navy-200 truncate">
+                    <span className="font-medium">Client URL: </span>
+                    <a
+                      href={`/client/portfolio/${item.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-gold-500 hover:underline"
+                    >
+                      {`/client/portfolio/${item.id}`}
+                    </a>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -380,6 +525,44 @@ export default function AdminPortfolioPage() {
                 className="bg-red-600 hover:bg-red-700 rounded-lg"
               >
                 Delete
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={pinDialogOpen} onOpenChange={setPinDialogOpen}>
+          <DialogContent className="bg-white rounded-lg">
+            <DialogHeader>
+              <DialogTitle>Set PIN for {itemToSetPin?.title}</DialogTitle>
+            </DialogHeader>
+            <div className="py-4">
+              <Input
+                type="text"
+                placeholder="Enter PIN (at least 4 characters)"
+                value={newPin}
+                onChange={(e) => setNewPin(e.target.value)}
+                className="border-navy-200 focus:ring-gold-500 rounded-lg mb-4"
+              />
+              {pinError && <p className="text-red-600 text-sm mb-4">{pinError}</p>}
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setPinDialogOpen(false);
+                  setItemToSetPin(null);
+                  setNewPin('');
+                  setPinError('');
+                }}
+                className="border-navy-200 text-navy-900 hover:bg-navy-100 rounded-lg"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={setPin}
+                className="bg-gold-500 text-navy-900 hover:bg-gold-400 rounded-lg"
+              >
+                Save PIN
               </Button>
             </div>
           </DialogContent>

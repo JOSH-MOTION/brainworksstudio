@@ -1,3 +1,4 @@
+// app/api/portfolio/route.ts - Updated to include PIN
 import { NextResponse, NextRequest } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import { uploadToImageKit } from '@/lib/imagekit';
@@ -53,6 +54,7 @@ export async function GET(request: NextRequest) {
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
         createdBy: data.createdBy || '',
         clientId: data.clientId || null,
+        // Don't expose PIN in public list
       } as PortfolioItem;
     });
 
@@ -109,6 +111,7 @@ export async function POST(request: NextRequest) {
     const clientName = formData.get('clientName') as string;
     const featured = formData.get('featured') === 'true';
     const clientId = formData.get('clientId') as string | null;
+    const downloadPin = formData.get('downloadPin') as string;
     const files = formData.getAll('files') as File[];
     const videoUrl = formData.get('videoUrl') as string | null;
 
@@ -120,6 +123,9 @@ export async function POST(request: NextRequest) {
     }
     if (!category) {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
+    }
+    if (!downloadPin || downloadPin.length < 4) {
+      return NextResponse.json({ error: 'Download PIN is required (at least 4 digits)' }, { status: 400 });
     }
     if (type === 'photography' && (!files || files.length === 0)) {
       return NextResponse.json({ error: 'At least one image is required for photography' }, { status: 400 });
@@ -146,6 +152,7 @@ export async function POST(request: NextRequest) {
       caption: caption?.trim() || null,
       clientName: clientName?.trim() || null,
       featured: Boolean(featured),
+      downloadPin: downloadPin.trim(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: decodedToken.uid,

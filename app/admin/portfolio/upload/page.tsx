@@ -1,3 +1,4 @@
+// app/admin/portfolio/upload/page.tsx - Updated with PIN field
 'use client';
 
 import { useState } from 'react';
@@ -8,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Upload } from 'lucide-react';
+import { ArrowLeft, Upload, Lock, Eye, EyeOff } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 
@@ -47,12 +48,24 @@ export default function UploadPortfolio() {
   const [clientName, setClientName] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
+  const [downloadPin, setDownloadPin] = useState('');
+  const [showPin, setShowPin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const generateRandomPin = () => {
+    const pin = Math.floor(1000 + Math.random() * 9000).toString();
+    setDownloadPin(pin);
+  };
 
   const handleUpload = async () => {
     if (!title || !category || !clientName || (type === 'photography' && !files) || (type === 'videography' && !files && !videoUrl)) {
       setError('Please fill in all required fields.');
+      return;
+    }
+
+    if (!downloadPin || downloadPin.length < 4) {
+      setError('Please set a download PIN (at least 4 digits).');
       return;
     }
 
@@ -72,6 +85,8 @@ export default function UploadPortfolio() {
       formData.append('caption', caption);
       formData.append('clientName', clientName);
       formData.append('featured', 'false');
+      formData.append('downloadPin', downloadPin);
+      
       if (type === 'photography' && files) {
         for (let i = 0; i < files.length; i++) {
           formData.append('files', files[i]);
@@ -98,8 +113,9 @@ export default function UploadPortfolio() {
         throw new Error(errorData.error || 'Failed to upload portfolio');
       }
 
-      alert('Portfolio uploaded successfully!');
-      router.push('/admin');
+      const result = await response.json();
+      alert(`Portfolio uploaded successfully! \n\nClient Access URL: ${window.location.origin}/client/portfolio/${result.id}\n\nDownload PIN: ${downloadPin}\n\nShare this URL and PIN with your client.`);
+      router.push('/admin/portfolio');
     } catch (err: any) {
       console.error('Upload failed:', err);
       setError(err.message || 'Failed to upload portfolio. Please try again.');
@@ -118,11 +134,11 @@ export default function UploadPortfolio() {
           className="mb-4"
         >
           <button
-            onClick={() => router.push('/admin')}
+            onClick={() => router.push('/admin/portfolio')}
             className="flex items-center text-navy-900 hover:text-gold-500 transition-colors"
           >
             <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Admin
+            Back to Portfolio
           </button>
         </motion.div>
 
@@ -136,29 +152,19 @@ export default function UploadPortfolio() {
         </motion.h2>
 
         <div className="space-y-6">
-          <motion.div
-            custom={0}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
             <Label htmlFor="title" className="text-navy-900">Title *</Label>
             <Input
               id="title"
               type="text"
               value={title}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Portfolio title"
               className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
             />
           </motion.div>
 
-          <motion.div
-            custom={1}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
             <Label htmlFor="type" className="text-navy-900">Type *</Label>
             <Select value={type} onValueChange={(value: 'photography' | 'videography') => setType(value)}>
               <SelectTrigger className="border-navy-200 focus:ring-gold-500">
@@ -171,12 +177,7 @@ export default function UploadPortfolio() {
             </Select>
           </motion.div>
 
-          <motion.div
-            custom={2}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
             <Label htmlFor="category" className="text-navy-900">Category *</Label>
             <Select value={category} onValueChange={(value: string) => setCategory(value)}>
               <SelectTrigger className="border-navy-200 focus:ring-gold-500">
@@ -190,64 +191,84 @@ export default function UploadPortfolio() {
             </Select>
           </motion.div>
 
-          <motion.div
-            custom={3}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
             <Label htmlFor="tags" className="text-navy-900">Tags (comma separated)</Label>
             <Input
               id="tags"
               type="text"
               value={tags}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTags(e.target.value)}
+              onChange={(e) => setTags(e.target.value)}
               placeholder="e.g., wedding, portrait"
               className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
             />
           </motion.div>
 
-          <motion.div
-            custom={4}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
             <Label htmlFor="caption" className="text-navy-900">Caption</Label>
             <Textarea
               id="caption"
               value={caption}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setCaption(e.target.value)}
+              onChange={(e) => setCaption(e.target.value)}
               placeholder="Describe your project..."
               rows={4}
               className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
             />
           </motion.div>
 
-          <motion.div
-            custom={5}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
             <Label htmlFor="clientName" className="text-navy-900">Client Name *</Label>
             <Input
               id="clientName"
               type="text"
               value={clientName}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setClientName(e.target.value)}
-              placeholder="Client’s name"
+              onChange={(e) => setClientName(e.target.value)}
+              placeholder="Client's name"
               className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
             />
           </motion.div>
 
+          {/* PIN Setup Section */}
+          <motion.div custom={6} variants={formElementVariants} initial="hidden" animate="visible">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Lock className="w-5 h-5 text-yellow-600" />
+                <Label className="text-navy-900 font-semibold">Download PIN *</Label>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Set a unique PIN that clients will use to download their photos
+              </p>
+              <div className="flex gap-2">
+                <div className="flex-1 relative">
+                  <Input
+                    type={showPin ? 'text' : 'password'}
+                    value={downloadPin}
+                    onChange={(e) => setDownloadPin(e.target.value.replace(/\D/g, ''))}
+                    maxLength={6}
+                    placeholder="Enter 4-6 digit PIN"
+                    className="border-navy-200 focus:ring-gold-500 pr-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPin(!showPin)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <Button
+                  type="button"
+                  onClick={generateRandomPin}
+                  variant="outline"
+                  className="border-gold-500 text-gold-600 hover:bg-gold-50"
+                >
+                  Generate
+                </Button>
+              </div>
+            </div>
+          </motion.div>
+
           {type === 'photography' && (
-            <motion.div
-              custom={6}
-              variants={formElementVariants}
-              initial="hidden"
-              animate="visible"
-            >
+            <motion.div custom={7} variants={formElementVariants} initial="hidden" animate="visible">
               <Label htmlFor="images" className="text-navy-900">Upload Images *</Label>
               <Input
                 id="images"
@@ -262,28 +283,18 @@ export default function UploadPortfolio() {
 
           {type === 'videography' && (
             <>
-              <motion.div
-                custom={7}
-                variants={formElementVariants}
-                initial="hidden"
-                animate="visible"
-              >
+              <motion.div custom={8} variants={formElementVariants} initial="hidden" animate="visible">
                 <Label htmlFor="videoUrl" className="text-navy-900">YouTube Video URL (optional)</Label>
                 <Input
                   id="videoUrl"
                   type="text"
                   value={videoUrl}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setVideoUrl(e.target.value)}
+                  onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="e.g., https://www.youtube.com/embed/your-video-id"
                   className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
                 />
               </motion.div>
-              <motion.div
-                custom={8}
-                variants={formElementVariants}
-                initial="hidden"
-                animate="visible"
-              >
+              <motion.div custom={9} variants={formElementVariants} initial="hidden" animate="visible">
                 <Label htmlFor="videoFiles" className="text-navy-900">Upload Video (optional)</Label>
                 <Input
                   id="videoFiles"
@@ -306,27 +317,20 @@ export default function UploadPortfolio() {
             </motion.div>
           )}
 
-          <motion.div
-            custom={9}
-            variants={formElementVariants}
-            initial="hidden"
-            animate="visible"
-          >
+          <motion.div custom={10} variants={formElementVariants} initial="hidden" animate="visible">
             <Button
               onClick={handleUpload}
               disabled={loading}
-              className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold py-6"
+              className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold py-6 flex items-center justify-center gap-2"
             >
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                {loading ? (
-                  'Uploading...'
-                ) : (
-                  <>
-                    <Upload className="h-5 w-5 mr-2" />
-                    Upload
-                  </>
-                )}
-              </motion.div>
+              {loading ? (
+                'Uploading...'
+              ) : (
+                <>
+                  <Upload className="h-5 w-5" />
+                  Upload Portfolio
+                </>
+              )}
             </Button>
           </motion.div>
         </div>
