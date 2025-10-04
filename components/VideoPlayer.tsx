@@ -1,64 +1,58 @@
 'use client';
 
-import { motion, Variants } from 'framer-motion';
 import { X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 
 interface VideoPlayerProps {
-  videoSrc: string; // YouTube embed URL or ImageKit video URL
+  videoSrc: string;
   onClose: () => void;
 }
-
-const videoPlayerVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: 'easeOut' as const } },
-  exit: { opacity: 0, scale: 0.8, transition: { duration: 0.3, ease: 'easeOut' as const } },
-};
 
 export default function VideoPlayer({ videoSrc, onClose }: VideoPlayerProps) {
   const isYouTube = videoSrc.includes('youtube.com') || videoSrc.includes('youtu.be');
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Prevent closing when clicking inside the video container
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
+  useEffect(() => {
+    console.log('VideoPlayer mounted with videoSrc:', videoSrc);
+    return () => console.log('VideoPlayer unmounted');
+  }, [videoSrc]);
 
   return (
     <motion.div
-      className="fixed inset-0 bg-navy-900 bg-opacity-75 flex items-center justify-center z-50"
-      variants={videoPlayerVariants}
-      initial="hidden"
-      animate="visible"
-      exit="hidden"
-      onClick={handleOverlayClick}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-teal-900/80 flex items-center justify-center z-50"
     >
-      <div className="relative max-w-5xl w-full bg-navy-900 rounded-lg overflow-hidden">
+      <div className="relative w-full max-w-4xl mx-4 sm:mx-6">
+        <button
+          onClick={onClose}
+          className="absolute -top-8 sm:-top-10 right-0 text-white hover:text-coral-500"
+        >
+          <X className="h-6 w-6" />
+        </button>
         {isYouTube ? (
           <iframe
-            src={videoSrc}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            src={`${videoSrc}${videoSrc.includes('?') ? '&' : '?'}autoplay=0&controls=1&mute=0`}
+            title="Video Player"
+            className="w-full h-[40vh] sm:h-[60vh] rounded-lg"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
             allowFullScreen
-            className="w-full h-auto max-h-[90vh] aspect-video"
-          ></iframe>
+            onError={(e) => console.error('Iframe error:', e)}
+          />
         ) : (
           <video
+            src={videoSrc}
             controls
-            className="w-full h-auto max-h-[90vh] aspect-video"
-            title="Portfolio video"
+            autoPlay={false}
+            muted={false}
+            className="w-full h-[40vh] sm:h-[60vh] object-contain rounded-lg bg-black"
+            onError={(e) => console.error('Video playback error:', e)}
           >
             <source src={videoSrc} type="video/mp4" />
             Your browser does not support the video tag.
           </video>
         )}
-        <button
-          className="absolute top-4 right-4 text-white hover:text-gold-500 bg-navy-800 rounded-full p-2"
-          onClick={onClose}
-          aria-label="Close video player"
-        >
-          <X className="w-6 h-6" />
-        </button>
       </div>
     </motion.div>
   );
