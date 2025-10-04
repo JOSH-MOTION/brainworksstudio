@@ -1,6 +1,5 @@
 import ImageKit from 'imagekit';
 
-
 // Initialize ImageKit client with environment variables
 const imagekit = new ImageKit({
   publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY || '',
@@ -16,7 +15,7 @@ interface UploadResponse {
 }
 
 // Server-side upload helper
-export async function uploadToImageKit(file: File | Buffer, fileName: string): Promise<UploadResponse> {
+export async function uploadToImageKit(file: File | Buffer, fileName: string, folder: string = '/brain-works-studio'): Promise<UploadResponse> {
   try {
     // Ensure file is either a base64 string or Buffer
     let fileData: string | Buffer;
@@ -30,7 +29,7 @@ export async function uploadToImageKit(file: File | Buffer, fileName: string): P
     const response = await imagekit.upload({
       file: fileData,
       fileName,
-      folder: '/brain-works-studio',
+      folder,
       useUniqueFileName: true,
       tags: ['portfolio'],
     });
@@ -45,7 +44,7 @@ export async function uploadToImageKit(file: File | Buffer, fileName: string): P
       message: error.message,
       stack: error.stack,
     });
-    throw new Error(`Failed to upload image to ImageKit: ${error.message}`);
+    throw new Error(`Failed to upload file to ImageKit: ${error.message}`);
   }
 }
 

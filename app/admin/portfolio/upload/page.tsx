@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Upload, Lock, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Upload, Lock, Eye, EyeOff, Image as ImageIcon } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import Layout from '@/components/Layout';
@@ -47,6 +47,7 @@ export default function UploadPortfolio() {
   const [caption, setCaption] = useState('');
   const [clientName, setClientName] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
   const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
@@ -59,11 +60,23 @@ export default function UploadPortfolio() {
   };
 
   const handleUpload = async () => {
-    if (!title || !category || !clientName || (type === 'photography' && !files) || (type === 'videography' && !files && !videoUrl)) {
-      setError('Please fill in all required fields.');
+    // Validation
+    if (!title || !category || !clientName) {
+      setError('Please fill in all required fields (Title, Category, Client Name).');
       return;
     }
-
+    if (type === 'photography' && !files) {
+      setError('Please upload at least one image for photography.');
+      return;
+    }
+    if (type === 'videography' && !files && !videoUrl) {
+      setError('Please upload a video file or provide a YouTube URL.');
+      return;
+    }
+    if (type === 'videography' && files && !thumbnailFile) {
+      setError('Please upload a thumbnail image for the local video.');
+      return;
+    }
     if (pin && pin.length < 4) {
       setError('PIN must be at least 4 digits.');
       return;
@@ -86,19 +99,31 @@ export default function UploadPortfolio() {
       formData.append('clientName', clientName);
       formData.append('featured', 'false');
       formData.append('pin', pin);
-      
+
+      // Handle photography uploads
       if (type === 'photography' && files) {
         for (let i = 0; i < files.length; i++) {
           formData.append('files', files[i]);
         }
-      } else if (type === 'videography') {
+      }
+
+      // Handle videography uploads
+      if (type === 'videography') {
         if (videoUrl) {
           formData.append('videoUrl', videoUrl);
-        }
-        if (files) {
-          for (let i = 0; i < files.length; i++) {
-            formData.append('files', files[i]);
+          if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+            const videoId = videoUrl.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
+            const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/video-placeholder.jpg';
+            formData.append('imageUrls', thumbnailUrl);
+          } else {
+            formData.append('imageUrls', '/video-placeholder.jpg');
           }
+        }
+        if (files && files[0]) {
+          formData.append('files', files[0]);
+        }
+        if (thumbnailFile) {
+          formData.append('thumbnail', thumbnailFile);
         }
       }
 
@@ -307,6 +332,21 @@ export default function UploadPortfolio() {
                     className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
                   />
                 </motion.div>
+                {files && (
+                  <motion.div custom={10} variants={formElementVariants} initial="hidden" animate="visible">
+                    <Label htmlFor="thumbnail" className="text-teal-900 text-sm">Video Thumbnail * (required for local video)</Label>
+                    <div className="relative">
+                      <ImageIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-teal-900 h-4 w-4" />
+                      <Input
+                        id="thumbnail"
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setThumbnailFile(e.target.files?.[0] || null)}
+                        className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg pl-10"
+                      />
+                    </div>
+                  </motion.div>
+                )}
               </>
             )}
 
@@ -320,7 +360,7 @@ export default function UploadPortfolio() {
               </motion.div>
             )}
 
-            <motion.div custom={10} variants={formElementVariants} initial="hidden" animate="visible">
+            <motion.div custom={11} variants={formElementVariants} initial="hidden" animate="visible">
               <motion.button
                 variants={buttonVariants}
                 whileHover="hover"

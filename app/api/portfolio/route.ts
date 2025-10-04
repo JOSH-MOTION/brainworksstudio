@@ -1,4 +1,3 @@
-// app/api/portfolio/route.ts - Updated to include PIN
 import { NextResponse, NextRequest } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import { uploadToImageKit } from '@/lib/imagekit';
@@ -9,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   console.log('GET /api/portfolio: Starting request');
-  
+
   try {
     if (!adminDb) {
       console.error('GET /api/portfolio: Firebase Admin not initialized');
@@ -24,13 +23,13 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category');
 
     console.log(`GET /api/portfolio: Querying with type=${type}, category=${category}`);
-    
+
     let query: Query<DocumentData> | CollectionReference<DocumentData> = adminDb.collection('portfolio');
-    
+
     if (type) {
       query = query.where('type', '==', type);
     }
-    if (category && category !== 'undefined' && category !== 'null') {
+    if (category && category !== 'undefined' && category !== 'null' && category !== 'all') {
       query = query.where('category', '==', category);
     }
 
@@ -54,13 +53,13 @@ export async function GET(request: NextRequest) {
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
         createdBy: data.createdBy || '',
         clientId: data.clientId || null,
-        // Don't expose PIN in public list
+        pin: data.pin || data.downloadPin || null,
       } as PortfolioItem;
     });
 
     portfolioItems.sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1));
     console.log(`GET /api/portfolio: Returning ${portfolioItems.length} items`);
-    
+
     return NextResponse.json(portfolioItems, {
       headers: {
         'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
@@ -111,9 +110,12 @@ export async function POST(request: NextRequest) {
     const clientName = formData.get('clientName') as string;
     const featured = formData.get('featured') === 'true';
     const clientId = formData.get('clientId') as string | null;
+    const pin = formData.get('pin') as string;
     const downloadPin = formData.get('downloadPin') as string;
     const files = formData.getAll('files') as File[];
+    const thumbnail = formData.get('thumbnail') as File | null;
     const videoUrl = formData.get('videoUrl') as string | null;
+    const thumbnailUrl = formData.get('imageUrls') as string | null;
 
     if (!title?.trim()) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
@@ -124,40 +126,105 @@ export async function POST(request: NextRequest) {
     if (!category) {
       return NextResponse.json({ error: 'Category is required' }, { status: 400 });
     }
-    if (!downloadPin || downloadPin.length < 4) {
-      return NextResponse.json({ error: 'Download PIN is required (at least 4 digits)' }, { status: 400 });
+
+    // PIN validation
+    const finalPin = pin || downloadPin;
+    if (!finalPin || finalPin.length < 4) {
+      return NextResponse.json({ error: 'PIN is required (at least 4 characters)' }, { status: 400 });
     }
+
     if (type === 'photography' && (!files || files.length === 0)) {
       return NextResponse.json({ error: 'At least one image is required for photography' }, { status: 400 });
     }
     if (type === 'videography' && !videoUrl && (!files || files.length === 0)) {
       return NextResponse.json({ error: 'Video URL or file is required for videography' }, { status: 400 });
     }
+    if (type === 'videography' && !videoUrl && !thumbnail) {
+      return NextResponse.json({ error: 'Thumbnail is required for local video uploads' }, { status: 400 });
+    }
 
     const imageUrls: string[] = [];
+    let uploadedVideoUrl: string | null = null;
+
+    // Process uploaded video files
     if (files && files.length > 0) {
+      console.log(`POST /api/portfolio: Processing ${files.length} video files`);
+
       for (const file of files) {
-        const result = await uploadToImageKit(file, file.name);
-        imageUrls.push(result.url);
+        if (file.size === 0) {
+          console.warn('POST /api/portfolio: Skipping empty file');
+          continue;
+        }
+
+        console.log(`POST /api/portfolio: Uploading video file - Name: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
+        const result = await uploadToImageKit(file, `${title || 'video'}-${Date.now()}.mp4`, '/brain-works-studio');
+        uploadedVideoUrl = result.url;
+        console.log(`POST /api/portfolio: Stored video in videoUrl: ${result.url}`);
       }
+    }
+
+    // Process thumbnail for videography
+    if (type === 'videography') {
+      if (thumbnail) {
+        console.log(`POST /api/portfolio: Uploading thumbnail - Name: ${thumbnail.name}, Type: ${thumbnail.type}, Size: ${thumbnail.size}`);
+        const thumbnailResult = await uploadToImageKit(thumbnail, `${title || 'thumbnail'}-${Date.now()}.jpg`, '/brain-works-studio/thumbnails');
+        imageUrls.push(thumbnailResult.url);
+        console.log(`POST /api/portfolio: Stored thumbnail in imageUrls: ${thumbnailResult.url}`);
+      } else if (thumbnailUrl) {
+        imageUrls.push(thumbnailUrl);
+        console.log(`POST /api/portfolio: Using provided thumbnail: ${thumbnailUrl}`);
+      } else {
+        imageUrls.push('/video-placeholder.jpg');
+        console.log('POST /api/portfolio: No thumbnail provided, using placeholder');
+      }
+    } else if (type === 'photography') {
+      // Process image files for photography
+      for (const file of files) {
+        if (!file.type.startsWith('image/')) {
+          console.warn(`POST /api/portfolio: Skipping non-image file for photography: ${file.name}`);
+          continue;
+        }
+        const result = await uploadToImageKit(file, file.name, '/brain-works-studio');
+        imageUrls.push(result.url);
+        console.log(`POST /api/portfolio: Stored image in imageUrls: ${result.url}`);
+      }
+    }
+
+    // Priority: YouTube/Vimeo URL > Uploaded video file
+    const finalVideoUrl = videoUrl?.trim() || uploadedVideoUrl || null;
+
+    if (type === 'videography' && !finalVideoUrl) {
+      return NextResponse.json({
+        error: 'No valid video found. Please provide a video URL or upload a video file.',
+      }, { status: 400 });
     }
 
     const portfolioItem = {
       title: title.trim(),
       type,
       category,
-      tags: tags ? tags.split(',').map(t => t.trim()) : [],
+      tags: tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [],
       imageUrls,
-      videoUrl: videoUrl?.trim() || null,
+      videoUrl: finalVideoUrl,
       caption: caption?.trim() || null,
       clientName: clientName?.trim() || null,
       featured: Boolean(featured),
-      downloadPin: downloadPin.trim(),
+      pin: finalPin.trim(),
+      downloadPin: finalPin.trim(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       createdBy: decodedToken.uid,
       clientId: clientId || null,
     };
+
+    console.log('POST /api/portfolio: Creating portfolio item:', {
+      title: portfolioItem.title,
+      type: portfolioItem.type,
+      category: portfolioItem.category,
+      imageCount: portfolioItem.imageUrls.length,
+      hasVideo: !!portfolioItem.videoUrl,
+      videoUrl: portfolioItem.videoUrl,
+    });
 
     const docRef = await adminDb.collection('portfolio').add(portfolioItem);
     const createdDoc = await docRef.get();

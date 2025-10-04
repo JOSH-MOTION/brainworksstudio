@@ -114,9 +114,9 @@ export default function AdminPortfolioPage() {
     if (searchTerm) {
       filtered = filtered.filter(
         (item) =>
-          item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          item.tags.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
+          item.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.tags?.some((tag) => tag.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (item.clientName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
           (item.clientId &&
             clients[item.clientId]?.displayName?.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -127,6 +127,7 @@ export default function AdminPortfolioPage() {
     if (selectedCategory !== 'all') {
       filtered = filtered.filter((item) => item.category === selectedCategory);
     }
+    console.log('Filtered items:', filtered);
     setFilteredItems(filtered);
   };
 
@@ -194,7 +195,7 @@ export default function AdminPortfolioPage() {
         } else {
           window.location.href = item.videoUrl;
         }
-      } else if (item.imageUrls.length > 0) {
+      } else if (item.imageUrls?.length) {
         const zip = new JSZip();
         const folder = zip.folder(item.title || 'portfolio-item');
 
@@ -254,7 +255,29 @@ export default function AdminPortfolioPage() {
     }
   };
 
-  const categories = ['all', ...Array.from(new Set(portfolioItems.map((item) => item.category)))];
+  // Function to get thumbnail for videos
+ const getVideoThumbnail = (videoUrl?: string): string => {
+  if (!videoUrl) {
+    console.log('No videoUrl provided, using placeholder');
+    return '/placeholder-image.jpg';
+  }
+  if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+    const videoId = videoUrl.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
+    const thumbnail = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/video-placeholder.jpg';
+    console.log(`YouTube video detected: ${videoUrl}, using thumbnail: ${thumbnail}`);
+    return thumbnail;
+  } else if (videoUrl.includes('vimeo.com')) {
+    console.log(`Vimeo video detected: ${videoUrl}, using placeholder (Vimeo API not implemented)`);
+    return '/video-placeholder.jpg'; // Simplified, add Vimeo API if needed
+  } else if (videoUrl.includes('ik.imagekit.io')) {
+    const thumbnailUrl = `${videoUrl}?tr=so-0,w-400,h-400,fo-auto`;
+    console.log(`ImageKit video detected: ${videoUrl}, trying thumbnail: ${thumbnailUrl}`);
+    return thumbnailUrl; // Rely on onError to fallback to /video-placeholder.jpg
+  }
+  console.log(`Unknown video source: ${videoUrl}, using placeholder`);
+  return '/video-placeholder.jpg';
+};
+  const categories = ['all', ...Array.from(new Set(portfolioItems.map((item) => item.category).filter((cat): cat is string => !!cat)))];
 
   if (authLoading || loading) {
     return (
@@ -340,35 +363,40 @@ export default function AdminPortfolioPage() {
                             item.imageUrls && item.imageUrls.length > 0
                               ? item.imageUrls[0]
                               : item.videoUrl
-                                ? '/video-placeholder.jpg'
-                                : '/placeholder-image.jpg'
+                                ? getVideoThumbnail(item.videoUrl)
+                                : '/placeholder-image.jpeg'
                           }
-                          alt={item.title}
+                          alt={item.title || 'Portfolio item'}
                           fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                           className="object-cover transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => {
-                            console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
+                            console.error(`Failed to load image for ${item.title || 'item'}: ${item.imageUrls?.[0] || item.videoUrl || 'no source'}`);
                             e.currentTarget.src = '/placeholder-image.jpg';
                           }}
-                          onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
+                          onLoad={() => console.log(`Successfully loaded image for ${item.title || 'item'}: ${item.imageUrls?.[0] || (item.videoUrl ? getVideoThumbnail(item.videoUrl) : '/placeholder-image.jpg')}`)}
                         />
                       )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-50 group-hover:opacity-80 transition-opacity duration-300" />
                       {item.featured && (
-                        <div className="absolute top-2 left-2">
+                        <div className="absolute top-2 left-2 z-10">
                           <Badge className="bg-coral-500 text-white text-xs">Featured</Badge>
                         </div>
                       )}
                       {item.pin && (
-                        <div className="absolute top-2 left-16">
+                        <div className="absolute top-2 left-16 z-10">
                           <Badge className="bg-teal-900 text-white text-xs">PIN Protected</Badge>
                         </div>
                       )}
                       {item.videoUrl && previewingId !== item.id && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-teal-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="absolute inset-0 flex items-center justify-center bg-teal-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                           <Button
                             size="sm"
                             variant="secondary"
-                            onClick={() => setPreviewingId(item.id)}
+                            onClick={() => {
+                              console.log(`Opening video preview for ${item.title || 'item'}: ${item.videoUrl}`);
+                              setPreviewingId(item.id);
+                            }}
                             className="bg-coral-500 hover:bg-coral-600 text-white rounded-full h-12 w-12"
                           >
                             <Play className="h-6 w-6" />
@@ -377,7 +405,7 @@ export default function AdminPortfolioPage() {
                       )}
                     </div>
                     <div
-                      className={`absolute top-2 right-12 transition-all duration-300 ${
+                      className={`absolute top-2 right-12 transition-all duration-300 z-20 ${
                         showActions === item.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
                       }`}
                     >
@@ -437,7 +465,7 @@ export default function AdminPortfolioPage() {
                           size="sm"
                           variant="secondary"
                           onClick={() => downloadMedia(item)}
-                          disabled={downloadingId === item.id || (!item.imageUrls.length && !item.videoUrl)}
+                          disabled={downloadingId === item.id || (!item.imageUrls?.length && !item.videoUrl)}
                           className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
                           title="Download Media"
                         >
@@ -461,21 +489,24 @@ export default function AdminPortfolioPage() {
                     <Button
                       size="sm"
                       variant="secondary"
-                      onClick={() => setShowActions(showActions === item.id ? null : item.id)}
-                      className="absolute top-2 right-2 bg-coral-500 hover:bg-coral-600 text-white rounded-full h-8 w-8 p-0"
+                      onClick={() => {
+                        console.log(`Toggling actions for ${item.title || 'item'}: ${item.id}`);
+                        setShowActions(showActions === item.id ? null : item.id);
+                      }}
+                      className="absolute top-2 right-2 bg-coral-500 hover:bg-coral-600 text-white rounded-full h-8 w-8 p-0 z-20"
                       title={showActions === item.id ? 'Hide Actions' : 'Show Actions'}
                     >
                       <Eye className="h-4 w-4" />
                     </Button>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-semibold text-sm text-teal-900 mb-1 truncate">{item.title}</h3>
+                    <h3 className="font-semibold text-sm text-teal-900 mb-1 truncate">{item.title || 'Untitled'}</h3>
                     <div className="flex items-center justify-between mb-2">
                       <Badge variant="outline" className="text-xs text-teal-900 border-coral-100">
-                        {item.category}
+                        {item.category || 'Uncategorized'}
                       </Badge>
                       <Badge variant="secondary" className="text-xs bg-coral-100 text-teal-900">
-                        {item.type}
+                        {item.type || 'Unknown'}
                       </Badge>
                     </div>
                     {(item.clientId && clients[item.clientId]) || item.clientName ? (
@@ -484,29 +515,31 @@ export default function AdminPortfolioPage() {
                         <span>
                           {item.clientId && clients[item.clientId]
                             ? clients[item.clientId].displayName || clients[item.clientId].email
-                            : item.clientName}
+                            : item.clientName || 'Unknown Client'}
                         </span>
                       </div>
                     ) : null}
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      {item.tags.slice(0, 3).map((tag) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className="text-xs bg-coral-100 text-teal-900"
-                        >
-                          {tag}
-                        </Badge>
-                      ))}
-                      {item.tags.length > 3 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-coral-100 text-teal-900"
-                        >
-                          +{item.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
+                    {item.tags?.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {item.tags.slice(0, 3).map((tag) => (
+                          <Badge
+                            key={tag}
+                            variant="secondary"
+                            className="text-xs bg-coral-100 text-teal-900"
+                          >
+                            {tag}
+                          </Badge>
+                        ))}
+                        {item.tags.length > 3 && (
+                          <Badge
+                            variant="secondary"
+                            className="text-xs bg-coral-100 text-teal-900"
+                          >
+                            +{item.tags.length - 3}
+                          </Badge>
+                        )}
+                      </div>
+                    )}
                     {item.caption && (
                       <p className="text-xs text-teal-900 line-clamp-2">{item.caption}</p>
                     )}
@@ -553,7 +586,7 @@ export default function AdminPortfolioPage() {
             </DialogHeader>
             <div className="py-4">
               <p className="text-teal-900 text-sm">
-                Are you sure you want to delete "{itemToDelete?.title}"? This action cannot be undone.
+                Are you sure you want to delete "{itemToDelete?.title || 'Untitled'}"? This action cannot be undone.
               </p>
             </div>
             <div className="flex justify-end gap-2">
@@ -578,7 +611,7 @@ export default function AdminPortfolioPage() {
         <Dialog open={pinDialogOpen} onOpenChange={setPinDialogOpen}>
           <DialogContent className="bg-white rounded-lg">
             <DialogHeader>
-              <DialogTitle>Set PIN for {itemToSetPin?.title}</DialogTitle>
+              <DialogTitle>Set PIN for {itemToSetPin?.title || 'Untitled'}</DialogTitle>
             </DialogHeader>
             <div className="py-4">
               <Input
