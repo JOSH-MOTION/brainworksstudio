@@ -52,6 +52,7 @@ export async function GET(
       updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
       createdBy: data.createdBy || '',
       clientId: data.clientId || null,
+      pin: data.pin || null, // Include pin
     };
 
     console.log(`GET /api/portfolio/${id}: Returning item`, portfolioItem);
@@ -108,6 +109,7 @@ export async function PUT(
     const clientId = formData.get('clientId') as string | null;
     const files = formData.getAll('files') as File[];
     const videoUrl = formData.get('videoUrl') as string | null;
+    const pin = formData.get('pin') as string | null; // Extract pin
 
     if (!title?.trim()) {
       return NextResponse.json({ error: 'Title is required' }, { status: 400 });
@@ -149,13 +151,15 @@ export async function PUT(
       createdAt: existingData.createdAt,
       createdBy: existingData.createdBy,
       clientId: clientId || existingData.clientId || null,
+      pin: pin || null, // Save pin
     };
 
+    console.log(`PUT /api/portfolio/${id}: Updating item with data`, updatedPortfolioItem);
     await portfolioRef.update(updatedPortfolioItem);
-    console.log('PUT /api/portfolio: Portfolio item updated successfully:', id);
+    console.log(`PUT /api/portfolio/${id}: Portfolio item updated successfully`);
     return NextResponse.json({ id, ...updatedPortfolioItem });
   } catch (error: any) {
-    console.error('PUT /api/portfolio: Error updating portfolio item:', error);
+    console.error(`PUT /api/portfolio/${id}: Error updating portfolio item`, error);
     return NextResponse.json(
       { error: 'Failed to update portfolio item', debug: error.message },
       { status: 500 }

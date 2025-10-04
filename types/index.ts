@@ -50,6 +50,12 @@ export interface PortfolioItem {
   pin?: string;
 }
 
+export interface Client {
+  id: string;
+  displayName: string;
+  email: string;
+}
+
 export interface Contact {
   id: string;
   name: string;

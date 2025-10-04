@@ -1,4 +1,3 @@
-// app/admin/portfolio/upload/page.tsx - Updated with PIN field
 'use client';
 
 import { useState } from 'react';
@@ -12,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Upload, Lock, Eye, EyeOff } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase';
+import Layout from '@/components/Layout';
 
 const formElementVariants: Variants = {
   hidden: { opacity: 0, x: -20 },
@@ -48,14 +48,14 @@ export default function UploadPortfolio() {
   const [clientName, setClientName] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [videoUrl, setVideoUrl] = useState('');
-  const [downloadPin, setDownloadPin] = useState('');
+  const [pin, setPin] = useState('');
   const [showPin, setShowPin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const generateRandomPin = () => {
     const pin = Math.floor(1000 + Math.random() * 9000).toString();
-    setDownloadPin(pin);
+    setPin(pin);
   };
 
   const handleUpload = async () => {
@@ -64,8 +64,8 @@ export default function UploadPortfolio() {
       return;
     }
 
-    if (!downloadPin || downloadPin.length < 4) {
-      setError('Please set a download PIN (at least 4 digits).');
+    if (pin && pin.length < 4) {
+      setError('PIN must be at least 4 digits.');
       return;
     }
 
@@ -85,7 +85,7 @@ export default function UploadPortfolio() {
       formData.append('caption', caption);
       formData.append('clientName', clientName);
       formData.append('featured', 'false');
-      formData.append('downloadPin', downloadPin);
+      formData.append('pin', pin);
       
       if (type === 'photography' && files) {
         for (let i = 0; i < files.length; i++) {
@@ -114,7 +114,7 @@ export default function UploadPortfolio() {
       }
 
       const result = await response.json();
-      alert(`Portfolio uploaded successfully! \n\nClient Access URL: ${window.location.origin}/client/portfolio/${result.id}\n\nDownload PIN: ${downloadPin}\n\nShare this URL and PIN with your client.`);
+      alert(`Portfolio uploaded successfully! \n\nClient Access URL: ${window.location.origin}/client/portfolio/${result.id}\n\nPIN: ${pin || 'None'}\n\nShare this URL and PIN with your client.`);
       router.push('/admin/portfolio');
     } catch (err: any) {
       console.error('Upload failed:', err);
@@ -125,216 +125,223 @@ export default function UploadPortfolio() {
   };
 
   return (
-    <div className="min-h-screen bg-navy-50 p-6">
-      <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md p-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="mb-4"
-        >
-          <button
-            onClick={() => router.push('/admin/portfolio')}
-            className="flex items-center text-navy-900 hover:text-gold-500 transition-colors"
+    <Layout>
+      <div className="min-h-screen bg-teal-50 p-6">
+        <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6 }}
+            className="mb-4"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
-            Back to Portfolio
-          </button>
-        </motion.div>
-
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-2xl font-bold text-navy-900 mb-6"
-        >
-          Upload Portfolio
-        </motion.h2>
-
-        <div className="space-y-6">
-          <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="title" className="text-navy-900">Title *</Label>
-            <Input
-              id="title"
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Portfolio title"
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="type" className="text-navy-900">Type *</Label>
-            <Select value={type} onValueChange={(value: 'photography' | 'videography') => setType(value)}>
-              <SelectTrigger className="border-navy-200 focus:ring-gold-500">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="photography">Photography</SelectItem>
-                <SelectItem value="videography">Videography</SelectItem>
-              </SelectContent>
-            </Select>
-          </motion.div>
-
-          <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="category" className="text-navy-900">Category *</Label>
-            <Select value={category} onValueChange={(value: string) => setCategory(value)}>
-              <SelectTrigger className="border-navy-200 focus:ring-gold-500">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent>
-                {(type === 'photography' ? photographyCategories : videographyCategories).map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </motion.div>
-
-          <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="tags" className="text-navy-900">Tags (comma separated)</Label>
-            <Input
-              id="tags"
-              type="text"
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              placeholder="e.g., wedding, portrait"
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="caption" className="text-navy-900">Caption</Label>
-            <Textarea
-              id="caption"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              placeholder="Describe your project..."
-              rows={4}
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientName" className="text-navy-900">Client Name *</Label>
-            <Input
-              id="clientName"
-              type="text"
-              value={clientName}
-              onChange={(e) => setClientName(e.target.value)}
-              placeholder="Client's name"
-              className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-            />
-          </motion.div>
-
-          {/* PIN Setup Section */}
-          <motion.div custom={6} variants={formElementVariants} initial="hidden" animate="visible">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Lock className="w-5 h-5 text-yellow-600" />
-                <Label className="text-navy-900 font-semibold">Download PIN *</Label>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">
-                Set a unique PIN that clients will use to download their photos
-              </p>
-              <div className="flex gap-2">
-                <div className="flex-1 relative">
-                  <Input
-                    type={showPin ? 'text' : 'password'}
-                    value={downloadPin}
-                    onChange={(e) => setDownloadPin(e.target.value.replace(/\D/g, ''))}
-                    maxLength={6}
-                    placeholder="Enter 4-6 digit PIN"
-                    className="border-navy-200 focus:ring-gold-500 pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPin(!showPin)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-                <Button
-                  type="button"
-                  onClick={generateRandomPin}
-                  variant="outline"
-                  className="border-gold-500 text-gold-600 hover:bg-gold-50"
-                >
-                  Generate
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-
-          {type === 'photography' && (
-            <motion.div custom={7} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="images" className="text-navy-900">Upload Images *</Label>
-              <Input
-                id="images"
-                type="file"
-                multiple
-                accept="image/*"
-                onChange={(e) => setFiles(e.target.files)}
-                className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-              />
-            </motion.div>
-          )}
-
-          {type === 'videography' && (
-            <>
-              <motion.div custom={8} variants={formElementVariants} initial="hidden" animate="visible">
-                <Label htmlFor="videoUrl" className="text-navy-900">YouTube Video URL (optional)</Label>
-                <Input
-                  id="videoUrl"
-                  type="text"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="e.g., https://www.youtube.com/embed/your-video-id"
-                  className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-                />
-              </motion.div>
-              <motion.div custom={9} variants={formElementVariants} initial="hidden" animate="visible">
-                <Label htmlFor="videoFiles" className="text-navy-900">Upload Video (optional)</Label>
-                <Input
-                  id="videoFiles"
-                  type="file"
-                  accept="video/*"
-                  onChange={(e) => setFiles(e.target.files)}
-                  className="border-navy-200 focus:ring-gold-500 focus:border-gold-500"
-                />
-              </motion.div>
-            </>
-          )}
-
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-red-600 text-sm bg-red-50 p-3 rounded-md"
-            >
-              {error}
-            </motion.div>
-          )}
-
-          <motion.div custom={10} variants={formElementVariants} initial="hidden" animate="visible">
             <Button
-              onClick={handleUpload}
-              disabled={loading}
-              className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 font-semibold py-6 flex items-center justify-center gap-2"
+              onClick={() => router.push('/admin/portfolio')}
+              variant="outline"
+              className="flex items-center text-teal-900 hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
             >
-              {loading ? (
-                'Uploading...'
-              ) : (
-                <>
-                  <Upload className="h-5 w-5" />
-                  Upload Portfolio
-                </>
-              )}
+              <ArrowLeft className="w-5 h-5 mr-2" />
+              Back to Portfolio
             </Button>
           </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="text-2xl font-bold text-teal-900 mb-6"
+          >
+            Upload Portfolio
+          </motion.h2>
+
+          <div className="space-y-6">
+            <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
+              <Label htmlFor="title" className="text-teal-900 text-sm">Title *</Label>
+              <Input
+                id="title"
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="Portfolio title"
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+              />
+            </motion.div>
+
+            <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
+              <Label htmlFor="type" className="text-teal-900 text-sm">Type *</Label>
+              <Select value={type} onValueChange={(value: 'photography' | 'videography') => setType(value)}>
+                <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="photography">Photography</SelectItem>
+                  <SelectItem value="videography">Videography</SelectItem>
+                </SelectContent>
+              </Select>
+            </motion.div>
+
+            <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
+              <Label htmlFor="category" className="text-teal-900 text-sm">Category *</Label>
+              <Select value={category} onValueChange={(value: string) => setCategory(value)}>
+                <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {(type === 'photography' ? photographyCategories : videographyCategories).map((cat) => (
+                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </motion.div>
+
+            <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
+              <Label htmlFor="tags" className="text-teal-900 text-sm">Tags (comma separated)</Label>
+              <Input
+                id="tags"
+                type="text"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                placeholder="e.g., wedding, portrait"
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+              />
+            </motion.div>
+
+            <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
+              <Label htmlFor="caption" className="text-teal-900 text-sm">Caption</Label>
+              <Textarea
+                id="caption"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                placeholder="Describe your project..."
+                rows={4}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+              />
+            </motion.div>
+
+            <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
+              <Label htmlFor="clientName" className="text-teal-900 text-sm">Client Name *</Label>
+              <Input
+                id="clientName"
+                type="text"
+                value={clientName}
+                onChange={(e) => setClientName(e.target.value)}
+                placeholder="Client's name"
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+              />
+            </motion.div>
+
+            <motion.div custom={6} variants={formElementVariants} initial="hidden" animate="visible">
+              <div className="bg-coral-50 border border-coral-100 rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lock className="w-5 h-5 text-coral-500" />
+                  <Label className="text-teal-900 font-semibold text-sm">PIN *</Label>
+                </div>
+                <p className="text-xs text-teal-900 mb-3">
+                  Set a unique PIN that clients will use to access their portfolio
+                </p>
+                <div className="flex gap-2">
+                  <div className="flex-1 relative">
+                    <Input
+                      type={showPin ? 'text' : 'password'}
+                      value={pin}
+                      onChange={(e) => setPin(e.target.value.replace(/\D/g, ''))}
+                      maxLength={6}
+                      placeholder="Enter 4-6 digit PIN"
+                      className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPin(!showPin)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-900 hover:text-coral-500"
+                    >
+                      {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <motion.button
+                    variants={buttonVariants}
+                    whileHover="hover"
+                    whileTap="tap"
+                    type="button"
+                    onClick={generateRandomPin}
+                    className="border-coral-100 text-coral-500 hover:bg-coral-50 text-sm rounded-lg px-4 py-2"
+                  >
+                    Generate
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+
+            {type === 'photography' && (
+              <motion.div custom={7} variants={formElementVariants} initial="hidden" animate="visible">
+                <Label htmlFor="images" className="text-teal-900 text-sm">Upload Images *</Label>
+                <Input
+                  id="images"
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => setFiles(e.target.files)}
+                  className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                />
+              </motion.div>
+            )}
+
+            {type === 'videography' && (
+              <>
+                <motion.div custom={8} variants={formElementVariants} initial="hidden" animate="visible">
+                  <Label htmlFor="videoUrl" className="text-teal-900 text-sm">YouTube Video URL (optional)</Label>
+                  <Input
+                    id="videoUrl"
+                    type="text"
+                    value={videoUrl}
+                    onChange={(e) => setVideoUrl(e.target.value)}
+                    placeholder="e.g., https://www.youtube.com/embed/your-video-id"
+                    className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                  />
+                </motion.div>
+                <motion.div custom={9} variants={formElementVariants} initial="hidden" animate="visible">
+                  <Label htmlFor="videoFiles" className="text-teal-900 text-sm">Upload Video (optional)</Label>
+                  <Input
+                    id="videoFiles"
+                    type="file"
+                    accept="video/*"
+                    onChange={(e) => setFiles(e.target.files)}
+                    className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                  />
+                </motion.div>
+              </>
+            )}
+
+            {error && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-red-600 text-sm bg-red-50 p-3 rounded-lg"
+              >
+                {error}
+              </motion.div>
+            )}
+
+            <motion.div custom={10} variants={formElementVariants} initial="hidden" animate="visible">
+              <motion.button
+                variants={buttonVariants}
+                whileHover="hover"
+                whileTap="tap"
+                onClick={handleUpload}
+                disabled={loading}
+                className="w-full bg-coral-500 text-white hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
+              >
+                {loading ? (
+                  'Uploading...'
+                ) : (
+                  <>
+                    <Upload className="h-5 w-5" />
+                    Upload Portfolio
+                  </>
+                )}
+              </motion.button>
+            </motion.div>
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import Layout from '@/components/Layout';
+import VideoPlayer from '@/components/VideoPlayer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -11,12 +12,22 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
-import { Camera, Plus, Edit, Trash2, Search, Filter, User, Eye, Link as LinkIcon, Download, Lock } from 'lucide-react';
+import { Camera, Plus, Edit, Trash2, Search, Filter, User, Eye, Link as LinkIcon, Download, Lock, Play } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { motion, Variants } from 'framer-motion';
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+
+const buttonVariants: Variants = {
+  hover: { scale: 1.05, transition: { duration: 0.2 } },
+  tap: { scale: 0.95 },
+};
 
 interface Client {
   id: string;
@@ -39,6 +50,8 @@ export default function AdminPortfolioPage() {
   const [pinError, setPinError] = useState('');
   const [copyingId, setCopyingId] = useState<string | null>(null);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [previewingId, setPreviewingId] = useState<string | null>(null);
+  const [showActions, setShowActions] = useState<string | null>(null);
 
   const { user, isAdmin, firebaseUser, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -246,10 +259,10 @@ export default function AdminPortfolioPage() {
   if (authLoading || loading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+        <div className="min-h-screen flex items-center justify-center bg-teal-50">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
-            <p className="mt-4 text-navy-900 text-lg font-medium">Loading portfolio management...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-coral-500 mx-auto"></div>
+            <p className="mt-4 text-teal-900 text-sm font-medium">Loading portfolio management...</p>
           </div>
         </div>
       </Layout>
@@ -262,36 +275,36 @@ export default function AdminPortfolioPage() {
 
   return (
     <Layout>
-      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-navy-50">
+      <section className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-teal-50">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-4xl font-extrabold text-navy-900 mb-2">Portfolio Management</h1>
-            <p className="text-lg text-navy-200">Manage your studio's portfolio items</p>
+            <h1 className="text-4xl font-extrabold text-teal-900 mb-2">Portfolio Management</h1>
+            <p className="text-sm text-teal-900">Manage your studio's portfolio items</p>
           </div>
           <Link href="/admin/portfolio/upload">
-            <Button className="bg-gold-500 hover:bg-gold-400 text-navy-900 rounded-lg px-6 py-2">
+            <Button className="bg-coral-500 hover:bg-coral-600 text-white rounded-lg px-6 py-2 text-sm">
               <Plus className="h-4 w-4 mr-2" />
               Add New Item
             </Button>
           </Link>
         </div>
 
-        <Card className="mb-6 border-none shadow-md bg-white rounded-lg">
+        <Card className="mb-6 border-coral-100 shadow-md bg-white rounded-lg">
           <CardContent className="p-6">
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-navy-200 h-4 w-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-teal-900 h-4 w-4" />
                   <Input
                     placeholder="Search by title, category, tags, or client..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 border-navy-200 focus:ring-gold-500 rounded-lg"
+                    className="pl-10 border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
                   />
                 </div>
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-[200px] border-navy-200 focus:ring-gold-500 rounded-lg">
+                <SelectTrigger className="w-[200px] border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -309,191 +322,223 @@ export default function AdminPortfolioPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
-            <Card
+            <motion.div
               key={item.id}
-              className="group hover:shadow-xl transition-all duration-300 border-none bg-white rounded-lg"
+              variants={cardVariants}
+              initial="hidden"
+              animate="visible"
             >
-              <CardContent className="p-0">
-                <div className="aspect-square relative overflow-hidden rounded-t-lg">
-                  <Image
-                    src={
-                      item.imageUrls && item.imageUrls.length > 0
-                        ? item.imageUrls[0]
-                        : item.videoUrl
-                          ? '/video-placeholder.jpg'
-                          : '/placeholder-image.jpg'
-                    }
-                    alt={item.title}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    onError={(e) => {
-                      console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
-                      e.currentTarget.src = '/placeholder-image.jpg';
-                    }}
-                    onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
-                  />
-                  {item.featured && (
-                    <div className="absolute top-2 left-2">
-                      <Badge className="bg-gold-500 text-white">Featured</Badge>
+              <Card className="group hover:shadow-xl transition-all duration-300 border-coral-100 bg-white rounded-lg">
+                <CardContent className="p-0">
+                  <div className="relative">
+                    <div className="aspect-square relative overflow-hidden rounded-t-lg">
+                      {previewingId === item.id && item.videoUrl ? (
+                        <VideoPlayer videoSrc={item.videoUrl} onClose={() => setPreviewingId(null)} />
+                      ) : (
+                        <Image
+                          src={
+                            item.imageUrls && item.imageUrls.length > 0
+                              ? item.imageUrls[0]
+                              : item.videoUrl
+                                ? '/video-placeholder.jpg'
+                                : '/placeholder-image.jpg'
+                          }
+                          alt={item.title}
+                          fill
+                          className="object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            console.error(`Failed to load image for ${item.title}: ${item.imageUrls[0] || item.videoUrl}`);
+                            e.currentTarget.src = '/placeholder-image.jpg';
+                          }}
+                          onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
+                        />
+                      )}
+                      {item.featured && (
+                        <div className="absolute top-2 left-2">
+                          <Badge className="bg-coral-500 text-white text-xs">Featured</Badge>
+                        </div>
+                      )}
+                      {item.pin && (
+                        <div className="absolute top-2 left-16">
+                          <Badge className="bg-teal-900 text-white text-xs">PIN Protected</Badge>
+                        </div>
+                      )}
+                      {item.videoUrl && previewingId !== item.id && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-teal-900/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => setPreviewingId(item.id)}
+                            className="bg-coral-500 hover:bg-coral-600 text-white rounded-full h-12 w-12"
+                          >
+                            <Play className="h-6 w-6" />
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                  {item.pin && (
-                    <div className="absolute top-2 left-16">
-                      <Badge className="bg-navy-900 text-white">PIN Protected</Badge>
-                    </div>
-                  )}
-                  <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <div className="flex gap-1">
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => toggleFeatured(item)}
-                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
-                      >
-                        <Camera className="h-4 w-4" />
-                      </Button>
-                      <Link href={`/admin/portfolio/edit/${item.id}`}>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => {
-                          setItemToDelete(item);
-                          setDeleteDialogOpen(true);
-                        }}
-                        className="h-8 w-8 p-0 bg-red-600 hover:bg-red-700 rounded-full"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                      <Link href={`/client/portfolio/${item.id}`}>
-                        <Button
-                          size="sm"
-                          variant="secondary"
-                          className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </Link>
-                      <TooltipProvider>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => copyClientUrl(item)}
-                              disabled={copyingId === item.id}
-                              className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
-                            >
-                              <LinkIcon className="h-4 w-4" />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent className="bg-navy-900 text-white p-2 rounded-lg">
-                            <p>Copy client URL: {`${window.location.origin}/client/portfolio/${item.id}`}</p>
-                            {item.pin && <p>PIN: {item.pin}</p>}
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => downloadMedia(item)}
-                        disabled={downloadingId === item.id || (!item.imageUrls.length && !item.videoUrl)}
-                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
-                      >
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => {
-                          setItemToSetPin(item);
-                          setNewPin(item.pin || '');
-                          setPinDialogOpen(true);
-                        }}
-                        className="h-8 w-8 p-0 bg-navy-100 hover:bg-gold-500 hover:text-white rounded-full"
-                      >
-                        <Lock className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-lg text-navy-900 mb-1 truncate">{item.title}</h3>
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant="outline" className="text-xs text-navy-900 border-navy-200">
-                      {item.category}
-                    </Badge>
-                    <Badge variant="secondary" className="text-xs bg-gold-100 text-navy-900">
-                      {item.type}
-                    </Badge>
-                  </div>
-                  {(item.clientId && clients[item.clientId]) || item.clientName ? (
-                    <div className="flex items-center gap-2 mb-2 text-sm text-navy-200">
-                      <User className="h-4 w-4" />
-                      <span>
-                        {item.clientId && clients[item.clientId]
-                          ? clients[item.clientId].displayName || clients[item.clientId].email
-                          : item.clientName}
-                      </span>
-                    </div>
-                  ) : null}
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {item.tags.slice(0, 3).map((tag) => (
-                      <Badge
-                        key={tag}
-                        variant="secondary"
-                        className="text-xs bg-gold-100 text-navy-900"
-                      >
-                        {tag}
-                      </Badge>
-                    ))}
-                    {item.tags.length > 3 && (
-                      <Badge
-                        variant="secondary"
-                        className="text-xs bg-gold-100 text-navy-900"
-                      >
-                        +{item.tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                  {item.caption && (
-                    <p className="text-sm text-navy-200 line-clamp-2">{item.caption}</p>
-                  )}
-                  <div className="mt-2 text-sm text-navy-200 truncate">
-                    <span className="font-medium">Client URL: </span>
-                    <a
-                      href={`/client/portfolio/${item.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-gold-500 hover:underline"
+                    <div
+                      className={`absolute top-2 right-12 transition-all duration-300 ${
+                        showActions === item.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                      }`}
                     >
-                      {`/client/portfolio/${item.id}`}
-                    </a>
+                      <div className="flex gap-1 p-2 bg-teal-900/80 rounded-lg">
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => toggleFeatured(item)}
+                          className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
+                          title={item.featured ? 'Unfeature' : 'Feature'}
+                        >
+                          <Camera className="h-4 w-4" />
+                        </Button>
+                        <Link href={`/admin/portfolio/edit/${item.id}`}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
+                            title="Edit Item"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => {
+                            setItemToDelete(item);
+                            setDeleteDialogOpen(true);
+                          }}
+                          className="h-8 w-8 p-0 bg-red-600 hover:bg-red-700 rounded-full"
+                          title="Delete Item"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                        <Link href={`/client/portfolio/${item.id}`}>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
+                            title="View Client Page"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => copyClientUrl(item)}
+                          disabled={copyingId === item.id}
+                          className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
+                          title={`Copy client URL: ${window.location.origin}/client/portfolio/${item.id}${item.pin ? ` (PIN: ${item.pin})` : ''}`}
+                        >
+                          <LinkIcon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => downloadMedia(item)}
+                          disabled={downloadingId === item.id || (!item.imageUrls.length && !item.videoUrl)}
+                          className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
+                          title="Download Media"
+                        >
+                          <Download className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => {
+                            setItemToSetPin(item);
+                            setNewPin(item.pin || '');
+                            setPinDialogOpen(true);
+                          }}
+                          className="h-8 w-8 p-0 bg-coral-100 hover:bg-coral-500 hover:text-white rounded-full"
+                          title="Set PIN"
+                        >
+                          <Lock className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => setShowActions(showActions === item.id ? null : item.id)}
+                      className="absolute top-2 right-2 bg-coral-500 hover:bg-coral-600 text-white rounded-full h-8 w-8 p-0"
+                      title={showActions === item.id ? 'Hide Actions' : 'Show Actions'}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm text-teal-900 mb-1 truncate">{item.title}</h3>
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className="text-xs text-teal-900 border-coral-100">
+                        {item.category}
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs bg-coral-100 text-teal-900">
+                        {item.type}
+                      </Badge>
+                    </div>
+                    {(item.clientId && clients[item.clientId]) || item.clientName ? (
+                      <div className="flex items-center gap-2 mb-2 text-xs text-teal-900">
+                        <User className="h-4 w-4" />
+                        <span>
+                          {item.clientId && clients[item.clientId]
+                            ? clients[item.clientId].displayName || clients[item.clientId].email
+                            : item.clientName}
+                        </span>
+                      </div>
+                    ) : null}
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {item.tags.slice(0, 3).map((tag) => (
+                        <Badge
+                          key={tag}
+                          variant="secondary"
+                          className="text-xs bg-coral-100 text-teal-900"
+                        >
+                          {tag}
+                        </Badge>
+                      ))}
+                      {item.tags.length > 3 && (
+                        <Badge
+                          variant="secondary"
+                          className="text-xs bg-coral-100 text-teal-900"
+                        >
+                          +{item.tags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                    {item.caption && (
+                      <p className="text-xs text-teal-900 line-clamp-2">{item.caption}</p>
+                    )}
+                    <div className="mt-2 text-xs text-teal-900 truncate">
+                      <span className="font-medium">Client URL: </span>
+                      <a
+                        href={`/client/portfolio/${item.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-coral-500 hover:underline"
+                      >
+                        {`/client/portfolio/${item.id}`}
+                      </a>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
         </div>
 
         {filteredItems.length === 0 && (
           <div className="text-center py-12">
-            <Camera className="h-12 w-12 text-navy-200 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-navy-900 mb-2">No portfolio items found</h3>
-            <p className="text-navy-200 mb-4">
+            <Camera className="h-12 w-12 text-teal-900 mx-auto mb-4" />
+            <h3 className="text-sm font-medium text-teal-900 mb-2">No portfolio items found</h3>
+            <p className="text-teal-900 text-xs mb-4">
               {portfolioItems.length === 0
                 ? 'Start by uploading your first portfolio item!'
                 : 'Try adjusting your search or filter criteria.'}
             </p>
             <Link href="/admin/portfolio/upload">
-              <Button className="bg-gold-500 hover:bg-gold-400 text-navy-900 rounded-lg px-6 py-2">
+              <Button className="bg-coral-500 hover:bg-coral-600 text-white rounded-lg px-6 py-2 text-sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Upload Portfolio Item
               </Button>
@@ -507,7 +552,7 @@ export default function AdminPortfolioPage() {
               <DialogTitle>Delete Portfolio Item</DialogTitle>
             </DialogHeader>
             <div className="py-4">
-              <p className="text-navy-200">
+              <p className="text-teal-900 text-sm">
                 Are you sure you want to delete "{itemToDelete?.title}"? This action cannot be undone.
               </p>
             </div>
@@ -515,14 +560,14 @@ export default function AdminPortfolioPage() {
               <Button
                 variant="outline"
                 onClick={() => setDeleteDialogOpen(false)}
-                className="border-navy-200 text-navy-900 hover:bg-navy-100 rounded-lg"
+                className="border-coral-100 text-teal-900 hover:bg-coral-50 rounded-lg text-sm"
               >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => itemToDelete && handleDelete(itemToDelete)}
-                className="bg-red-600 hover:bg-red-700 rounded-lg"
+                className="bg-red-600 hover:bg-red-700 rounded-lg text-sm"
               >
                 Delete
               </Button>
@@ -541,7 +586,7 @@ export default function AdminPortfolioPage() {
                 placeholder="Enter PIN (at least 4 characters)"
                 value={newPin}
                 onChange={(e) => setNewPin(e.target.value)}
-                className="border-navy-200 focus:ring-gold-500 rounded-lg mb-4"
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg mb-4"
               />
               {pinError && <p className="text-red-600 text-sm mb-4">{pinError}</p>}
             </div>
@@ -554,13 +599,13 @@ export default function AdminPortfolioPage() {
                   setNewPin('');
                   setPinError('');
                 }}
-                className="border-navy-200 text-navy-900 hover:bg-navy-100 rounded-lg"
+                className="border-coral-100 text-teal-900 hover:bg-coral-50 rounded-lg text-sm"
               >
                 Cancel
               </Button>
               <Button
                 onClick={setPin}
-                className="bg-gold-500 text-navy-900 hover:bg-gold-400 rounded-lg"
+                className="bg-coral-500 text-white hover:bg-coral-600 rounded-lg text-sm"
               >
                 Save PIN
               </Button>

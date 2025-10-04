@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
@@ -20,31 +21,15 @@ import {
 
 const formVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
 const photographyCategories = [
-  'Corporate',
-  'Event',
-  'Portrait',
-  'Fashion',
-  'Product',
-  'Travel & Landscape',
-  'Documentary & Lifestyle',
-  'Creative/Artistic',
-  'Others',
+  'Corporate', 'Event', 'Portrait', 'Fashion', 'Product', 'Travel & Landscape', 'Documentary & Lifestyle', 'Creative/Artistic', 'Others',
 ];
 
 const videographyCategories = [
-  'Corporate',
-  'Event',
-  'Music Videos',
-  'Commercials & Adverts',
-  'Documentary',
-  'Short Films / Creative Projects',
-  'Promotional',
-  'Social Media',
-  'Others',
+  'Corporate', 'Event', 'Music Videos', 'Commercials & Adverts', 'Documentary', 'Short Films / Creative Projects', 'Promotional', 'Social Media', 'Others',
 ];
 
 export default function EditPortfolio({ params }: { params: { id: string } }) {
@@ -53,6 +38,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
   const [item, setItem] = useState<PortfolioItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pinError, setPinError] = useState('');
   const [formData, setFormData] = useState({
     title: '',
     type: 'photography' as 'photography' | 'videography',
@@ -64,12 +50,13 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
     clientId: '',
     files: [] as File[],
     videoUrl: '',
+    pin: '',
   });
   const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
     const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, async user => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
           const idToken = await user.getIdToken();
@@ -113,6 +100,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         }
         const data: PortfolioItem = await response.json();
         console.log('Fetched portfolio item:', data);
+        console.log('Fetched PIN:', data.pin); // Debug PIN
         setItem(data);
         setFormData({
           title: data.title || '',
@@ -125,6 +113,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
           clientId: data.clientId || '',
           files: [],
           videoUrl: data.videoUrl || '',
+          pin: data.pin || '',
         });
       } catch (err: any) {
         console.error('Fetch failed:', err);
@@ -133,7 +122,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         setLoading(false);
       }
     };
-    fetchItem();
+    if (token) fetchItem();
   }, [id, token]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -142,7 +131,12 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
       setError('Authentication required to update portfolio item');
       return;
     }
+    if (formData.pin && formData.pin.length < 4) {
+      setPinError('PIN must be at least 4 characters');
+      return;
+    }
     setLoading(true);
+    setPinError('');
     try {
       const body = new FormData();
       body.append('title', formData.title);
@@ -153,8 +147,10 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
       body.append('clientName', formData.clientName);
       body.append('featured', String(formData.featured));
       body.append('clientId', formData.clientId);
+      body.append('pin', formData.pin);
       if (formData.videoUrl) body.append('videoUrl', formData.videoUrl);
-      formData.files.forEach(file => body.append('files', file));
+      formData.files.forEach((file) => body.append('files', file));
+      console.log('Submitting PIN:', formData.pin); // Debug PIN
 
       const response = await fetch(`/api/portfolio/${id}`, {
         method: 'PUT',
@@ -179,6 +175,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         }
         throw new Error(errorMessage);
       }
+      console.log('Portfolio item updated successfully');
       router.push('/admin/portfolio');
     } catch (err: any) {
       console.error('Update failed:', err);
@@ -197,10 +194,10 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+        <div className="min-h-screen flex items-center justify-center bg-teal-50">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
-            <p className="mt-4 text-navy-900">Loading...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-coral-500 mx-auto"></div>
+            <p className="mt-4 text-sm text-teal-900">Loading...</p>
           </div>
         </div>
       </Layout>
@@ -210,12 +207,12 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
   if (error) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+        <div className="min-h-screen flex items-center justify-center bg-teal-50">
           <div className="text-center">
-            <p className="text-red-600">{error}</p>
+            <p className="text-red-600 text-sm">{error}</p>
             <Button
               onClick={() => router.push('/admin/portfolio')}
-              className="mt-4 bg-navy-900 text-white hover:bg-gold-500 hover:text-navy-900"
+              className="mt-4 bg-coral-500 text-white hover:bg-coral-600 rounded-lg text-sm"
             >
               Back to Portfolio
             </Button>
@@ -231,30 +228,38 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         initial="hidden"
         animate="visible"
         variants={formVariants}
-        className="py-20 bg-navy-50"
+        className="py-20 bg-teal-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-8">Edit Portfolio Item</h1>
+          <h1 className="text-3xl font-bold text-teal-900 mb-8">Edit Portfolio Item</h1>
+          <div className="mb-6">
+            <Label className="text-teal-900 text-sm">Current PIN</Label>
+            <Input
+              value={formData.pin || 'No PIN set'}
+              readOnly
+              className="border-coral-100 text-sm rounded-lg bg-gray-100"
+            />
+          </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="title" className="text-navy-900">Title</Label>
+              <Label htmlFor="title" className="text-teal-900 text-sm">Title</Label>
               <Input
                 id="title"
                 value={formData.title}
-                onChange={e => setFormData({ ...formData, title: e.target.value })}
-                className="border-navy-200 focus:border-gold-500"
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
                 required
               />
             </div>
             <div>
-              <Label htmlFor="type" className="text-navy-900">Type</Label>
+              <Label htmlFor="type" className="text-teal-900 text-sm">Type</Label>
               <Select
                 value={formData.type}
                 onValueChange={(value: 'photography' | 'videography') =>
                   setFormData({ ...formData, type: value })
                 }
               >
-                <SelectTrigger className="border-navy-200 focus:border-gold-500">
+                <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -264,90 +269,102 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="category" className="text-navy-900">Category</Label>
+              <Label htmlFor="category" className="text-teal-900 text-sm">Category</Label>
               <Select
                 value={formData.category}
-                onValueChange={value => setFormData({ ...formData, category: value })}
+                onValueChange={(value) => setFormData({ ...formData, category: value })}
               >
-                <SelectTrigger className="border-navy-200 focus:border-gold-500">
+                <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(formData.type === 'photography' ? photographyCategories : videographyCategories).map(cat => (
+                  {(formData.type === 'photography' ? photographyCategories : videographyCategories).map((cat) => (
                     <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="tags" className="text-navy-900">Tags (comma-separated)</Label>
+              <Label htmlFor="tags" className="text-teal-900 text-sm">Tags (comma-separated)</Label>
               <Input
                 id="tags"
                 value={formData.tags}
-                onChange={e => setFormData({ ...formData, tags: e.target.value })}
-                className="border-navy-200 focus:border-gold-500"
+                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
               />
             </div>
             <div>
-              <Label htmlFor="caption" className="text-navy-900">Caption</Label>
+              <Label htmlFor="caption" className="text-teal-900 text-sm">Caption</Label>
               <Input
                 id="caption"
                 value={formData.caption}
-                onChange={e => setFormData({ ...formData, caption: e.target.value })}
-                className="border-navy-200 focus:border-gold-500"
+                onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
               />
             </div>
             <div>
-              <Label htmlFor="clientName" className="text-navy-900">Client Name</Label>
+              <Label htmlFor="clientName" className="text-teal-900 text-sm">Client Name</Label>
               <Input
                 id="clientName"
                 value={formData.clientName}
-                onChange={e => setFormData({ ...formData, clientName: e.target.value })}
-                className="border-navy-200 focus:border-gold-500"
+                onChange={(e) => setFormData({ ...formData, clientName: e.target.value })}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
               />
             </div>
             <div>
-              <Label htmlFor="clientId" className="text-navy-900">Client ID</Label>
+              <Label htmlFor="clientId" className="text-teal-900 text-sm">Client ID</Label>
               <Input
                 id="clientId"
                 value={formData.clientId}
-                onChange={e => setFormData({ ...formData, clientId: e.target.value })}
-                className="border-navy-200 focus:border-gold-500"
+                onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
               />
             </div>
             <div>
-              <Label htmlFor="featured" className="text-navy-900">Featured</Label>
+              <Label htmlFor="pin" className="text-teal-900 text-sm">PIN (Client Access)</Label>
+              <Input
+                id="pin"
+                type="text"
+                value={formData.pin}
+                onChange={(e) => setFormData({ ...formData, pin: e.target.value })}
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                placeholder="Enter PIN (at least 4 characters, leave blank to remove)"
+              />
+              {pinError && <p className="text-xs text-red-600 mt-1">{pinError}</p>}
+            </div>
+            <div>
+              <Label htmlFor="featured" className="text-teal-900 text-sm">Featured</Label>
               <Checkbox
                 id="featured"
                 checked={formData.featured}
-                onCheckedChange={checked => setFormData({ ...formData, featured: !!checked })}
+                onCheckedChange={(checked) => setFormData({ ...formData, featured: !!checked })}
               />
             </div>
             {formData.type === 'videography' && (
               <div>
-                <Label htmlFor="videoUrl" className="text-navy-900">Video URL</Label>
+                <Label htmlFor="videoUrl" className="text-teal-900 text-sm">Video URL</Label>
                 <Input
                   id="videoUrl"
                   value={formData.videoUrl}
-                  onChange={e => setFormData({ ...formData, videoUrl: e.target.value })}
-                  className="border-navy-200 focus:border-gold-500"
+                  onChange={(e) => setFormData({ ...formData, videoUrl: e.target.value })}
+                  className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
                 />
               </div>
             )}
             <div>
-              <Label htmlFor="files" className="text-navy-900">Upload Additional Files</Label>
+              <Label htmlFor="files" className="text-teal-900 text-sm">Upload Additional Files</Label>
               <Input
                 id="files"
                 type="file"
                 multiple
                 onChange={handleFileChange}
-                className="border-navy-200 focus:border-gold-500"
+                className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
               />
             </div>
             <Button
               type="submit"
               disabled={loading || !token}
-              className="bg-navy-900 text-white hover:bg-gold-500 hover:text-navy-900"
+              className="bg-coral-500 text-white hover:bg-coral-600 rounded-lg text-sm"
             >
               {loading ? 'Updating...' : 'Update Portfolio Item'}
             </Button>

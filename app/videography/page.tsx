@@ -6,15 +6,16 @@ import Layout from '@/components/Layout';
 import VideoPlayer from '@/components/VideoPlayer';
 import Image from 'next/image';
 import { PortfolioItem } from '@/types';
+import { useRouter } from 'next/navigation';
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
 const heroImageVariants: Variants = {
   hidden: { opacity: 0, scale: 1.1 },
-  visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: 'easeOut' as const } },
+  visible: { opacity: 1, scale: 1, transition: { duration: 1, ease: 'easeOut' } },
 };
 
 const cardVariants: Variants = {
@@ -22,12 +23,13 @@ const cardVariants: Variants = {
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.1, ease: 'easeOut' as const },
+    transition: { duration: 0.5, delay: i * 0.1, ease: 'easeOut' },
   }),
 };
 
-export default function VideographyPortfolio({ params }: { params: { category: string } }) {
-  const { category } = params;
+export default function VideographyPortfolio({ params }: { params: { category?: string } }) {
+  const router = useRouter();
+  const category = params.category || 'all'; // Fallback to 'all' if category is undefined
   const [items, setItems] = useState<PortfolioItem[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,24 +53,30 @@ export default function VideographyPortfolio({ params }: { params: { category: s
     fetchItems();
   }, [category]);
 
+  if (!params.category) {
+    console.warn('No category provided, redirecting to /videography/all');
+    router.push('/videography/all');
+    return null;
+  }
+
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-navy-50">
+        <div className="min-h-screen flex items-center justify-center bg-teal-50">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
-            <p className="mt-4 text-navy-900">Loading...</p>
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-coral-500 mx-auto"></div>
+            <p className="mt-4 text-sm text-teal-900">Loading...</p>
           </div>
-          </div>
-        </Layout>
-      );
+        </div>
+      </Layout>
+    );
   }
 
   if (error) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-navy-50">
-          <p className="text-red-600">{error}</p>
+        <div className="min-h-screen flex items-center justify-center bg-teal-50">
+          <p className="text-red-600 text-sm">{error}</p>
         </div>
       </Layout>
     );
@@ -94,8 +102,9 @@ export default function VideographyPortfolio({ params }: { params: { category: s
             fill
             className="object-cover"
             priority
+            onError={() => `/images/video-hero-placeholder.jpg`}
           />
-          <div className="absolute inset-0 bg-navy-900 bg-opacity-50"></div>
+          <div className="absolute inset-0 bg-teal-900 bg-opacity-50"></div>
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <motion.h1
@@ -104,15 +113,15 @@ export default function VideographyPortfolio({ params }: { params: { category: s
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            {category.replace('-', ' ')} Videography
+            {category.replace(/-/g, ' ')} Videography
           </motion.h1>
           <motion.p
-            className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90 text-white"
+            className="text-sm md:text-base mb-8 max-w-3xl mx-auto opacity-90 text-white"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Explore our captivating portfolio of {category.replace('-', ' ')} videography.
+            Explore our captivating portfolio of {category.replace(/-/g, ' ')} videography.
           </motion.p>
         </div>
       </motion.section>
@@ -122,7 +131,7 @@ export default function VideographyPortfolio({ params }: { params: { category: s
         whileInView="visible"
         viewport={{ once: true }}
         variants={sectionVariants}
-        className="py-20 bg-navy-50"
+        className="py-20 bg-teal-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -157,11 +166,11 @@ export default function VideographyPortfolio({ params }: { params: { category: s
                     }}
                   />
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black bg-opacity-50">
-                    <span className="text-white text-lg font-semibold">Play</span>
+                    <span className="text-white text-sm font-semibold">Play</span>
                   </div>
                   <div className="absolute bottom-4 left-4 right-4 text-white">
-                    <h3 className="font-semibold">{item.title}</h3>
-                    <p className="text-sm">{item.clientName}</p>
+                    <h3 className="font-semibold text-sm">{item.title}</h3>
+                    <p className="text-xs">{item.clientName}</p>
                   </div>
                 </div>
               </motion.div>
