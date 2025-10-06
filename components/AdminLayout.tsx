@@ -9,6 +9,7 @@ import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder, FileText, Doll
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
+import Image from 'next/image';
 
 // Animation variants for header
 const headerVariants: Variants = {
@@ -74,14 +75,22 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex justify-between items-center h-16">
               {/* Logo */}
               <Link href="/admin" className="flex items-center space-x-2">
-                <motion.div
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Camera className="h-6 w-6 text-coral-500" />
-                </motion.div>
-                <span className="text-base font-bold">Brain Works Studio - Admin</span>
-              </Link>
+  <motion.div
+    whileHover={{ scale: 1.1 }}
+    transition={{ duration: 0.3 }}
+  >
+    <Image
+      src="/brain1.png"     // 👈 your logo from public/
+      alt="Brain Works Studio Logo"
+      width={32}            // adjust size as needed
+      height={32}
+      // className="filter invert-[0.35] sepia-[1] saturate-[8] hue-rotate-[140deg]" // teal tint
+    />
+  </motion.div>
+  <span className="text-base font-bold text-white">
+    Brain Works Studio
+  </span>
+</Link>
 
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
