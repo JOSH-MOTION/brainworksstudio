@@ -68,6 +68,7 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
         if (contentType?.includes('application/json')) {
           const errorData = await response.json();
           errorMessage = errorData.error || errorMessage;
+          console.error(`Fetch error response: ${JSON.stringify(errorData)}`);
         }
         throw new Error(errorMessage);
       }
@@ -85,24 +86,27 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
   const validatePin = async () => {
     if (!enteredPin || enteredPin.length < 4) {
       setPinError('Please enter a PIN (minimum 4 characters)');
+      console.warn(`PIN validation failed: PIN is ${enteredPin ? 'too short' : 'empty'}`);
       return;
     }
     try {
-      console.log(`Validating PIN for /api/portfolio/${id}`);
+      console.log(`Validating PIN for /api/portfolio/${id}: ${enteredPin}`);
       const response = await fetch(`/api/portfolio/${id}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: enteredPin }),
+        body: JSON.stringify({ pin: enteredPin.trim() }),
       });
       if (!response.ok) {
         const errorData = await response.json();
+        console.error(`PIN validation error response: ${JSON.stringify(errorData)}`);
         setPinError(errorData.error || 'Invalid PIN');
         return;
       }
+      console.log(`PIN validated successfully for /api/portfolio/${id}`);
       setPinError('');
       setPinDialogOpen(false);
       setEnteredPin('');
-      downloadMedia(); // Proceed to download after PIN validation
+      downloadMedia();
     } catch (error: any) {
       console.error('PIN validation error:', error);
       setPinError('Failed to validate PIN. Please try again.');
@@ -110,6 +114,7 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
   };
 
   const handleDownloadClick = () => {
+    console.log(`Download clicked for portfolio item: ${id}, has PIN: ${!!item?.pin}`);
     if (item?.pin) {
       setPinDialogOpen(true);
       setEnteredPin('');
@@ -124,22 +129,26 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
     setDownloading(true);
 
     try {
+      console.log(`Downloading media for portfolio item: ${id}`);
       if (item.type === 'videography' && item.videoUrl) {
+        console.log(`Opening video URL: ${item.videoUrl}`);
         if (item.videoUrl.includes('youtube.com') || item.videoUrl.includes('vimeo.com')) {
           window.open(item.videoUrl, '_blank');
         } else {
           window.location.href = item.videoUrl;
         }
       } else if (item.imageUrls.length > 0) {
+        console.log(`Zipping ${item.imageUrls.length} images`);
         const zip = new JSZip();
         const folder = zip.folder(item.title || 'portfolio-item');
 
         for (let i = 0; i < item.imageUrls.length; i++) {
           const url = item.imageUrls[i];
+          console.log(`Fetching image ${i + 1}: ${url}`);
           try {
             const response = await fetch(url);
             if (!response.ok) {
-              console.error(`Failed to fetch image: ${url}`);
+              console.error(`Failed to fetch image: ${url}, status: ${response.status}`);
               continue;
             }
             const blob = await response.blob();
@@ -150,8 +159,10 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
           }
         }
 
+        console.log('Generating ZIP file');
         const content = await zip.generateAsync({ type: 'blob' });
         saveAs(content, `${item.title || 'portfolio-item'}.zip`);
+        console.log('ZIP file downloaded successfully');
       } else {
         throw new Error('No downloadable media available');
       }
@@ -164,6 +175,7 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
   };
 
   const openLightbox = (imageUrl: string) => {
+    console.log(`Opening lightbox for image: ${imageUrl}`);
     setSelectedImage(imageUrl);
     setLightboxOpen(true);
   };
@@ -374,7 +386,7 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
                   type={showPin ? 'text' : 'password'}
                   placeholder="Enter PIN"
                   value={enteredPin}
-                  onChange={(e) => setEnteredPin(e.target.value)}
+                  onChange={(e) => setEnteredPin(e.target.value.trim())}
                   className="border-navy-200 focus:ring-gold-500 rounded-lg pr-10"
                 />
                 <Button

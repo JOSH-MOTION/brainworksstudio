@@ -10,6 +10,7 @@ export async function GET(
 ) {
   try {
     if (!adminDb) {
+      console.error('GET /api/portfolio/[id]: Firebase Admin not initialized');
       return NextResponse.json(
         { error: 'Service temporarily unavailable' },
         { status: 503 }
@@ -21,6 +22,7 @@ export async function GET(
     const doc = await docRef.get();
 
     if (!doc.exists) {
+      console.error(`GET /api/portfolio/${id}: Portfolio item not found`);
       return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
     }
 
@@ -30,6 +32,7 @@ export async function GET(
       ...data,
       createdAt: data?.createdAt?.toDate?.()?.toISOString() || data?.createdAt || new Date().toISOString(),
       updatedAt: data?.updatedAt?.toDate?.()?.toISOString() || data?.updatedAt || new Date().toISOString(),
+      pin: data?.pin || data?.downloadPin || null, // Map pin or downloadPin for consistency
     };
 
     console.log(`GET /api/portfolio/${id}: Returning item`, item);
@@ -43,17 +46,68 @@ export async function GET(
   }
 }
 
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    if (!adminDb) {
+      console.error('POST /api/portfolio/[id]: Firebase Admin not initialized');
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable' },
+        { status: 503 }
+      );
+    }
+
+    const { id } = params;
+    const { pin } = await request.json();
+
+    if (!pin) {
+      console.error(`POST /api/portfolio/${id}: PIN is required`);
+      return NextResponse.json({ error: 'PIN is required' }, { status: 400 });
+    }
+
+    console.log(`POST /api/portfolio/${id}: Validating PIN for portfolio item`);
+    const docRef = adminDb.collection('portfolio').doc(id);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      console.error(`POST /api/portfolio/${id}: Portfolio item not found`);
+      return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
+    }
+
+    const data = doc.data();
+    const storedPin = data?.pin || data?.downloadPin || null;
+
+    if (storedPin && storedPin !== pin) {
+      console.error(`POST /api/portfolio/${id}: Invalid PIN provided`);
+      return NextResponse.json({ error: 'Invalid PIN' }, { status: 401 });
+    }
+
+    console.log(`POST /api/portfolio/${id}: PIN validated successfully`);
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error(`POST /api/portfolio/[id]: Error validating PIN:`, error);
+    return NextResponse.json(
+      { error: 'Failed to validate PIN', debug: error.message },
+      { status: 500 }
+    );
+  }
+}
+
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
     if (!adminAuth || !adminDb) {
+      console.error('PUT /api/portfolio/[id]: Firebase Admin not initialized');
       return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
     }
 
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('PUT /api/portfolio/[id]: Missing authorization header');
       return NextResponse.json({ error: 'Authorization header required' }, { status: 401 });
     }
 
@@ -69,6 +123,7 @@ export async function PUT(
     const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
     const userData = userDoc.data();
     if (!userData?.role || userData.role !== 'admin') {
+      console.error('PUT /api/portfolio/[id]: User is not admin');
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -79,14 +134,13 @@ export async function PUT(
       updatedAt: new Date().toISOString(),
     };
 
-    // Handle all possible update fields
     if (formData.has('featured')) {
       updateData.featured = formData.get('featured') === 'true';
     }
     if (formData.has('pin')) {
       const pin = formData.get('pin') as string;
       updateData.pin = pin.trim();
-      updateData.downloadPin = pin.trim(); // Keep both for backwards compatibility
+      updateData.downloadPin = pin.trim(); // Keep both for backward compatibility
     }
     if (formData.has('title')) {
       updateData.title = (formData.get('title') as string).trim();
@@ -109,6 +163,7 @@ export async function PUT(
     const doc = await docRef.get();
 
     if (!doc.exists) {
+      console.error(`PUT /api/portfolio/${id}: Portfolio item not found`);
       return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
     }
 
@@ -121,6 +176,7 @@ export async function PUT(
       ...updatedData,
       createdAt: updatedData?.createdAt?.toDate?.()?.toISOString() || updatedData?.createdAt,
       updatedAt: updatedData?.updatedAt?.toDate?.()?.toISOString() || updatedData?.updatedAt,
+      pin: updatedData?.pin || updatedData?.downloadPin || null,
     };
 
     console.log(`PUT /api/portfolio/${id}: Item updated successfully`);
@@ -183,23 +239,18 @@ export async function DELETE(
 
     console.log(`DELETE /api/portfolio/${id}: Found ${imageUrls.length} images and ${videoUrl ? '1 video' : 'no video'}`);
 
-    // Try to delete media files from ImageKit, but don't fail if it doesn't work
-    // This is optional cleanup - the important part is deleting from Firestore
+    // Optional cleanup for ImageKit files
     if (imageUrls.length > 0) {
       for (const url of imageUrls) {
         try {
-          // Extract fileId from ImageKit URL
-          // Format: https://ik.imagekit.io/identifier/folder/filename.ext
           const urlParts = url.split('/');
           const fileNameWithQuery = urlParts[urlParts.length - 1];
           const fileName = fileNameWithQuery.split('?')[0];
           
           console.log(`DELETE /api/portfolio/${id}: Attempting to delete image: ${fileName}`);
-          // Note: You'll need to import deleteFromImageKit from your imagekit lib
-          // await deleteFromImageKit(fileName);
+          // await deleteFromImageKit(fileName); // Uncomment if ImageKit cleanup is implemented
         } catch (error) {
           console.error(`DELETE /api/portfolio/${id}: Failed to delete image from ImageKit:`, error);
-          // Continue anyway - don't fail the whole delete operation
         }
       }
     }
@@ -211,14 +262,12 @@ export async function DELETE(
         const fileName = fileNameWithQuery.split('?')[0];
         
         console.log(`DELETE /api/portfolio/${id}: Attempting to delete video: ${fileName}`);
-        // await deleteFromImageKit(fileName);
+        // await deleteFromImageKit(fileName); // Uncomment if ImageKit cleanup is implemented
       } catch (error) {
         console.error(`DELETE /api/portfolio/${id}: Failed to delete video from ImageKit:`, error);
-        // Continue anyway
       }
     }
 
-    // Delete the Firestore document - this is the critical part
     await docRef.delete();
 
     console.log(`DELETE /api/portfolio/${id}: Portfolio item deleted successfully from Firestore`);
