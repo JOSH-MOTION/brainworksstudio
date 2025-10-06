@@ -53,6 +53,7 @@
     "file-saver": "^2.0.5",
     "firebase": "^12.2.1",
     "firebase-admin": "^13.5.0",
+    "formidable": "^3.5.4",
     "framer-motion": "^12.23.21",
     "imagekit": "^6.0.0",
     "imagekitio-react": "^4.3.0",
@@ -78,6 +79,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/file-saver": "^2.0.7"
+    "@types/file-saver": "^2.0.7",
+    "@types/formidable": "^3.4.5"
   }
 }

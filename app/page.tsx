@@ -1,8 +1,11 @@
+// app/page.tsx
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Camera, Video, Star } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -65,7 +68,7 @@ const cardVariants: Variants = {
     transition: { duration: 0.8, delay: i * 0.2, type: 'spring', stiffness: 90 },
   }),
   hover: {
-    scale: 1.05, // Reduced scale for mobile
+    scale: 1.05,
     y: -10,
     transition: { duration: 0.4, type: 'spring', stiffness: 130 },
   },
@@ -85,7 +88,7 @@ const imageVariants: Variants = {
     opacity: 0,
     x: i % 2 === 0 ? -50 : 50,
     scale: 1.1,
-}),
+  }),
   visible: {
     opacity: 1,
     x: 0,
@@ -93,7 +96,7 @@ const imageVariants: Variants = {
     transition: { duration: 1, ease: 'easeInOut', type: 'spring', stiffness: 80 },
   },
   hover: {
-    scale: 1.05, // Reduced scale for mobile
+    scale: 1.05,
     transition: { duration: 0.5, type: 'spring', stiffness: 110 },
   },
 };
@@ -119,7 +122,41 @@ const ctaChildVariants: Variants = {
   }),
 };
 
+interface Review {
+  id: string;
+  clientName: string;
+  clientImage?: string;
+  rating: number;
+  reviewText: string;
+  serviceType: string;
+  approved: boolean;
+  adminResponse?: string;
+}
+
 export default function Home() {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch('/api/reviews?approved=true');
+      if (response.ok) {
+        const data = await response.json();
+        setReviews(data);
+      } else {
+        console.error('Failed to fetch reviews:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error fetching reviews:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Layout>
       {/* Hero Section */}
@@ -129,7 +166,6 @@ export default function Home() {
         variants={sectionVariants}
         className="relative min-h-[80vh] sm:min-h-screen flex items-center justify-center text-white overflow-hidden"
       >
-        {/* Background Image */}
         <motion.div
           initial={{ opacity: 0, scale: 1.2 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -148,7 +184,6 @@ export default function Home() {
           <div className="absolute inset-0 bg-teal-900/50" />
         </motion.div>
 
-        {/* Floating Images */}
         <motion.div
           custom="left"
           variants={heroImageVariants}
@@ -195,7 +230,6 @@ export default function Home() {
           />
         </motion.div>
 
-        {/* Hero Content */}
         <motion.div
           variants={heroContentVariants}
           className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10"
@@ -220,7 +254,7 @@ export default function Home() {
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-coral-400 text-white hover:bg-coral-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
+                  className="w-full sm:w-auto bg-teal-500 text-white hover:bg-teal-600 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
                 >
                   Discover Our Work
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -232,7 +266,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-white text-teal-600 hover:bg-white hover:text-coral-400 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
+                  className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
                 >
                   Start Your Journey
                 </Button>
@@ -313,7 +347,7 @@ export default function Home() {
                       className="flex items-center justify-center mb-3 sm:mb-4"
                       whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
                     >
-                      <service.icon className="h-10 w-10 sm:h-12 sm:w-12 text-coral-500" />
+                      <service.icon className="h-10 w-10 sm:h-12 sm:w-12 text-teal-500" />
                     </motion.div>
                     <h3 className="text-lg sm:text-xl font-semibold text-teal-900 text-center">
                       {service.title}
@@ -373,7 +407,7 @@ export default function Home() {
                       onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
                     />
                     <motion.div
-                      className="absolute inset-0 bg-coral-400/60 flex items-center justify-center"
+                      className="absolute inset-0 bg-teal-500/60 flex items-center justify-center"
                       initial={{ opacity: 0 }}
                       whileHover={{ opacity: 1 }}
                       transition={{ duration: 0.4 }}
@@ -391,12 +425,101 @@ export default function Home() {
           >
             <Link href="/portfolio">
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button className="bg-coral-500 text-white hover:bg-coral-600 text-sm sm:text-base py-3 sm:py-4 px-6 sm:px-8">
+                <Button className="bg-teal-500 text-white hover:bg-teal-600 text-sm sm:text-base py-3 sm:py-4 px-6 sm:px-8">
                   Explore Full Portfolio
                 </Button>
               </motion.div>
             </Link>
           </motion.div>
+        </div>
+      </motion.section>
+
+      {/* Testimonials Section */}
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+        className="py-16 sm:py-20 lg:py-24 bg-teal-50"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={heroChildVariants}
+            className="text-center mb-8 sm:mb-12"
+          >
+            <h2 className="text-3xl sm:text-4xl font-bold text-teal-900">Client Testimonials</h2>
+            <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
+              Hear what our clients have to say about their experience with us.
+            </p>
+          </motion.div>
+          {loading ? (
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-500 mx-auto"></div>
+              <p className="mt-4 text-gray-600">Loading testimonials...</p>
+            </div>
+          ) : reviews.length === 0 ? (
+            <p className="text-center text-gray-600">No testimonials available.</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              {reviews.map((review, index) => (
+                <motion.div
+                  key={review.id}
+                  custom={index}
+                  initial="hidden"
+                  whileInView="visible"
+                  whileHover="hover"
+                  viewport={{ once: true }}
+                  variants={cardVariants}
+                >
+                  <Card className="border-gray-200">
+                    <CardHeader>
+                      <div className="flex items-center gap-4">
+                        {review.clientImage ? (
+                          <Image
+                            src={review.clientImage}
+                            alt={review.clientName}
+                            width={50}
+                            height={50}
+                            className="rounded-full object-cover"
+                            onError={(e) => (e.currentTarget.src = '/images/profile-placeholder.jpg')}
+                          />
+                        ) : (
+                          <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
+                            <span className="text-teal-500 font-semibold text-lg">
+                              {review.clientName.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        <div>
+                          <CardTitle className="text-lg text-teal-900">{review.clientName}</CardTitle>
+                          <p className="text-sm text-gray-600">{review.serviceType}</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-1 mb-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Star
+                            key={i}
+                            className={`h-5 w-5 ${
+                              i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <p className="text-sm text-gray-700 mb-4">{review.reviewText}</p>
+                      {review.adminResponse && (
+                        <div className="p-3 bg-teal-50 border border-teal-200 rounded-md">
+                          <p className="text-sm font-semibold text-teal-500">Our Response:</p>
+                          <p className="text-sm text-gray-700">{review.adminResponse}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </motion.section>
 
@@ -406,9 +529,8 @@ export default function Home() {
         whileInView="visible"
         viewport={{ once: true }}
         variants={sectionVariants}
-        className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-teal-600 to-coral-500 text-white overflow-hidden"
+        className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-teal-600 to-teal-500 text-white overflow-hidden"
       >
-        {/* Background Decorative Image */}
         <motion.div
           initial={{ opacity: 0, scale: 1.3 }}
           animate={{ opacity: 0.2, scale: 1 }}
@@ -425,7 +547,6 @@ export default function Home() {
           />
         </motion.div>
 
-        {/* Floating Decorative Elements */}
         <motion.div
           custom="left"
           variants={heroImageVariants}
@@ -495,7 +616,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-white text-teal-600 hover:bg-white hover:text-teal-900 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
+                  className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
                 >
                   Get in Touch
                 </Button>

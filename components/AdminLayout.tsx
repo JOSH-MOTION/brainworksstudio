@@ -5,7 +5,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder } from 'lucide-react';
+import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder, FileText, DollarSign, Star } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -89,8 +89,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   { href: '/admin', label: 'Dashboard' },
                   { href: '/admin/bookings', label: 'Bookings' },
                   { href: '/admin/portfolio', label: 'Portfolio' },
+                  { href: '/admin/blog', label: 'Blog' },
+                  { href: '/admin/pricing', label: 'Pricing' },
+                  { href: '/admin/reviews', label: 'Reviews' },
                   { href: '/admin/users', label: 'Clients' },
-                  { href: '/admin/settings', label: 'Settings' },
                 ].map((item, index) => (
                   <motion.div
                     key={item.href}
@@ -151,8 +153,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       { href: '/admin', label: 'Dashboard', icon: Settings },
                       { href: '/admin/bookings', label: 'Bookings', icon: Calendar },
                       { href: '/admin/portfolio', label: 'Portfolio', icon: Folder },
+                      { href: '/admin/blog', label: 'Blog', icon: FileText },
+                      { href: '/admin/pricing', label: 'Pricing', icon: DollarSign },
+                      { href: '/admin/reviews', label: 'Reviews', icon: Star },
                       { href: '/admin/users', label: 'Clients', icon: Users },
-                      { href: '/admin/settings', label: 'Settings', icon: Settings },
                     ].map((item, index) => (
                       <motion.div
                         key={item.href}
@@ -174,10 +178,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       </motion.div>
                     ))}
                     <motion.button
-                      custom={5}
+                      custom={7}
                       initial={{ opacity: 0, x: 15 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.5 }}
+                      transition={{ duration: 0.3, delay: 0.7 }}
                       onClick={() => {
                         signOut();
                         setMobileMenuOpen(false);

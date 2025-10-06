@@ -1,3 +1,4 @@
+// components/Layout.tsx
 'use client';
 
 import { ReactNode, FormEvent } from 'react';
@@ -135,6 +136,8 @@ export default function RootLayout({ children }: LayoutProps) {
                 {[
                   { href: '/', label: 'Home' },
                   { href: '/portfolio', label: 'Portfolio' },
+                  { href: '/pricing', label: 'Pricing' },
+                  { href: '/blog', label: 'Blog' },
                   { href: '/about', label: 'About' },
                   { href: '/contact', label: 'Contact' },
                   { href: '/booking', label: 'Book' },
@@ -242,6 +245,8 @@ export default function RootLayout({ children }: LayoutProps) {
                     {[
                       { href: '/', label: 'Home' },
                       { href: '/portfolio', label: 'Portfolio' },
+                      { href: '/pricing', label: 'Pricing' },
+                      { href: '/blog', label: 'Blog' },
                       { href: '/about', label: 'About' },
                       { href: '/contact', label: 'Contact' },
                       { href: '/booking', label: 'Book' },
@@ -281,10 +286,10 @@ export default function RootLayout({ children }: LayoutProps) {
                           />
                         )}
                         <motion.div
-                          custom={5}
+                          custom={7}
                           initial={{ opacity: 0, x: 15 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: 0.5 }}
+                          transition={{ duration: 0.3, delay: 0.7 }}
                         >
                           <Link
                             href="/dashboard"
@@ -295,10 +300,10 @@ export default function RootLayout({ children }: LayoutProps) {
                           </Link>
                         </motion.div>
                         <motion.div
-                          custom={6}
+                          custom={8}
                           initial={{ opacity: 0, x: 15 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: 0.6 }}
+                          transition={{ duration: 0.3, delay: 0.8 }}
                         >
                           <Link
                             href="/bookings"
@@ -311,10 +316,10 @@ export default function RootLayout({ children }: LayoutProps) {
                         {isAdmin && (
                           <>
                             <motion.div
-                              custom={7}
+                              custom={9}
                               initial={{ opacity: 0, x: 15 }}
                               animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: 0.7 }}
+                              transition={{ duration: 0.3, delay: 0.9 }}
                             >
                               <Link
                                 href="/admin"
@@ -325,10 +330,10 @@ export default function RootLayout({ children }: LayoutProps) {
                               </Link>
                             </motion.div>
                             <motion.div
-                              custom={8}
+                              custom={10}
                               initial={{ opacity: 0, x: 15 }}
                               animate={{ opacity: 1, x: 0 }}
-                              transition={{ duration: 0.3, delay: 0.8 }}
+                              transition={{ duration: 0.3, delay: 1.0 }}
                             >
                               <Link
                                 href="/admin/bookings"
@@ -341,10 +346,10 @@ export default function RootLayout({ children }: LayoutProps) {
                           </>
                         )}
                         <motion.button
-                          custom={9}
+                          custom={11}
                           initial={{ opacity: 0, x: 15 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: 0.9 }}
+                          transition={{ duration: 0.3, delay: 1.1 }}
                           onClick={() => {
                             signOut();
                             setMobileMenuOpen(false);
@@ -357,10 +362,10 @@ export default function RootLayout({ children }: LayoutProps) {
                     ) : (
                       <>
                         <motion.div
-                          custom={5}
+                          custom={7}
                           initial={{ opacity: 0, x: 15 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: 0.5 }}
+                          transition={{ duration: 0.3, delay: 0.7 }}
                         >
                           <Link
                             href="/auth/login"
@@ -371,10 +376,10 @@ export default function RootLayout({ children }: LayoutProps) {
                           </Link>
                         </motion.div>
                         <motion.div
-                          custom={6}
+                          custom={8}
                           initial={{ opacity: 0, x: 15 }}
                           animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.3, delay: 0.6 }}
+                          transition={{ duration: 0.3, delay: 0.8 }}
                         >
                           <Link
                             href="/auth/signup"
@@ -472,6 +477,8 @@ export default function RootLayout({ children }: LayoutProps) {
                   {[
                     { href: '/about', label: 'About Us' },
                     { href: '/portfolio', label: 'Portfolio' },
+                    { href: '/pricing', label: 'Pricing' },
+                    { href: '/blog', label: 'Blog' },
                     { href: '/booking', label: 'Book a Session' },
                     { href: '/privacy', label: 'Privacy Policy' },
                     { href: '/terms', label: 'Terms of Service' },

@@ -65,3 +65,37 @@ export interface Contact {
   message: string;
   createdAt: Date;
 }
+
+// types/blog.ts
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  featuredImage: string;
+  author: {
+    name: string;
+    uid: string;
+  };
+  category: string;
+  tags: string[];
+  published: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  views: number;
+}
+
+export interface RateCard {
+  id: string;
+  category: string;
+  serviceName: string;
+  description: string;
+  price: string;
+  duration?: string;
+  includes: string[];
+  featured: boolean;
+  order: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
