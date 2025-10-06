@@ -117,7 +117,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-coral-100 text-coral-500 hover:bg-coral-50 hover:text-coral-600 text-sm"
+                    className="border-coral-100 text-teal-500 hover:bg-coral-50 hover:text-coral-600 text-sm"
                     onClick={signOut}
                   >
                     <LogOut className="h-4 w-4 mr-1" />
