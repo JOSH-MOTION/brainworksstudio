@@ -7,7 +7,11 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Brain Works Studio - Professional Photography & Videography',
-  description: 'Professional photography and videography services for events, portraits, products, and commercial work.',
+  description:
+    'Professional photography and videography services for events, portraits, products, and commercial work.',
+  icons: {
+    icon: '/brain1.png', // 👈 Add your logo here
+  },
 };
 
 export default function RootLayout({
@@ -18,9 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );
