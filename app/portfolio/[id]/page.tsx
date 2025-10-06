@@ -53,7 +53,6 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
   const [downloading, setDownloading] = useState(false);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [isPinValidated, setIsPinValidated] = useState(false);
 
   useEffect(() => {
     fetchItem();
@@ -75,9 +74,6 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
       const data: PortfolioItem = await response.json();
       console.log('Fetched portfolio item:', data);
       setItem(data);
-      if (!data.pin) {
-        setIsPinValidated(true); // No PIN required
-      }
     } catch (err: any) {
       console.error('Fetch error:', err);
       setError(err.message);
@@ -103,10 +99,10 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
         setPinError(errorData.error || 'Invalid PIN');
         return;
       }
-      setIsPinValidated(true);
       setPinError('');
       setPinDialogOpen(false);
       setEnteredPin('');
+      downloadMedia(); // Proceed to download after PIN validation
     } catch (error: any) {
       console.error('PIN validation error:', error);
       setPinError('Failed to validate PIN. Please try again.');
@@ -114,7 +110,7 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
   };
 
   const handleDownloadClick = () => {
-    if (item?.pin && !isPinValidated) {
+    if (item?.pin) {
       setPinDialogOpen(true);
       setEnteredPin('');
       setPinError('');
@@ -200,49 +196,6 @@ export default function ClientPortfolioPage({ params }: { params: { id: string }
             </Button>
           </div>
         </div>
-      </Layout>
-    );
-  }
-
-  if (item.pin && !isPinValidated) {
-    return (
-      <Layout>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="min-h-screen flex items-center justify-center bg-navy-50"
-        >
-          <div className="max-w-md w-full p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold text-navy-900 mb-4">Enter PIN</h2>
-            <p className="text-navy-200 mb-4">Please enter the PIN provided by your photographer to view your portfolio.</p>
-            <div className="relative mb-4">
-              <Input
-                type={showPin ? 'text' : 'password'}
-                placeholder="Enter PIN"
-                value={enteredPin}
-                onChange={(e) => setEnteredPin(e.target.value)}
-                className="border-navy-200 focus:ring-gold-500 rounded-lg pr-10"
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={() => setShowPin(!showPin)}
-              >
-                {showPin ? <EyeOff className="h-4 w-4 text-navy-200" /> : <Eye className="h-4 w-4 text-navy-200" />}
-              </Button>
-            </div>
-            {pinError && <p className="text-red-600 text-sm mb-4">{pinError}</p>}
-            <Button
-              onClick={validatePin}
-              disabled={downloading}
-              className="w-full bg-gold-500 text-navy-900 hover:bg-gold-400 rounded-lg px-6 py-2 disabled:bg-gold-200"
-            >
-              <Lock className="h-5 w-5 mr-2" />
-              {downloading ? 'Verifying...' : 'Verify PIN'}
-            </Button>
-          </div>
-        </motion.div>
       </Layout>
     );
   }

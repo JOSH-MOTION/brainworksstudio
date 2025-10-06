@@ -288,7 +288,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
+                  className="w-full sm:w-auto border-2 border-white text-teal-600 hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
                 >
                   Start Your Journey
                 </Button>
@@ -614,7 +614,7 @@ export default function Home() {
             fill
             sizes="100vw"
             className="object-cover opacity-20"
-            onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
+            onError={(e) => (e.currentTarget.src = '/placeholder-image.jpeg')}
           />
         </motion.div>
 
