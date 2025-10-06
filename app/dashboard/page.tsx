@@ -1,3 +1,4 @@
+// app/dashboard/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -30,11 +31,14 @@ const buttonVariants: Variants = {
 export default function DashboardPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { user, firebaseUser, userProfile } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
+    console.log('Dashboard: User state:', { user, firebaseUser, userProfile });
     if (!user) {
+      console.log('No user, redirecting to /auth/login');
       router.push('/auth/login');
       return;
     }
@@ -44,18 +48,34 @@ export default function DashboardPage() {
 
   const fetchBookings = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      console.log('Fetching bookings from /api/bookings/user');
+      const token = await firebaseUser?.getIdToken();
+      if (!token) {
+        throw new Error('No authentication token available');
+      }
       const response = await fetch('/api/bookings/user', {
         headers: {
-          'Authorization': `Bearer ${await firebaseUser?.getIdToken()}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        setBookings(data);
+      console.log('Bookings response status:', response.status, response.statusText);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Failed to fetch bookings:', errorText);
+        throw new Error(`Failed to fetch bookings: ${errorText}`);
       }
-    } catch (error) {
+      const data = await response.json();
+      console.log('Fetched bookings:', data);
+      if (!Array.isArray(data)) {
+        throw new Error('Invalid bookings data format');
+      }
+      setBookings(data);
+    } catch (error: any) {
       console.error('Error fetching bookings:', error);
+      setError(error.message);
     } finally {
       setLoading(false);
     }
@@ -84,29 +104,7 @@ export default function DashboardPage() {
   };
 
   if (!user) {
-    return null;
-  }
-
-  if (loading) {
-    return (
-      <Layout>
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-          className="min-h-screen flex items-center justify-center bg-gray-100"
-        >
-          <div className="text-center">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-              className="rounded-full h-16 w-16 border-t-2 border-teal-500 mx-auto"
-            />
-            <p className="mt-4 text-teal-900 text-lg font-medium">Loading dashboard...</p>
-          </div>
-        </motion.div>
-      </Layout>
-    );
+    return null; // Redirect handled in useEffect
   }
 
   return (
@@ -150,6 +148,20 @@ export default function DashboardPage() {
             </div>
           </div>
         </motion.div>
+
+        {/* Error Display */}
+        {error && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center text-red-600 mb-6"
+          >
+            <p>Error: {error}</p>
+            <Button onClick={fetchBookings} className="mt-4 bg-teal-500 text-white">
+              Retry
+            </Button>
+          </motion.div>
+        )}
 
         {/* Quick Actions */}
         <motion.div
@@ -225,7 +237,12 @@ export default function DashboardPage() {
               <p className="text-gray-600">Your recent photography session requests and their status</p>
             </CardHeader>
             <CardContent>
-              {bookings.length === 0 ? (
+              {loading ? (
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-teal-500 mx-auto"></div>
+                  <p className="mt-4 text-teal-900 text-lg font-medium">Loading bookings...</p>
+                </div>
+              ) : bookings.length === 0 ? (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

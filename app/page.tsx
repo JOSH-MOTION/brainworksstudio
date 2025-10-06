@@ -136,22 +136,44 @@ interface Review {
 export default function Home() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchReviews();
   }, []);
 
   const fetchReviews = async () => {
+    setLoading(true);
+    setError(null);
+    
     try {
-      const response = await fetch('/api/reviews?approved=true');
+      console.log('Fetching approved reviews...');
+      const response = await fetch('/api/reviews?approved=true', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
+      
+      console.log('Response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
-        setReviews(data);
+        console.log('Fetched reviews:', data.length, 'approved reviews');
+        
+        // Filter to ensure only approved reviews
+        const approvedReviews = data.filter((r: Review) => r.approved === true);
+        console.log('After filtering:', approvedReviews.length, 'approved reviews');
+        
+        setReviews(approvedReviews);
       } else {
-        console.error('Failed to fetch reviews:', await response.text());
+        const errorText = await response.text();
+        console.error('Failed to fetch reviews:', response.status, errorText);
+        setError('Failed to load testimonials');
       }
-    } catch (error) {
-      console.error('Error fetching reviews:', error);
+    } catch (err) {
+      console.error('Error fetching reviews:', err);
+      setError('An error occurred while loading testimonials');
     } finally {
       setLoading(false);
     }
@@ -266,7 +288,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
+                  className="w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
                 >
                   Start Your Journey
                 </Button>
@@ -294,7 +316,7 @@ export default function Home() {
               Tailored services to capture your vision with creativity and precision.
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
             {[
               {
                 icon: Camera,
@@ -309,13 +331,6 @@ export default function Home() {
                 description: 'Cinematic videos that bring your story to life.',
                 link: '/videography',
                 image: '/Pic3.jpeg',
-              },
-              {
-                icon: Star,
-                title: 'Custom Creations',
-                description: 'Unique projects crafted for your specific needs.',
-                link: '/custom',
-                image: '/service-custom.jpg',
               },
             ].map((service, index) => (
               <motion.div
@@ -452,73 +467,129 @@ export default function Home() {
               Hear what our clients have to say about their experience with us.
             </p>
           </motion.div>
+          
           {loading ? (
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-500 mx-auto"></div>
               <p className="mt-4 text-gray-600">Loading testimonials...</p>
             </div>
-          ) : reviews.length === 0 ? (
-            <p className="text-center text-gray-600">No testimonials available.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {reviews.map((review, index) => (
-                <motion.div
-                  key={review.id}
-                  custom={index}
-                  initial="hidden"
-                  whileInView="visible"
-                  whileHover="hover"
-                  viewport={{ once: true }}
-                  variants={cardVariants}
+          ) : error ? (
+            <div className="text-center">
+              <div className="bg-white rounded-lg shadow-md p-8">
+                <p className="text-red-600 mb-4">{error}</p>
+                <Button 
+                  onClick={fetchReviews}
+                  className="bg-teal-500 text-white hover:bg-teal-600"
                 >
-                  <Card className="border-gray-200">
-                    <CardHeader>
-                      <div className="flex items-center gap-4">
-                        {review.clientImage ? (
-                          <Image
-                            src={review.clientImage}
-                            alt={review.clientName}
-                            width={50}
-                            height={50}
-                            className="rounded-full object-cover"
-                            onError={(e) => (e.currentTarget.src = '/images/profile-placeholder.jpg')}
-                          />
-                        ) : (
-                          <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center">
-                            <span className="text-teal-500 font-semibold text-lg">
-                              {review.clientName.charAt(0)}
-                            </span>
+                  Try Again
+                </Button>
+              </div>
+            </div>
+          ) : reviews.length === 0 ? (
+            <div className="text-center bg-white rounded-lg shadow-md p-12">
+              <p className="text-gray-600 mb-4 text-lg">No testimonials available yet.</p>
+              <p className="text-sm text-gray-500 mb-6">
+                Be the first to share your experience with Brain Works Studio!
+              </p>
+              <Link href="/reviews/submit">
+                <Button className="bg-teal-500 text-white hover:bg-teal-600">
+                  Submit a Review
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {reviews.slice(0, 6).map((review, index) => (
+                  <motion.div
+                    key={review.id}
+                    custom={index}
+                    initial="hidden"
+                    whileInView="visible"
+                    whileHover="hover"
+                    viewport={{ once: true }}
+                    variants={cardVariants}
+                  >
+                    <Card className="border-gray-200 h-full flex flex-col">
+                      <CardHeader>
+                        <div className="flex items-center gap-4">
+                          {review.clientImage ? (
+                            <Image
+                              src={review.clientImage}
+                              alt={review.clientName}
+                              width={50}
+                              height={50}
+                              className="rounded-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/profile-placeholder.jpg';
+                              }}
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
+                              <span className="text-teal-500 font-semibold text-lg">
+                                {review.clientName.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <CardTitle className="text-lg text-teal-900 truncate">
+                              {review.clientName}
+                            </CardTitle>
+                            <p className="text-sm text-gray-600 truncate">{review.serviceType}</p>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="flex-1 flex flex-col">
+                        <div className="flex items-center gap-1 mb-3">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              className={`h-4 w-4 ${
+                                i < review.rating 
+                                  ? 'fill-yellow-400 text-yellow-400' 
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          ))}
+                          <span className="ml-2 text-sm text-gray-600 font-medium">
+                            {review.rating}/5
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-700 mb-4 flex-1">
+                          &ldquo;{review.reviewText}&rdquo;
+                        </p>
+                        {review.adminResponse && (
+                          <div className="p-3 bg-teal-50 border border-teal-200 rounded-md mt-auto">
+                            <p className="text-xs font-semibold text-teal-600 mb-1">
+                              Our Response:
+                            </p>
+                            <p className="text-xs text-gray-700">
+                              {review.adminResponse}
+                            </p>
                           </div>
                         )}
-                        <div>
-                          <CardTitle className="text-lg text-teal-900">{review.clientName}</CardTitle>
-                          <p className="text-sm text-gray-600">{review.serviceType}</p>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center gap-1 mb-2">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-5 w-5 ${
-                              i < review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <p className="text-sm text-gray-700 mb-4">{review.reviewText}</p>
-                      {review.adminResponse && (
-                        <div className="p-3 bg-teal-50 border border-teal-200 rounded-md">
-                          <p className="text-sm font-semibold text-teal-500">Our Response:</p>
-                          <p className="text-sm text-gray-700">{review.adminResponse}</p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+              
+              {reviews.length > 6 && (
+                <motion.div
+                  variants={heroChildVariants}
+                  className="text-center mt-8"
+                >
+                  <p className="text-gray-600 mb-4">
+                    Showing 6 of {reviews.length} testimonials
+                  </p>
+                  <Link href="/reviews">
+                    <Button className="bg-teal-500 text-white hover:bg-teal-600">
+                      View All Testimonials
+                    </Button>
+                  </Link>
                 </motion.div>
-              ))}
-            </div>
+              )}
+            </>
           )}
         </div>
       </motion.section>
@@ -594,7 +665,7 @@ export default function Home() {
             variants={ctaChildVariants}
             className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-gray-100 drop-shadow-md"
           >
-            Let’s craft something extraordinary. Book your session or reach out now.
+            Let&rsquo;s craft something extraordinary. Book your session or reach out now.
           </motion.p>
           <motion.div
             custom={2}
@@ -605,7 +676,7 @@ export default function Home() {
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-teal-900 text-white hover:bg-teal-800 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
+                  className="w-full sm:w-auto bg-white text-teal-600 hover:bg-gray-100 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
                 >
                   Book a Session
                 </Button>
@@ -616,7 +687,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-white text-white hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
+                  className="w-full sm:w-auto border-2 border-white bg-transparent text-white hover:bg-white hover:text-teal-600 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
                 >
                   Get in Touch
                 </Button>
