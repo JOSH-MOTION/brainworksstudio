@@ -208,7 +208,7 @@ export default function ContactPage() {
                 {
                   icon: MapPin,
                   title: 'Location',
-                  value: 'Your City, State',
+                  value: 'Accra, Lapaz',
                   note: 'We travel to your location',
                 },
                 {
