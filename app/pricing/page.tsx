@@ -1,4 +1,3 @@
-// app/pricing/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -36,7 +35,9 @@ export default function PricingPage() {
       const response = await fetch('/api/rate-cards');
       if (response.ok) {
         const data = await response.json();
-        setRateCards(data);
+        setRateCards(data.sort((a: RateCard, b: RateCard) => a.order - b.order || a.serviceName.localeCompare(b.serviceName)));
+      } else {
+        console.error('Failed to fetch rate cards:', await response.text());
       }
     } catch (error) {
       console.error('Error fetching rate cards:', error);
@@ -46,8 +47,8 @@ export default function PricingPage() {
   };
 
   const categories = ['all', ...Array.from(new Set(rateCards.map((card) => card.category)))];
-  const filteredCards = selectedCategory === 'all' 
-    ? rateCards 
+  const filteredCards = selectedCategory === 'all'
+    ? rateCards
     : rateCards.filter((card) => card.category === selectedCategory);
 
   if (loading) {
@@ -137,7 +138,7 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href="/booking">
+                  <Link href={`/booking?rateCardId=${encodeURIComponent(card.id || card.serviceName)}&category=${encodeURIComponent(card.category)}`}>
                     <Button
                       className={`w-full ${
                         card.featured

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 import { Upload, MapPin, Calendar, Clock, CheckCircle } from 'lucide-react';
+
+interface RateCard {
+  id?: string;
+  category: string;
+  serviceName: string;
+  description: string;
+  price: string;
+  duration?: string;
+  includes: string[];
+  featured: boolean;
+  order: number;
+}
 
 // Animation variants for sections
 const sectionVariants: Variants = {
@@ -64,6 +77,9 @@ const messageVariants: Variants = {
 };
 
 export default function BookingPage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const { user, firebaseUser, userProfile } = useAuth();
   const [formData, setFormData] = useState({
     serviceCategory: '',
     date: '',
@@ -71,14 +87,65 @@ export default function BookingPage() {
     endTime: '',
     address: '',
     additionalNotes: '',
+    serviceName: '', // Added to store rate card serviceName
   });
   const [attachments, setAttachments] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedRateCard, setSelectedRateCard] = useState<RateCard | null>(null);
 
-  const { user, firebaseUser, userProfile } = useAuth();
-  const router = useRouter();
+  useEffect(() => {
+    fetchCategories();
+    const rateCardId = searchParams.get('rateCardId');
+    const category = searchParams.get('category');
+    if (rateCardId) {
+      fetchRateCard(rateCardId);
+    }
+    if (category) {
+      setFormData((prev) => ({ ...prev, serviceCategory: decodeURIComponent(category) }));
+    }
+  }, [searchParams]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/rate-cards');
+      if (response.ok) {
+        const data = await response.json() as RateCard[];
+        const uniqueCategories = Array.from(new Set(data.map((card) => card.category)));
+        setCategories(uniqueCategories);
+        console.log('Categories loaded:', uniqueCategories);
+      } else {
+        console.error('Failed to fetch categories:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  const fetchRateCard = async (rateCardId: string) => {
+    try {
+      const response = await fetch('/api/rate-cards');
+      if (response.ok) {
+        const data = await response.json() as RateCard[];
+        const rateCard = data.find((card) => card.id === rateCardId || card.serviceName === decodeURIComponent(rateCardId));
+        if (rateCard) {
+          setSelectedRateCard(rateCard);
+          setFormData((prev) => ({
+            ...prev,
+            serviceCategory: rateCard.category,
+            serviceName: rateCard.serviceName,
+            additionalNotes: `Selected Package: ${rateCard.serviceName}\nPrice: ${rateCard.price}\nIncludes:\n${rateCard.includes.map((item) => `- ${item}`).join('\n')}`,
+          }));
+        }
+      } else {
+        console.error('Failed to fetch rate card:', await response.text());
+      }
+    } catch (error) {
+      console.error('Error fetching rate card:', error);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -146,6 +213,7 @@ export default function BookingPage() {
         endTime: '',
         address: '',
         additionalNotes: '',
+        serviceName: '',
       });
       setAttachments([]);
       setTimeout(() => {
@@ -298,14 +366,37 @@ export default function BookingPage() {
                     <SelectValue placeholder="Select a service" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Event">Event Photography</SelectItem>
-                    <SelectItem value="Portrait">Portrait Session</SelectItem>
-                    <SelectItem value="Product">Product Photography</SelectItem>
-                    <SelectItem value="Commercial">Commercial Work</SelectItem>
-                    <SelectItem value="Wedding">Wedding Photography</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </motion.div>
+
+              {/* Service Name (Read-only if pre-filled) */}
+              {formData.serviceName && (
+                <motion.div
+                  custom={1}
+                  variants={formElementVariants}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  className="space-y-2"
+                >
+                  <Label htmlFor="serviceName" className="text-sm text-teal-900">
+                    Selected Package
+                  </Label>
+                  <Input
+                    id="serviceName"
+                    name="serviceName"
+                    value={formData.serviceName}
+                    readOnly
+                    className="border-coral-200 bg-gray-100 rounded-md text-sm"
+                  />
+                </motion.div>
+              )}
 
               {/* Date and Time */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -337,7 +428,7 @@ export default function BookingPage() {
                 ].map((field, index) => (
                   <motion.div
                     key={field.id}
-                    custom={index + 1}
+                    custom={index + 2}
                     variants={formElementVariants}
                     initial="hidden"
                     whileInView="visible"
@@ -364,7 +455,7 @@ export default function BookingPage() {
 
               {/* Location */}
               <motion.div
-                custom={4}
+                custom={5}
                 variants={formElementVariants}
                 initial="hidden"
                 whileInView="visible"
@@ -388,7 +479,7 @@ export default function BookingPage() {
 
               {/* Additional Notes */}
               <motion.div
-                custom={5}
+                custom={6}
                 variants={formElementVariants}
                 initial="hidden"
                 whileInView="visible"
@@ -404,14 +495,14 @@ export default function BookingPage() {
                   value={formData.additionalNotes}
                   onChange={handleChange}
                   placeholder="Share your project details, special requests, or creative vision..."
-                  rows={4}
+                  rows={6}
                   className="border-coral-200 focus:ring-teal-500 rounded-md text-sm"
                 />
               </motion.div>
 
               {/* File Attachments */}
               <motion.div
-                custom={6}
+                custom={7}
                 variants={formElementVariants}
                 initial="hidden"
                 whileInView="visible"
@@ -461,7 +552,7 @@ export default function BookingPage() {
               )}
 
               <motion.div
-                custom={7}
+                custom={8}
                 variants={formElementVariants}
                 initial="hidden"
                 whileInView="visible"

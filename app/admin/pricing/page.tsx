@@ -25,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Star } from 'lucide-react';
+import { Plus, Edit, Trash2, Star, X } from 'lucide-react';
 
 interface RateCard {
   id?: string;
@@ -48,19 +48,15 @@ const videographyCategories = [
   'Short Films / Creative Projects', 'Promotional', 'Social Media', 'Others'
 ];
 const serviceCategories = Array.from(new Set([...photographyCategories, ...videographyCategories]));
+const MAX_INCLUDES = 17;
 
-// Helper function to format price as GHS
 const formatGHS = (value: string): string => {
-  // Remove non-numeric characters except decimal point
   const numericValue = value.replace(/[^0-9.]/g, '');
-  // Ensure valid number
   const number = parseFloat(numericValue);
   if (isNaN(number)) return '';
-  // Format with commas and GHS symbol
   return `₵${number.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
 
-// Helper function to parse GHS price to raw number for input handling
 const parseGHS = (value: string): string => {
   return value.replace(/[^0-9.]/g, '');
 };
@@ -72,6 +68,7 @@ export default function AdminPricingPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<RateCard | null>(null);
+  const [includesInputs, setIncludesInputs] = useState<string[]>(['']);
 
   const [formData, setFormData] = useState({
     category: '',
@@ -79,7 +76,6 @@ export default function AdminPricingPage() {
     description: '',
     price: '',
     duration: '',
-    includes: '',
     featured: false,
     order: 0,
   });
@@ -128,8 +124,8 @@ export default function AdminPricingPage() {
         },
         body: JSON.stringify({
           ...formData,
-          price: formatGHS(formData.price), // Ensure price is stored with GHS symbol
-          includes: formData.includes.split('\n').filter((item) => item.trim()),
+          price: formatGHS(formData.price),
+          includes: includesInputs.filter((item) => item.trim()),
           order: parseInt(formData.order.toString()) || 0,
         }),
       });
@@ -176,12 +172,12 @@ export default function AdminPricingPage() {
       category: card.category,
       serviceName: card.serviceName,
       description: card.description,
-      price: parseGHS(card.price), // Strip GHS symbol for editing
+      price: parseGHS(card.price),
       duration: card.duration || '',
-      includes: card.includes.join('\n'),
       featured: card.featured,
       order: card.order,
     });
+    setIncludesInputs(card.includes.length > 0 ? card.includes : ['']);
     setDialogOpen(true);
   };
 
@@ -192,11 +188,27 @@ export default function AdminPricingPage() {
       description: '',
       price: '',
       duration: '',
-      includes: '',
       featured: false,
       order: 0,
     });
+    setIncludesInputs(['']);
     setEditingCard(null);
+  };
+
+  const handleAddInclude = () => {
+    if (includesInputs.length < MAX_INCLUDES) {
+      setIncludesInputs([...includesInputs, '']);
+    }
+  };
+
+  const handleRemoveInclude = (index: number) => {
+    setIncludesInputs(includesInputs.filter((_, i) => i !== index));
+  };
+
+  const handleIncludeChange = (index: number, value: string) => {
+    const newIncludes = [...includesInputs];
+    newIncludes[index] = value;
+    setIncludesInputs(newIncludes);
   };
 
   if (authLoading || loading) {
@@ -298,14 +310,38 @@ export default function AdminPricingPage() {
                 </div>
               </div>
               <div>
-                <Label>What's Included (one per line)</Label>
-                <Textarea
-                  value={formData.includes}
-                  onChange={(e) => setFormData({ ...formData, includes: e.target.value })}
-                  placeholder="Up to 100 edited photos\nOnline gallery\nHigh-resolution downloads"
-                  rows={6}
-                  className="border-gray-300 focus:ring-teal-500"
-                />
+                <Label>What's Included</Label>
+                {includesInputs.map((include, index) => (
+                  <div key={index} className="flex items-center gap-2 mb-2">
+                    <Input
+                      value={include}
+                      onChange={(e) => handleIncludeChange(index, e.target.value)}
+                      placeholder={`Feature ${index + 1}`}
+                      className="border-gray-300 focus:ring-teal-500"
+                    />
+                    {includesInputs.length > 1 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="border-red-300 text-red-600 hover:bg-red-50"
+                        onClick={() => handleRemoveInclude(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                {includesInputs.length < MAX_INCLUDES && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-teal-300 text-teal-500 hover:bg-teal-50"
+                    onClick={handleAddInclude}
+                  >
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add Feature
+                  </Button>
+                )}
               </div>
               <div>
                 <Label>Display Order</Label>
@@ -365,12 +401,9 @@ export default function AdminPricingPage() {
             <CardContent>
               <div className="space-y-2 mb-4">
                 <p className="text-sm font-semibold text-gray-700">Includes:</p>
-                <ul className="text-sm text-gray-600 space-y-1">
+                <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
                   {card.includes.map((item, index) => (
-                    <li key={index} className="flex items-start gap-2">
-                      <span className="text-teal-500">•</span>
-                      <span>{item}</span>
-                    </li>
+                    <li key={index}>{item}</li>
                   ))}
                 </ul>
               </div>

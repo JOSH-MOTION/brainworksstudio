@@ -1,4 +1,3 @@
- // app/api/bookings/create/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuth, adminDb } from '@/lib/firebase-admin';
 import { sendBookingConfirmation } from '@/lib/nodemailer';
@@ -34,21 +33,22 @@ export async function POST(request: NextRequest) {
 
     // Get the request body
     const body = await request.json();
-    const { 
-      serviceCategory, 
-      date, 
-      startTime, 
-      endTime, 
-      address, 
+    const {
+      serviceCategory,
+      serviceName, // Added
+      date,
+      startTime,
+      endTime,
+      address,
       additionalNotes,
       userName,
-      userEmail 
+      userEmail,
     } = body;
 
     // Validate required fields
     if (!serviceCategory || !date || !startTime || !endTime || !address) {
-      return NextResponse.json({ 
-        error: 'Missing required fields: serviceCategory, date, startTime, endTime, address' 
+      return NextResponse.json({
+        error: 'Missing required fields: serviceCategory, date, startTime, endTime, address',
       }, { status: 400 });
     }
 
@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
 
     // Validate that end time is after start time
     if (endDateTime <= startDateTime) {
-      return NextResponse.json({ 
-        error: 'End time must be after start time' 
+      return NextResponse.json({
+        error: 'End time must be after start time',
       }, { status: 400 });
     }
 
@@ -67,10 +67,11 @@ export async function POST(request: NextRequest) {
     const bookingData = {
       userId: decodedToken.uid,
       serviceCategory,
+      serviceName: serviceName || null, // Optional field
       startDateTime,
       endDateTime,
       location: {
-        address
+        address,
       },
       additionalNotes: additionalNotes || '',
       adminNotes: '',
@@ -95,10 +96,12 @@ export async function POST(request: NextRequest) {
         await sendBookingConfirmation(userEmail, {
           userName: userName || 'User',
           serviceCategory,
+          serviceName: serviceName || 'Custom Service', // Include serviceName
           date: startDateTime.toLocaleDateString(),
-          startTime: startDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-          endTime: endDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+          startTime: startDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          endTime: endDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           location: address,
+          additionalNotes: additionalNotes || 'No additional notes provided',
         });
       } catch (emailError) {
         console.error('Error sending confirmation email:', emailError);
@@ -106,17 +109,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       bookingId,
-      message: 'Booking created successfully' 
+      message: 'Booking created successfully',
     }, { status: 201 });
-
   } catch (error) {
     console.error('Error creating booking:', error);
-    return NextResponse.json(
-      { error: 'Failed to create booking' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create booking' }, { status: 500 });
   }
 }
