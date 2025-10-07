@@ -1,12 +1,14 @@
 'use client';
 
+import { useState } from 'react';
 import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
-import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Award, Users, Heart, Star, MapPin, Instagram, Twitter, Linkedin } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Mail, Phone, MapPin, Clock, Send } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 // Animation variants for sections
 const sectionVariants: Variants = {
@@ -14,86 +16,120 @@ const sectionVariants: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: 'easeOut', staggerChildren: 0.1 },
+    transition: { duration: 0.7, ease: 'easeOut', staggerChildren: 0.15 },
   },
 };
 
 // Animation variants for hero content
 const heroContentVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
+  hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.5, type: 'spring', stiffness: 130, damping: 20 },
+    transition: { duration: 0.6, type: 'spring', stiffness: 120, damping: 20 },
   },
 };
 
 // Animation variants for hero words
 const wordVariants: Variants = {
-  hidden: { opacity: 0, y: 15 },
+  hidden: { opacity: 0, y: 20 },
   visible: (index: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, delay: index * 0.08, ease: 'easeOut' },
+    transition: { duration: 0.5, delay: index * 0.1, ease: 'easeOut' },
   }),
 };
 
-// Animation variants for cards
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 15, rotateX: 10 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    rotateX: 0,
-    transition: { duration: 0.4, delay: index * 0.08, ease: 'easeOut' },
-}),
-  hover: {
-    scale: 1.02,
-    y: -3,
-    rotateX: 5,
-    boxShadow: '0 8px 16px rgba(0, 0, 0, 0.1)',
-    transition: { duration: 0.3, type: 'spring', stiffness: 140 },
-  },
-};
-
-// Animation variants for team member content (name, role, description, socials)
-const teamContentVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
-  visible: (index: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.3, delay: index * 0.1, ease: 'easeOut' },
-  }),
-};
-
-// Animation variants for social media icons
-const socialIconVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8 },
+// Animation variants for contact info cards
+const infoCardVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9, y: 20 },
   visible: (index: number) => ({
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.2, delay: index * 0.05, type: 'spring', stiffness: 200, damping: 10 },
+    y: 0,
+    transition: { duration: 0.6, delay: index * 0.1, type: 'spring', stiffness: 100 },
   }),
   hover: {
-    scale: 1.2,
-    rotate: 5,
-    transition: { duration: 0.2, type: 'spring', stiffness: 300 },
+    scale: 1.03,
+    y: -5,
+    transition: { duration: 0.3, type: 'spring', stiffness: 150 },
   },
 };
 
-// Animation variants for stats
-const statVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
+// Animation variants for form elements
+const formElementVariants: Variants = {
+  hidden: { opacity: 0, x: -15 },
   visible: (index: number) => ({
     opacity: 1,
-    scale: 1,
-    transition: { duration: 0.3, delay: index * 0.08, type: 'spring', stiffness: 110 },
+    x: 0,
+    transition: { duration: 0.5, delay: index * 0.1, ease: 'easeOut' },
   }),
 };
 
-export default function AboutPage() {
+// Animation variants for success message
+const successVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.6, type: 'spring', stiffness: 110, damping: 20 },
+  },
+};
+
+export default function ContactPage() {
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setSuccess(true);
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        subject: '',
+        message: '',
+      });
+    } catch (error: any) {
+      setError(error.message || 'An error occurred while sending your message');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Split the heading text into words for animation
-  const headingText = 'Our Creative Journey'.split(' ');
+  const headingText = 'Connect With Us'.split(' ');
 
   return (
     <Layout>
@@ -102,7 +138,7 @@ export default function AboutPage() {
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="relative min-h-[35vh] flex items-center justify-center bg-teal-50"
+        className="relative min-h-[40vh] flex items-center justify-center bg-teal-50"
       >
         <motion.div
           variants={heroContentVariants}
@@ -125,18 +161,18 @@ export default function AboutPage() {
           <motion.p
             custom={0}
             variants={wordVariants}
-            className="text-base md:text-lg text-gray-600 max-w-xl mx-auto mb-6"
+            className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto mb-6"
           >
-            Learn about our passion for crafting timeless visual stories.
+            Let's collaborate to capture your vision. Reach out today!
           </motion.p>
           <motion.div custom={1} variants={wordVariants}>
-            <Link href="#contact">
+            <Link href="#contact-form">
               <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
                 <Button
                   size="lg"
                   className="bg-coral-500 text-white hover:bg-coral-600 font-semibold py-2 px-6 rounded-full"
                 >
-                  Connect With Us
+                  Contact Us
                 </Button>
               </motion.div>
             </Link>
@@ -144,379 +180,216 @@ export default function AboutPage() {
         </motion.div>
       </motion.section>
 
-      {/* Main Content Section */}
-      <div className="bg-white py-12 px-4 sm:px-6 lg:px-8">
-        <motion.div
-          className="max-w-7xl mx-auto"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={sectionVariants}
-        >
-          {/* Our Story Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 items-center">
-            <motion.div
-              custom={0}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <h2 className="text-xl font-bold text-teal-900 mb-3">Our Story</h2>
-              <div className="space-y-2 text-gray-600 text-sm">
-                <p>
-                  Since 2018, Brain Works Studio has grown from a small team of photographers into a full-service studio, driven by a love for authentic storytelling through photography and videography.
-                </p>
-                <p>
-                  We specialize in everything from intimate portraits to large-scale commercial projects, always prioritizing your vision. Our work has earned accolades and been featured in leading publications.
-                </p>
-                <p>
-                  Our mission is simple: create visuals that capture the essence of every moment, whether personal or professional.
-                </p>
-              </div>
-            </motion.div>
-            <motion.div
-              custom={1}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <Card className="overflow-hidden shadow-sm rounded-xl border border-coral-100">
-                <CardContent className="p-0">
-                  <div className="aspect-[4/3] relative">
-                    <Image
-                      src="/Pic3.jpeg"
-                      alt="Photography Studio"
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                      onError={(e) => {
-                        console.error('Failed to load about story image');
-                        e.currentTarget.src = '/placeholder-story.jpg';
-                      }}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          </div>
-
-          {/* Values Section */}
-          <div className="mb-12">
-            <motion.div
-              className="text-center mb-6"
-              custom={0}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <h2 className="text-xl font-bold text-teal-900 mb-2">Our Values</h2>
-              <p className="text-sm text-gray-600 max-w-lg mx-auto">
-                Core principles that shape our creative process.
-              </p>
-            </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {values.map((value, index) => (
-                <motion.div
-                  key={index}
-                  custom={index}
-                  variants={cardVariants}
-                  whileHover="hover"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  <Card className="text-center bg-teal-50 rounded-xl shadow-sm border border-coral-100 hover:bg-teal-100 transition-colors">
-                    <CardContent className="p-4">
-                      <div className="mx-auto mb-2 p-2 bg-coral-50 rounded-full w-fit">
-                        <value.icon className="h-5 w-5 text-coral-500" />
-                      </div>
-                      <h3 className="text-sm font-semibold text-teal-900 mb-1">{value.title}</h3>
-                      <p className="text-gray-600 text-xs">{value.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Team Section */}
-          <div className="mb-12">
-            <motion.div
-              className="text-center mb-6"
-              custom={0}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <h2 className="text-xl font-bold text-teal-900 mb-2">Meet Our Team</h2>
-              <p className="text-sm text-gray-600 max-w-lg mx-auto">
-                Passionate creatives dedicated to your vision.
-              </p>
-            </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {teamMembers.map((member, index) => (
-                <motion.div
-                  key={index}
-                  custom={index}
-                  variants={cardVariants}
-                  whileHover="hover"
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                >
-                  <Card className="text-center bg-teal-50 rounded-xl shadow-sm border border-coral-100 hover:bg-teal-100 transition-colors">
-                    <CardContent className="p-4">
-                      <motion.div
-                        className="w-24 h-24 mx-auto mb-3 relative rounded-full overflow-hidden"
-                        whileHover={{ scale: 1.1, rotate: 3 }}
-                        transition={{ type: 'spring', stiffness: 200, damping: 10 }}
-                      >
-                        <Image
-                          src={`/images/team-${index + 1}.jpg`}
-                          alt={member.name}
-                          fill
-                          className="object-cover"
-                          sizes="96px"
-                          onError={(e) => {
-                            console.error(`Failed to load team image for ${member.name}`);
-                            e.currentTarget.src = '/placeholder-team.jpg';
-                          }}
-                        />
-                      </motion.div>
-                      <motion.h3
-                        custom={0}
-                        variants={teamContentVariants}
-                        className="text-sm font-semibold text-teal-900 mb-1"
-                      >
-                        {member.name}
-                      </motion.h3>
-                      <motion.p
-                        custom={1}
-                        variants={teamContentVariants}
-                        className="text-coral-500 text-xs font-medium mb-1"
-                      >
-                        {member.role}
-                      </motion.p>
-                      <motion.p
-                        custom={2}
-                        variants={teamContentVariants}
-                        className="text-gray-600 text-xs mb-2"
-                      >
-                        {member.description}
-                      </motion.p>
-                      <motion.div
-                        custom={3}
-                        variants={teamContentVariants}
-                        className="flex justify-center gap-3"
-                      >
-                        {member.socials.map((social, socialIndex) => (
-                          <motion.a
-                            key={socialIndex}
-                            href={social.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            custom={socialIndex}
-                            variants={socialIconVariants}
-                            whileHover="hover"
-                            initial="hidden"
-                            animate="visible"
-                          >
-                            <social.icon className="h-5 w-5 text-teal-600 hover:text-coral-500 transition-colors" />
-                          </motion.a>
-                        ))}
-                      </motion.div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-
-          {/* Statistics Section */}
-          <motion.div
-            className="bg-teal-600 rounded-xl p-8 mb-12 border border-coral-100"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={sectionVariants}
-          >
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-white mb-2">Our Impact</h2>
-              <p className="text-sm text-teal-50">
-                Milestones that reflect our dedication to excellence.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              {stats.map((stat, index) => (
-                <motion.div
-                  key={index}
-                  custom={index}
-                  variants={statVariants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  className="text-center"
-                >
-                  <div className="text-2xl md:text-3xl font-bold text-white mb-1">{stat.number}</div>
-                  <div className="text-xs text-teal-50">{stat.label}</div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
-
-          {/* Service Areas */}
-          <div className="mb-12">
-            <motion.div
-              className="text-center mb-6"
-              custom={0}
-              variants={cardVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              <h2 className="text-xl font-bold text-teal-900 mb-2">Service Areas</h2>
-              <p className="text-sm text-gray-600 max-w-lg mx-auto">
-                From local to global, we're here for your projects.
-              </p>
-            </motion.div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      {/* Contact Section */}
+      <motion.section
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={sectionVariants}
+        className="py-12 bg-white"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Contact Information */}
+            <div className="lg:col-span-2 space-y-4">
               {[
                 {
-                  title: 'Local Service Area',
-                  description: 'Within 50 miles - No travel fee',
+                  icon: Mail,
+                  title: 'Email',
+                  value: 'hello@brainworksstudio2.com',
+                  note: 'Response within 24 hours',
                 },
                 {
-                  title: 'Regional Coverage',
-                  description: 'Within 200 miles - Minimal travel fee',
+                  icon: Phone,
+                  title: 'Phone',
+                  value: '+233 242403450',
+                  note: 'Mon-Fri, 9am-6pm EST',
                 },
                 {
-                  title: 'Destination Projects',
-                  description: 'Nationwide and international - Custom quote',
+                  icon: MapPin,
+                  title: 'Location',
+                  value: 'Your City, State',
+                  note: 'We travel to your location',
                 },
-              ].map((area, index) => (
+                {
+                  icon: Clock,
+                  title: 'Business Hours',
+                  value: 'Mon-Fri: 9am-6pm\nWeekend: By appointment',
+                },
+              ].map((info, index) => (
                 <motion.div
-                  key={index}
+                  key={info.title}
                   custom={index}
-                  variants={cardVariants}
+                  variants={infoCardVariants}
                   whileHover="hover"
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true }}
                 >
-                  <Card className="text-center bg-teal-50 rounded-xl shadow-sm border border-coral-100 hover:bg-teal-100 transition-colors">
-                    <CardContent className="p-4">
-                      <MapPin className="h-5 w-5 text-coral-500 mx-auto mb-2" />
-                      <h3 className="text-sm font-semibold text-teal-900 mb-1">{area.title}</h3>
-                      <p className="text-gray-600 text-xs">{area.description}</p>
-                    </CardContent>
-                  </Card>
+                  <div className="bg-teal-50 rounded-xl shadow-sm p-5 flex items-start gap-3 hover:bg-teal-100 transition-colors border border-coral-100">
+                    <motion.div
+                      className="p-2 bg-coral-50 rounded-full"
+                      whileHover={{ scale: 1.1, transition: { duration: 0.3 } }}
+                    >
+                      <info.icon className="h-5 w-5 text-coral-500" />
+                    </motion.div>
+                    <div>
+                      <h3 className="font-semibold text-teal-900 text-base">{info.title}</h3>
+                      <p className="text-gray-600 text-sm">{info.value}</p>
+                      <p className="text-xs text-gray-500">{info.note}</p>
+                    </div>
+                  </div>
                 </motion.div>
               ))}
+              {/* Emergency Contact */}
+              <motion.div
+                custom={4}
+                variants={infoCardVariants}
+                whileHover="hover"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <div className="bg-teal-50 rounded-xl shadow-sm p-5 text-center border border-coral-100">
+                  <h3 className="font-semibold text-teal-900 text-base mb-2">Urgent Project?</h3>
+                  <p className="text-xs text-gray-600 mb-3">Reach out for time-sensitive bookings.</p>
+                  <Button
+                    variant="outline"
+                    className="w-full border-coral-500 text-coral-500 hover:bg-coral-50 rounded-full text-sm py-1"
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    +233 242403450
+                  </Button>
+                </div>
+              </motion.div>
             </div>
-          </div>
 
-          {/* CTA Section */}
-          <motion.div
-            custom={0}
-            variants={cardVariants}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <Card className="bg-teal-50 border-coral-100 shadow-sm rounded-xl p-6 text-center">
-              <h2 className="text-xl font-bold text-teal-900 mb-2">Ready to Collaborate?</h2>
-              <p className="text-sm text-gray-600 mb-4 max-w-lg mx-auto">
-                Let's create something extraordinary together.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-2 justify-center">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link href="/booking">
-                    <Button size="sm" className="bg-teal-500 hover:bg-teal-600 text-white rounded-full">
-                      Book a Session
-                    </Button>
-                  </Link>
-                </motion.div>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Link href="/contact">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-coral-500 text-coral-500 hover:bg-coral-50 rounded-full"
+            {/* Contact Form */}
+            <motion.div
+              id="contact-form"
+              variants={sectionVariants}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="lg:col-span-3"
+            >
+              <div className="bg-teal-50 rounded-xl shadow-sm p-6 border border-coral-100">
+                {success ? (
+                  <motion.div
+                    variants={successVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="text-center py-8"
+                  >
+                    <motion.div
+                      className="mx-auto mb-4 p-3 bg-coral-50 rounded-full w-fit"
+                      animate={{ scale: [1, 1.15, 1] }}
+                      transition={{ duration: 1, repeat: 1 }}
                     >
-                      Contact Us
-                    </Button>
-                  </Link>
-                </motion.div>
+                      <Send className="h-6 w-6 text-coral-500" />
+                    </motion.div>
+                    <h3 className="text-lg font-semibold text-teal-900 mb-2">Message Sent!</h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      We've received your message and will respond soon.
+                    </p>
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                      <Button
+                        onClick={() => setSuccess(false)}
+                        variant="outline"
+                        className="border-coral-500 text-coral-500 hover:bg-coral-50 rounded-full text-sm py-1"
+                      >
+                        Send Another Message
+                      </Button>
+                    </motion.div>
+                  </motion.div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {[
+                        { id: 'name', label: 'Name *', type: 'text', placeholder: 'Your full name', required: true },
+                        { id: 'email', label: 'Email *', type: 'email', placeholder: 'your@email.com', required: true },
+                        { id: 'phone', label: 'Phone', type: 'tel', placeholder: '+233 242403450', required: false },
+                        { id: 'subject', label: 'Subject *', type: 'text', placeholder: 'What can we help you with?', required: true },
+                      ].map((field, index) => (
+                        <motion.div
+                          key={field.id}
+                          custom={index}
+                          variants={formElementVariants}
+                          initial="hidden"
+                          whileInView="visible"
+                          viewport={{ once: true }}
+                        >
+                          <Label htmlFor={field.id} className="text-teal-900 font-medium text-sm">{field.label}</Label>
+                          <Input
+                            id={field.id}
+                            name={field.id}
+                            type={field.type}
+                            value={formData[field.id as keyof typeof formData]}
+                            onChange={handleChange}
+                            required={field.required}
+                            placeholder={field.placeholder}
+                            className="border-coral-200 focus:ring-teal-500 focus:border-teal-500 rounded-md text-sm"
+                          />
+                        </motion.div>
+                      ))}
+                    </div>
+                    <motion.div
+                      custom={4}
+                      variants={formElementVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                    >
+                      <Label htmlFor="message" className="text-teal-900 font-medium text-sm">Message *</Label>
+                      <Textarea
+                        id="message"
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
+                        required
+                        placeholder="Tell us about your project, timeline, or requirements..."
+                        rows={5}
+                        className="border-coral-200 focus:ring-teal-500 focus:border-teal-500 rounded-md text-sm"
+                      />
+                    </motion.div>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="text-coral-600 text-xs bg-coral-50 p-2 rounded-md"
+                      >
+                        {error}
+                      </motion.div>
+                    )}
+                    <motion.div
+                      custom={5}
+                      variants={formElementVariants}
+                      initial="hidden"
+                      whileInView="visible"
+                      viewport={{ once: true }}
+                    >
+                      <Button
+                        type="submit"
+                        className="w-full bg-teal-500 text-white hover:bg-teal-600 py-2 text-sm font-semibold rounded-full"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          'Sending Message...'
+                        ) : (
+                          <>
+                            <Send className="h-4 w-4 mr-2" />
+                            Send Message
+                          </>
+                        )}
+                      </Button>
+                    </motion.div>
+                  </form>
+                )}
               </div>
-            </Card>
-          </motion.div>
-        </motion.div>
-      </div>
+            </motion.div>
+          </div>
+        </div>
+      </motion.section>
     </Layout>
   );
 }
-
-const values = [
-  {
-    title: 'Authenticity',
-    description: 'We capture genuine moments that reflect your unique story.',
-    icon: Heart,
-  },
-  {
-    title: 'Excellence',
-    description: 'We pursue perfection in every frame with top-tier techniques.',
-    icon: Star,
-  },
-  {
-    title: 'Collaboration',
-    description: 'We partner with you to bring your vision to life.',
-    icon: Users,
-  },
-  {
-    title: 'Innovation',
-    description: 'We embrace new trends to keep our work fresh and creative.',
-    icon: Award,
-  },
-];
-
-const teamMembers = [
-  {
-    name: 'Joshua Doe',
-    role: 'Lead Photographer & Founder',
-    description: 'Sarah specializes in portrait and wedding photography, focusing on natural light and candid moments.',
-    socials: [
-      { platform: 'Instagram', url: 'https://instagram.com/joshuadoe', icon: Instagram },
-      { platform: 'Twitter', url: 'https://twitter.com/joshuadoe', icon: Twitter },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/joshuadoe', icon: Linkedin },
-    ],
-  },
-  {
-    name: 'Michael Otoo Bekoe',
-    role: 'Cinematographer',
-    description: 'Michael excels in product and architectural photography with a keen eye for detail.',
-    socials: [
-      { platform: 'Instagram', url: 'https://instagram.com/michaelotoo', icon: Instagram },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/michaelotoo', icon: Linkedin },
-    ],
-  },
-  {
-    name: 'Courage Johnson',
-    role: 'Videographer & Editor',
-    description: 'Emma crafts compelling video stories from concept to final edit.',
-    socials: [
-      { platform: 'Instagram', url: 'https://instagram.com/couragejohnson', icon: Instagram },
-      { platform: 'Twitter', url: 'https://twitter.com/couragejohnson', icon: Twitter },
-    ],
-  },
-];
-
-const stats = [
-  { number: '500+', label: 'Happy Clients' },
-  { number: '50+', label: 'Weddings Shot' },
-  { number: '100+', label: 'Commercial Projects' },
-  { number: '5', label: 'Years of Excellence' },
-];
