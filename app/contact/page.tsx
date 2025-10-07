@@ -196,7 +196,7 @@ export default function ContactPage() {
                 {
                   icon: Mail,
                   title: 'Email',
-                  value: 'hello@brainworksstudio2.com',
+                  value: 'brainworksstudio2@gmail.com',
                   note: 'Response within 24 hours',
                 },
                 {
