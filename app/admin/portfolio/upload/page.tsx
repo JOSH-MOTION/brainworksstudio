@@ -367,7 +367,7 @@ export default function UploadPortfolio() {
                 whileTap="tap"
                 onClick={handleUpload}
                 disabled={loading}
-                className="w-full bg-coral-500 text-white hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
+                className="w-full bg-coral-500 text-teal-600 hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
               >
                 {loading ? (
                   'Uploading...'
