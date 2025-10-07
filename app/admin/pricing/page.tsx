@@ -1,4 +1,3 @@
-// app/admin/pricing/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -26,7 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Star, DollarSign } from 'lucide-react';
+import { Plus, Edit, Trash2, Star } from 'lucide-react';
 
 interface RateCard {
   id?: string;
@@ -49,6 +48,22 @@ const videographyCategories = [
   'Short Films / Creative Projects', 'Promotional', 'Social Media', 'Others'
 ];
 const serviceCategories = Array.from(new Set([...photographyCategories, ...videographyCategories]));
+
+// Helper function to format price as GHS
+const formatGHS = (value: string): string => {
+  // Remove non-numeric characters except decimal point
+  const numericValue = value.replace(/[^0-9.]/g, '');
+  // Ensure valid number
+  const number = parseFloat(numericValue);
+  if (isNaN(number)) return '';
+  // Format with commas and GHS symbol
+  return `₵${number.toLocaleString('en-GH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+};
+
+// Helper function to parse GHS price to raw number for input handling
+const parseGHS = (value: string): string => {
+  return value.replace(/[^0-9.]/g, '');
+};
 
 export default function AdminPricingPage() {
   const { user, isAdmin, loading: authLoading, firebaseUser } = useAuth();
@@ -113,6 +128,7 @@ export default function AdminPricingPage() {
         },
         body: JSON.stringify({
           ...formData,
+          price: formatGHS(formData.price), // Ensure price is stored with GHS symbol
           includes: formData.includes.split('\n').filter((item) => item.trim()),
           order: parseInt(formData.order.toString()) || 0,
         }),
@@ -160,7 +176,7 @@ export default function AdminPricingPage() {
       category: card.category,
       serviceName: card.serviceName,
       description: card.description,
-      price: card.price,
+      price: parseGHS(card.price), // Strip GHS symbol for editing
       duration: card.duration || '',
       includes: card.includes.join('\n'),
       featured: card.featured,
@@ -185,206 +201,204 @@ export default function AdminPricingPage() {
 
   if (authLoading || loading) {
     return (
-   
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading pricing...</p>
-          </div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading pricing...</p>
         </div>
-     
+      </div>
     );
   }
 
   if (!user || !isAdmin) return null;
 
   return (
-    
-      <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Pricing Management</h1>
-            <p className="text-gray-600">Manage service rate cards and pricing packages</p>
-          </div>
-          <Dialog open={dialogOpen} onOpenChange={(open) => {
-            setDialogOpen(open);
-            if (!open) resetForm();
-          }}>
-            <DialogTrigger asChild>
-              <Button className="bg-teal-500 hover:bg-teal-600">
-                <Plus className="h-4 w-4 mr-2" />
-                New Rate Card
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>{editingCard ? 'Edit Rate Card' : 'Create New Rate Card'}</DialogTitle>
-                <DialogDescription>
-                  {editingCard ? 'Update rate card details' : 'Add a new service pricing option'}
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4">
+    <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Pricing Management</h1>
+          <p className="text-gray-600">Manage service rate cards and pricing packages</p>
+        </div>
+        <Dialog open={dialogOpen} onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) resetForm();
+        }}>
+          <DialogTrigger asChild>
+            <Button className="bg-teal-500 hover:bg-teal-600">
+              <Plus className="h-4 w-4 mr-2" />
+              New Rate Card
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>{editingCard ? 'Edit Rate Card' : 'Create New Rate Card'}</DialogTitle>
+              <DialogDescription>
+                {editingCard ? 'Update rate card details' : 'Add a new service pricing option'}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label>Category</Label>
+                <Select
+                  value={formData.category}
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
+                  <SelectTrigger className="border-gray-300 focus:ring-teal-500">
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {serviceCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Service Name</Label>
+                <Input
+                  value={formData.serviceName}
+                  onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
+                  placeholder="e.g., Corporate Video Production"
+                  className="border-gray-300 focus:ring-teal-500"
+                />
+              </div>
+              <div>
+                <Label>Description</Label>
+                <Textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  placeholder="Brief description of the service"
+                  rows={2}
+                  className="border-gray-300 focus:ring-teal-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label>Category</Label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) => setFormData({ ...formData, category: value })}
-                  >
-                    <SelectTrigger className="border-gray-300 focus:ring-teal-500">
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {serviceCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Service Name</Label>
-                  <Input
-                    value={formData.serviceName}
-                    onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
-                    placeholder="e.g., Corporate Video Production"
-                    className="border-gray-300 focus:ring-teal-500"
-                  />
-                </div>
-                <div>
-                  <Label>Description</Label>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Brief description of the service"
-                    rows={2}
-                    className="border-gray-300 focus:ring-teal-500"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>Price</Label>
+                  <Label>Price (GHS)</Label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₵</span>
                     <Input
                       value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      placeholder="e.g., GH₵ 1,500"
-                      className="border-gray-300 focus:ring-teal-500"
-                    />
-                  </div>
-                  <div>
-                    <Label>Duration (optional)</Label>
-                    <Input
-                      value={formData.duration}
-                      onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                      placeholder="e.g., 3 hours"
-                      className="border-gray-300 focus:ring-teal-500"
+                      onChange={(e) => setFormData({ ...formData, price: parseGHS(e.target.value) })}
+                      placeholder="1500"
+                      className="border-gray-300 focus:ring-teal-500 pl-8"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label>What's Included (one per line)</Label>
-                  <Textarea
-                    value={formData.includes}
-                    onChange={(e) => setFormData({ ...formData, includes: e.target.value })}
-                    placeholder="Up to 100 edited photos\nOnline gallery\nHigh-resolution downloads"
-                    rows={6}
-                    className="border-gray-300 focus:ring-teal-500"
-                  />
-                </div>
-                <div>
-                  <Label>Display Order</Label>
+                  <Label>Duration (optional)</Label>
                   <Input
-                    type="number"
-                    value={formData.order}
-                    onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
-                    placeholder="1"
+                    value={formData.duration}
+                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                    placeholder="e.g., 3 hours"
                     className="border-gray-300 focus:ring-teal-500"
                   />
                 </div>
-                <div className="flex items-center gap-2">
-                  <Switch
-                    checked={formData.featured}
-                    onCheckedChange={(checked) => setFormData({ ...formData, featured: checked })}
-                  />
-                  <Label>Mark as Featured/Popular</Label>
-                </div>
-                <Button
-                  onClick={handleSubmit}
-                  className="w-full bg-teal-500 hover:bg-teal-600"
-                >
-                  {editingCard ? 'Update Rate Card' : 'Create Rate Card'}
-                </Button>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <div>
+                <Label>What's Included (one per line)</Label>
+                <Textarea
+                  value={formData.includes}
+                  onChange={(e) => setFormData({ ...formData, includes: e.target.value })}
+                  placeholder="Up to 100 edited photos\nOnline gallery\nHigh-resolution downloads"
+                  rows={6}
+                  className="border-gray-300 focus:ring-teal-500"
+                />
+              </div>
+              <div>
+                <Label>Display Order</Label>
+                <Input
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
+                  placeholder="1"
+                  className="border-gray-300 focus:ring-teal-500"
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={formData.featured}
+                  onCheckedChange={(checked) => setFormData({ ...formData, featured: checked })}
+                />
+                <Label>Mark as Featured/Popular</Label>
+              </div>
+              <Button
+                onClick={handleSubmit}
+                className="w-full bg-teal-500 hover:bg-teal-600"
+              >
+                {editingCard ? 'Update Rate Card' : 'Create Rate Card'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rateCards.map((card) => (
-            <Card
-              key={card.id || card.serviceName}
-              className={card.featured ? 'border-2 border-teal-500' : 'border-gray-200'}
-            >
-              <CardHeader>
-                <div className="flex justify-between items-start mb-2">
-                  <Badge variant="outline" className="text-xs border-teal-300 text-teal-600">
-                    {card.category}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {rateCards.map((card) => (
+          <Card
+            key={card.id || card.serviceName}
+            className={card.featured ? 'border-2 border-teal-500' : 'border-gray-200'}
+          >
+            <CardHeader>
+              <div className="flex justify-between items-start mb-2">
+                <Badge variant="outline" className="text-xs border-teal-300 text-teal-600">
+                  {card.category}
+                </Badge>
+                {card.featured && (
+                  <Badge className="bg-teal-100 text-teal-700 flex items-center gap-1">
+                    <Star className="h-3 w-3" />
+                    Featured
                   </Badge>
-                  {card.featured && (
-                    <Badge className="bg-teal-100 text-teal-700 flex items-center gap-1">
-                      <Star className="h-3 w-3" />
-                      Featured
-                    </Badge>
-                  )}
-                </div>
-                <CardTitle className="text-lg text-gray-900">{card.serviceName}</CardTitle>
-                <CardDescription>{card.description}</CardDescription>
-                <div className="mt-3 flex items-baseline gap-2">
-                  <DollarSign className="h-4 w-4 text-teal-500" />
-                  <span className="text-2xl font-bold text-teal-500">{card.price}</span>
-                </div>
-                {card.duration && (
-                  <p className="text-sm text-gray-500 mt-1">{card.duration}</p>
                 )}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 mb-4">
-                  <p className="text-sm font-semibold text-gray-700">Includes:</p>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    {card.includes.map((item, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-teal-500">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="flex gap-2">
+              </div>
+              <CardTitle className="text-lg text-gray-900">{card.serviceName}</CardTitle>
+              <CardDescription>{card.description}</CardDescription>
+              <div className="mt-3 flex items-baseline gap-2">
+                <span className="text-2xl font-bold text-teal-500">{card.price}</span>
+              </div>
+              {card.duration && (
+                <p className="text-sm text-gray-500 mt-1">{card.duration}</p>
+              )}
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 mb-4">
+                <p className="text-sm font-semibold text-gray-700">Includes:</p>
+                <ul className="text-sm text-gray-600 space-y-1">
+                  {card.includes.map((item, index) => (
+                    <li key={index} className="flex items-start gap-2">
+                      <span className="text-teal-500">•</span>
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 border-teal-300 text-teal-500 hover:bg-teal-50"
+                  onClick={() => handleEdit(card)}
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </Button>
+                {card.id && (
                   <Button
                     variant="outline"
                     size="sm"
-                    className="flex-1 border-teal-300 text-teal-500 hover:bg-teal-50"
-                    onClick={() => handleEdit(card)}
+                    className="text-red-600 hover:bg-red-50 border-red-300"
+                    onClick={() => handleDelete(card.id!)}
                   >
-                    <Edit className="h-4 w-4 mr-1" />
-                    Edit
+                    <Trash2 className="h-4 w-4" />
                   </Button>
-                  {card.id && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-600 hover:bg-red-50 border-red-300"
-                      onClick={() => handleDelete(card.id!)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    
+    </div>
   );
 }
