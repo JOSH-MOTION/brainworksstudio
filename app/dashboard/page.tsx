@@ -86,7 +86,7 @@ export default function DashboardPage() {
       case 'accepted':
         return 'bg-teal-500 text-white hover:bg-teal-600';
       case 'rejected':
-        return 'bg-coral-500 text-white hover:bg-coral-600';
+        return 'bg-red-500 text-white hover:bg-coral-600';
       default:
         return 'bg-yellow-400 text-gray-900 hover:bg-yellow-500';
     }

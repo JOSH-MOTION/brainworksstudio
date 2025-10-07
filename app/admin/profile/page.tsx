@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { User, Camera, Mail, Phone, MapPin, Save, InstagramIcon, Twitter, Linkedin, AlertCircle, Users, Star } from 'lucide-react';
+import { User, Camera, Mail, Phone, MapPin, Save, InstagramIcon, Twitter, Linkedin, AlertCircle, Users,Star } from 'lucide-react';
 import { motion, Variants } from 'framer-motion';
 import { SocialLink, User as UserType } from '@/types';
 
@@ -27,7 +27,7 @@ const buttonVariants: Variants = {
   tap: { scale: 0.95 },
 };
 
-export default function ProfilePage() {
+export default function AdminProfilePage() {
   const { user, userProfile, updateUserProfile, isAdmin } = useAuth();
   const router = useRouter();
 
@@ -47,7 +47,7 @@ export default function ProfilePage() {
     address: '',
     profileImageUrl: '',
     description: '',
-    role: 'user',
+    role: 'admin',
     socials: [
       { platform: 'Instagram', url: '' },
       { platform: 'Twitter', url: '' },
@@ -62,7 +62,7 @@ export default function ProfilePage() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !isAdmin) {
       router.push('/auth/login');
       return;
     }
@@ -75,7 +75,7 @@ export default function ProfilePage() {
         address: userProfile.address || '',
         profileImageUrl: userProfile.profileImageUrl || '',
         description: userProfile.description || '',
-        role: userProfile.role || 'user',
+        role: userProfile.role || 'admin',
         socials: userProfile.socials || [
           { platform: 'Instagram', url: '' },
           { platform: 'Twitter', url: '' },
@@ -84,7 +84,7 @@ export default function ProfilePage() {
       });
       setImagePreview(userProfile.profileImageUrl || '');
     }
-  }, [user, userProfile, router]);
+  }, [user, userProfile, isAdmin, router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -152,10 +152,8 @@ export default function ProfilePage() {
         profileImageUrl,
         description: formData.description,
         socials: formData.socials.filter((s) => s.url.trim() !== ''),
+        role: formData.role,
       };
-      if (isAdmin) {
-        updatedProfile.role = formData.role;
-      }
 
       await updateUserProfile(updatedProfile);
       setSuccess(true);
@@ -168,7 +166,7 @@ export default function ProfilePage() {
     }
   };
 
-  if (!user) {
+  if (!user || !isAdmin) {
     return null;
   }
 
@@ -179,10 +177,10 @@ export default function ProfilePage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-6 w-6" />
-              Profile Settings
+              Admin Profile Settings
             </CardTitle>
             <CardDescription>
-              Update your personal information for Brain Works Studio
+              Manage your admin profile and position for Brain Works Studio
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -273,28 +271,26 @@ export default function ProfilePage() {
                   </p>
                 </motion.div>
               </div>
-              {isAdmin && (
-                <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="role">
-                    <Users className="inline h-4 w-4 mr-1" />
-                    Position
-                  </Label>
-                  <select
-                    id="role"
-                    name="role"
-                    value={formData.role}
-                    onChange={handleChange}
-                    className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
-                  >
-                    <option value="user">Client</option>
-                    <option value="admin">Studio Manager</option>
-                    <option value="photographer">Photographer</option>
-                    <option value="ceo">CEO</option>
-                    <option value="director">Director</option>
-                    <option value="cinematographer">Cinematographer</option>
-                  </select>
-                </motion.div>
-              )}
+              <motion.div variants={inputVariants} className="space-y-2">
+                <Label htmlFor="role">
+                  <Users className="inline h-4 w-4 mr-1" />
+                  Position
+                </Label>
+                <select
+                  id="role"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500"
+                >
+                  <option value="user">Client</option>
+                  <option value="admin">Studio Manager</option>
+                  <option value="photographer">Photographer</option>
+                  <option value="ceo">CEO</option>
+                  <option value="director">Director</option>
+                  <option value="cinematographer">Cinematographer</option>
+                </select>
+              </motion.div>
               <motion.div variants={inputVariants} className="space-y-2">
                 <Label htmlFor="phone">
                   <Phone className="inline h-4 w-4 mr-1" />
@@ -375,45 +371,6 @@ export default function ProfilePage() {
                 </Button>
               </motion.div>
             </form>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Account Information</CardTitle>
-            <CardDescription>Additional details about your account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Account Type:</span>
-                <span className="font-medium">
-                  {userProfile?.role === 'admin'
-                    ? 'Studio Manager'
-                    : userProfile?.role === 'photographer'
-                    ? 'Photographer'
-                    : userProfile?.role === 'ceo'
-                    ? 'CEO'
-                    : userProfile?.role === 'director'
-                    ? 'Director'
-                    : userProfile?.role === 'cinematographer'
-                    ? 'Cinematographer'
-                    : 'Client'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Member Since:</span>
-                <span className="font-medium">
-                  {userProfile?.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'Unknown'}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">User ID:</span>
-                <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                  {user.uid}
-                </span>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </motion.div>

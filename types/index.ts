@@ -1,3 +1,13 @@
+// types/index.ts
+import { LucideIcon } from 'lucide-react';
+
+export type SocialPlatform = 'Instagram' | 'Twitter' | 'LinkedIn';
+
+export interface SocialLink {
+  platform: SocialPlatform;
+  url: string;
+}
+
 export interface User {
   uid: string;
   displayName: string;
@@ -9,8 +19,10 @@ export interface User {
     lng: number;
   };
   profileImageUrl?: string;
-  role: 'user' | 'admin';
+  role: 'user' | 'admin' | 'photographer' | 'ceo' | 'director' | 'cinematographer'; // Updated positions
   createdAt: Date;
+  description?: string;
+  socials?: SocialLink[];
 }
 
 export interface Booking {
@@ -30,6 +42,15 @@ export interface Booking {
   adminNotes?: string;
   createdAt: Date;
   updatedAt: Date;
+}
+
+interface TeamMember {
+  id: string;
+  displayName: string;
+  role: string;
+  description: string;
+  profileImageUrl: string;
+  socials: { platform: SocialPlatform; url: string; icon: LucideIcon }[]; // Use LucideIcon instead of React.ComponentType
 }
 
 export interface PortfolioItem {

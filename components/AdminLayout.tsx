@@ -1,11 +1,10 @@
-// components/AdminLayout.tsx
 'use client';
 
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder, FileText, DollarSign, Star } from 'lucide-react';
+import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder, FileText, DollarSign, Star, User } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -75,33 +74,33 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
             <div className="flex justify-between items-center h-16">
               {/* Logo */}
               <Link href="/admin" className="flex items-center space-x-2">
-  <motion.div
-    whileHover={{ scale: 1.1 }}
-    transition={{ duration: 0.3 }}
-  >
-    <Image
-      src="/brain1.png"     // 👈 your logo from public/
-      alt="Brain Works Studio Logo"
-      width={32}            // adjust size as needed
-      height={32}
-      // className="filter invert-[0.35] sepia-[1] saturate-[8] hue-rotate-[140deg]" // teal tint
-    />
-  </motion.div>
-  <span className="text-base font-bold text-white">
-    Brain Works Studio
-  </span>
-</Link>
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Image
+                    src="/brain1.png"
+                    alt="Brain Works Studio Logo"
+                    width={32}
+                    height={32}
+                  />
+                </motion.div>
+                <span className="text-base font-bold text-white">
+                  Brain Works Studio
+                </span>
+              </Link>
 
               {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center space-x-6">
                 {[
-                  { href: '/admin', label: 'Dashboard' },
-                  { href: '/admin/bookings', label: 'Bookings' },
-                  { href: '/admin/portfolio', label: 'Portfolio' },
-                  { href: '/admin/blog', label: 'Blog' },
-                  { href: '/admin/pricing', label: 'Pricing' },
-                  { href: '/admin/reviews', label: 'Reviews' },
-                  { href: '/admin/users', label: 'Clients' },
+                  { href: '/admin', label: 'Dashboard', icon: Settings },
+                  { href: '/admin/bookings', label: 'Bookings', icon: Calendar },
+                  { href: '/admin/portfolio', label: 'Portfolio', icon: Folder },
+                  { href: '/admin/blog', label: 'Blog', icon: FileText },
+                  { href: '/admin/pricing', label: 'Pricing', icon: DollarSign },
+                  { href: '/admin/reviews', label: 'Reviews', icon: Star },
+                  { href: '/admin/users', label: 'Clients', icon: Users },
+                  { href: '/admin/profile', label: 'Profile', icon: User }, // Updated to /admin/profile
                 ].map((item, index) => (
                   <motion.div
                     key={item.href}
@@ -166,6 +165,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       { href: '/admin/pricing', label: 'Pricing', icon: DollarSign },
                       { href: '/admin/reviews', label: 'Reviews', icon: Star },
                       { href: '/admin/users', label: 'Clients', icon: Users },
+                      { href: '/admin/profile', label: 'Profile', icon: User }, // Updated to /admin/profile
                     ].map((item, index) => (
                       <motion.div
                         key={item.href}
@@ -187,10 +187,10 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       </motion.div>
                     ))}
                     <motion.button
-                      custom={7}
+                      custom={8}
                       initial={{ opacity: 0, x: 15 }}
                       animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.3, delay: 0.7 }}
+                      transition={{ duration: 0.3, delay: 0.8 }}
                       onClick={() => {
                         signOut();
                         setMobileMenuOpen(false);

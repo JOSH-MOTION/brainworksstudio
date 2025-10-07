@@ -1,14 +1,14 @@
-// hooks/useAuth.ts
 'use client';
 
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { 
-  User as FirebaseUser, 
-  signInWithEmailAndPassword, 
+import {
+  User as FirebaseUser,
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut as firebaseSignOut,
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  sendPasswordResetEmail as firebaseSendPasswordResetEmail,
 } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
@@ -23,6 +23,7 @@ interface UseAuthReturn {
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   updateUserProfile: (userData: Partial<User>) => Promise<void>;
+  sendPasswordResetEmail: (email: string) => Promise<void>;
   isAdmin: boolean;
   refreshUserProfile: () => Promise<void>;
 }
@@ -95,11 +96,11 @@ function useAuthInternal(): UseAuthReturn {
 
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       console.log('Auth state changed:', firebaseUser?.uid || 'No user');
-      
+
       try {
         if (firebaseUser) {
           setFirebaseUser(firebaseUser);
-          
+
           if (!db) {
             console.warn('Firestore not initialized');
             setLoading(false);
@@ -158,7 +159,7 @@ function useAuthInternal(): UseAuthReturn {
 
     try {
       const { user: firebaseUser } = await createUserWithEmailAndPassword(auth, email, password);
-      
+
       if (userData.displayName) {
         await updateProfile(firebaseUser, { displayName: userData.displayName });
       }
@@ -236,6 +237,24 @@ function useAuthInternal(): UseAuthReturn {
     }
   };
 
+  const sendPasswordResetEmail = async (email: string) => {
+    if (!auth) {
+      throw new Error('Firebase Auth not initialized. Please check your configuration.');
+    }
+
+    try {
+      await firebaseSendPasswordResetEmail(auth, email);
+      console.log('Password reset email sent to:', email); // Debug log
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      throw new Error(
+        error.code === 'auth/invalid-email' ? 'Invalid email address' :
+        error.code === 'auth/user-not-found' ? 'No account found with this email' :
+        error.message || 'An error occurred while sending the reset email'
+      );
+    }
+  };
+
   return {
     user,
     firebaseUser,
@@ -245,6 +264,7 @@ function useAuthInternal(): UseAuthReturn {
     signIn,
     signOut,
     updateUserProfile,
+    sendPasswordResetEmail,
     refreshUserProfile,
     isAdmin: user?.role === 'admin',
   };

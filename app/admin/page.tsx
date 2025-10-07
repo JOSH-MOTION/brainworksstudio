@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
-import { Calendar, Users, Clock, TrendingUp, Shield, AlertCircle, Settings, Moon, Sun, User } from 'lucide-react';
+import { Calendar, Users, Clock, TrendingUp, AlertCircle, Settings, Moon, Sun, User, Edit } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion, Variants } from 'framer-motion';
@@ -41,11 +41,11 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     console.log('AdminDashboard: User state:', { user, firebaseUser, userProfile, isAdmin });
-    if (!loading && (!user || !isAdmin)) {
-      console.log('No user or not admin, redirecting to /auth/login');
+    if (!loading && !user) {
+      console.log('No user, redirecting to /auth/login');
       router.push('/auth/login');
     }
-  }, [user, isAdmin, loading, router]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     if (user && isAdmin) {
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
         setStats({
           pendingBookings: bookings.filter((b: any) => b.status === 'pending').length,
           totalBookings: bookings.length,
-          totalUsers: 0, // Update if API provides user count
+          totalUsers: 0,
           recentActivity: bookings.slice(0, 3),
         });
       } else {
@@ -102,7 +102,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!user || !isAdmin) {
+  if (!user) {
     return null;
   }
 
@@ -141,8 +141,19 @@ export default function AdminDashboard() {
             )}
             <div>
               <h1 className="text-2xl font-bold text-teal-900 dark:text-teal-300">Studio Dashboard</h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Welcome, {userProfile?.displayName || user.displayName || 'Admin'}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Welcome, {userProfile?.displayName || user.displayName || 'User'}</p>
             </div>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Link href="/admin/profile">
+                <Button
+                  variant="outline"
+                  className="ml-4 border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-900 rounded-full"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Profile
+                </Button>
+              </Link>
+            </motion.div>
           </div>
           <Button
             onClick={toggleTheme}
