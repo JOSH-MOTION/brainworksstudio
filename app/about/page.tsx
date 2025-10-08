@@ -38,9 +38,20 @@ const cardVariants: Variants = {
   hover: {
     scale: 1.05,
     y: -5,
-    boxShadow: '0 12px 24px rgba(0, 128, 128, 0.2)',
-    borderColor: '#f59e0b',
     transition: { duration: 0.3, type: 'spring', stiffness: 150 },
+  },
+};
+
+const logoVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: (index: number) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, delay: index * 0.05, ease: 'easeOut' },
+  }),
+  hover: {
+    scale: 1.1,
+    transition: { duration: 0.2, type: 'spring', stiffness: 300 },
   },
 };
 
@@ -86,6 +97,12 @@ interface TeamMember {
   socials: { platform: 'Instagram' | 'Twitter' | 'LinkedIn'; url: string; icon: LucideIcon }[];
 }
 
+interface Client {
+  name: string;
+  logo: string;
+  category: string;
+}
+
 const iconMap: Record<'Instagram' | 'Twitter' | 'LinkedIn', LucideIcon> = {
   Instagram: InstagramIcon,
   Twitter,
@@ -109,7 +126,7 @@ const teamMembers: TeamMember[] = [
     name: 'Michael Otoo Bekoe',
     position: 'Director - Cinematographer',
     years: '5+',
-    description: 'With a deep passion for storytelling, I capture life’s most meaningful moments through cinematic visuals that inspire emotion and connection. Every project is an opportunity to create timeless memories that speak beyond words.',
+    description: "With a deep passion for storytelling, I capture life's most meaningful moments through cinematic visuals that inspire emotion and connection. Every project is an opportunity to create timeless memories that speak beyond words.",
     profileImageUrl: '/mic.jpg',
     socials: [
       { platform: 'Instagram', url: 'https://www.instagram.com/bekoe.films?igsh=MWVlZzdmOHJ5enR3OA%3D%3D&utm_source=qr', icon: InstagramIcon },
@@ -155,6 +172,18 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
+// Add your actual client logos here
+const clients: Client[] = [
+  { name: 'Company A', logo: '/clients/client-1.png', category: 'Corporate' },
+  { name: 'Codetrain Africa', logo: '/code.png', category: 'Fashion' },
+  { name: 'Company C', logo: '/clients/client-3.png', category: 'Events' },
+  { name: 'Company D', logo: '/clients/client-4.png', category: 'Product' },
+  { name: 'Company E', logo: '/clients/client-5.png', category: 'Corporate' },
+  { name: 'Company F', logo: '/clients/client-6.png', category: 'Events' },
+  { name: 'Company G', logo: '/clients/client-7.png', category: 'Fashion' },
+  { name: 'Company H', logo: '/clients/client-8.png', category: 'Product' },
+];
+
 export default function AboutPage() {
   const headingText = 'Our Creative Journey'.split(' ');
 
@@ -175,7 +204,7 @@ export default function AboutPage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-teal-50 to-amber-50 py-12 md:py-24">
+      <section className="relative bg-gradient-to-br from-teal-50 to-teal-100 py-12 md:py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             variants={heroContentVariants}
@@ -204,7 +233,7 @@ export default function AboutPage() {
               transition={{ delay: 0.5, duration: 0.5 }}
             >
               <Link href="/contact">
-                <Button className="bg-amber-700 hover:bg-amber-800 text-white px-6 py-3 rounded-lg text-lg">
+                <Button className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 rounded-lg text-lg">
                   Get in Touch
                 </Button>
               </Link>
@@ -225,7 +254,7 @@ export default function AboutPage() {
           >
             <h2 className="text-3xl font-bold text-teal-900 mb-4">Our Story</h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
-              Founded in 2010, Brain Works Studio began as a small team of passionate photographers dedicated to capturing life’s most meaningful moments. Over the years, we’ve grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
+              Founded in 2010, Brain Works Studio began as a small team of passionate photographers dedicated to capturing life's most meaningful moments. Over the years, we've grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
             </p>
           </motion.div>
           <motion.div
@@ -236,17 +265,17 @@ export default function AboutPage() {
             className="grid grid-cols-1 md:grid-cols-2 gap-8"
           >
             <motion.div variants={cardVariants}>
-              <Card className="bg-teal-50 border border-amber-200 shadow-sm">
+              <Card className="bg-teal-50 border border-teal-200 shadow-sm">
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold text-teal-900 mb-2">Our Mission</h3>
                   <p className="text-gray-600">
-                    To create timeless memories through exceptional photography, tailored to each client’s unique vision.
+                    To create timeless memories through exceptional photography, tailored to each client's unique vision.
                   </p>
                 </CardContent>
               </Card>
             </motion.div>
             <motion.div variants={cardVariants}>
-              <Card className="bg-teal-50 border border-amber-200 shadow-sm">
+              <Card className="bg-teal-50 border border-teal-200 shadow-sm">
                 <CardContent className="p-6">
                   <h3 className="text-xl font-semibold text-teal-900 mb-2">Our Vision</h3>
                   <p className="text-gray-600">
@@ -260,7 +289,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-12 bg-gradient-to-br from-teal-50 to-amber-50">
+      <section className="py-12 bg-gradient-to-br from-teal-50 to-teal-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={sectionVariants}
@@ -284,9 +313,9 @@ export default function AboutPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <Card className="bg-white shadow-sm border border-amber-200 hover:bg-teal-50 transition-colors">
+                <Card className="bg-white shadow-sm border border-teal-200 hover:bg-teal-50 transition-colors">
                   <CardContent className="p-6 text-center">
-                    <value.icon className="h-10 w-10 mx-auto text-amber-700 mb-4" />
+                    <value.icon className="h-10 w-10 mx-auto text-teal-600 mb-4" />
                     <h3 className="text-lg font-semibold text-teal-900 mb-2">{value.title}</h3>
                     <p className="text-gray-600 text-sm">{value.description}</p>
                   </CardContent>
@@ -324,10 +353,10 @@ export default function AboutPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <Card className="relative bg-white rounded-2xl shadow-lg border border-teal-200 hover:border-amber-400 transition-all">
+                <Card className="bg-white rounded-2xl shadow-lg border border-teal-200 hover:border-teal-400 hover:shadow-xl transition-all overflow-hidden">
                   <CardContent className="p-6 text-center">
                     <motion.div
-                      className="w-28 h-28 mx-auto mb-4 relative rounded-full overflow-hidden border-4 border-amber-200"
+                      className="w-28 h-28 mx-auto mb-4 relative rounded-full overflow-hidden border-4 border-teal-200"
                       whileHover={{ scale: 1.1, rotate: 4 }}
                       transition={{ type: 'spring', stiffness: 200, damping: 10 }}
                     >
@@ -353,7 +382,7 @@ export default function AboutPage() {
                     <motion.p
                       custom={1}
                       variants={teamContentVariants}
-                      className="text-amber-700 text-sm font-semibold mb-2"
+                      className="text-teal-600 text-sm font-semibold mb-2"
                     >
                       {member.position}
                     </motion.p>
@@ -388,7 +417,7 @@ export default function AboutPage() {
                           initial="hidden"
                           animate="visible"
                         >
-                          <social.icon className="h-6 w-6 text-teal-600 hover:text-amber-700 transition-colors" />
+                          <social.icon className="h-6 w-6 text-teal-600 hover:text-teal-800 transition-colors" />
                         </motion.a>
                       ))}
                     </motion.div>
@@ -400,8 +429,72 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Clients & Partners Section */}
+      <section className="py-12 bg-gradient-to-br from-teal-50 to-teal-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={sectionVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-bold text-teal-900 mb-4">Trusted By</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              We're proud to have worked with amazing brands and businesses across various industries.
+            </p>
+          </motion.div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6">
+            {clients.map((client, index) => (
+              <motion.div
+                key={client.name}
+                custom={index}
+                variants={logoVariants}
+                whileHover="hover"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+              >
+                <Card className="bg-white border border-teal-200 shadow-sm hover:shadow-md transition-all">
+                  <CardContent className="p-6 flex items-center justify-center h-32">
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <Image
+                        src={client.logo}
+                        alt={client.name}
+                        fill
+                        className="object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
+                        onError={(e) => {
+                          // Fallback to text if image fails
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.innerHTML = `<p class="text-teal-900 font-semibold text-center">${client.name}</p>`;
+                          }
+                        }}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="text-center mt-8"
+          >
+            <p className="text-sm text-gray-500">
+              And many more amazing clients...
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
       {/* Statistics Section */}
-      <section className="py-12 bg-gradient-to-br from-teal-50 to-amber-50">
+      <section className="py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={sectionVariants}
@@ -425,9 +518,9 @@ export default function AboutPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <Card className="bg-white shadow-sm border border-amber-200 text-center">
+                <Card className="bg-white shadow-sm border border-teal-200 text-center">
                   <CardContent className="p-6">
-                    <stat.icon className="h-10 w-10 mx-auto text-amber-700 mb-4" />
+                    <stat.icon className="h-10 w-10 mx-auto text-teal-600 mb-4" />
                     <p className="text-2xl font-bold text-teal-900">{stat.value}</p>
                     <p className="text-gray-600 text-sm">{stat.label}</p>
                   </CardContent>
@@ -439,7 +532,7 @@ export default function AboutPage() {
       </section>
 
       {/* Service Areas Section */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-gradient-to-br from-teal-50 to-teal-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             variants={sectionVariants}
@@ -460,7 +553,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {['New York, NY', 'Los Angeles, CA', 'Chicago, IL'].map((location, index) => (
+            {['Ghana, Accra', 'Los Angeles, CA', 'Chicago, IL'].map((location, index) => (
               <motion.div
                 key={location}
                 custom={index}
@@ -469,9 +562,9 @@ export default function AboutPage() {
                 whileInView="visible"
                 viewport={{ once: true }}
               >
-                <Card className="bg-teal-50 border border-amber-200 shadow-sm text-center">
+                <Card className="bg-white border border-teal-200 shadow-sm text-center">
                   <CardContent className="p-6">
-                    <MapPin className="h-8 w-8 mx-auto text-amber-700 mb-4" />
+                    <MapPin className="h-8 w-8 mx-auto text-teal-600 mb-4" />
                     <p className="text-lg font-semibold text-teal-900">{location}</p>
                   </CardContent>
                 </Card>
@@ -482,7 +575,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-12 bg-amber-700 text-white">
+      <section className="py-12 bg-teal-600 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div
             variants={sectionVariants}
@@ -492,10 +585,10 @@ export default function AboutPage() {
           >
             <h2 className="text-3xl font-bold mb-4">Ready to Capture Your Moments?</h2>
             <p className="text-lg mb-6 max-w-2xl mx-auto">
-              Let’s create something extraordinary together. Book your session today!
+              Let's create something extraordinary together. Book your session today!
             </p>
             <Link href="/booking">
-              <Button className="bg-white text-amber-700 hover:bg-gray-100 px-6 py-3 rounded-lg text-lg">
+              <Button className="bg-white text-teal-600 hover:bg-gray-100 px-6 py-3 rounded-lg text-lg">
                 Book Now
               </Button>
             </Link>
