@@ -146,25 +146,45 @@ export async function POST(request: NextRequest) {
     const imageUrls: string[] = [];
     let uploadedVideoUrl: string | null = null;
 
-    // Process uploaded video files
-    if (files && files.length > 0) {
-      console.log(`POST /api/portfolio: Processing ${files.length} video files`);
-
+    // FIXED: Process files based on type
+    if (type === 'photography') {
+      // Process image files for photography
+      console.log(`POST /api/portfolio: Processing ${files.length} image files for photography`);
       for (const file of files) {
         if (file.size === 0) {
           console.warn('POST /api/portfolio: Skipping empty file');
           continue;
         }
-
-        console.log(`POST /api/portfolio: Uploading video file - Name: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
-        const result = await uploadToImageKit(file, `${title || 'video'}-${Date.now()}.mp4`, '/brain-works-studio');
-        uploadedVideoUrl = result.url;
-        console.log(`POST /api/portfolio: Stored video in videoUrl: ${result.url}`);
+        if (!file.type.startsWith('image/')) {
+          console.warn(`POST /api/portfolio: Skipping non-image file for photography: ${file.name}`);
+          continue;
+        }
+        console.log(`POST /api/portfolio: Uploading image - Name: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
+        const result = await uploadToImageKit(file, file.name, '/brain-works-studio');
+        imageUrls.push(result.url);
+        console.log(`POST /api/portfolio: Stored image in imageUrls: ${result.url}`);
       }
-    }
+    } else if (type === 'videography') {
+      // Process video files for videography
+      if (files && files.length > 0) {
+        console.log(`POST /api/portfolio: Processing ${files.length} video files for videography`);
+        for (const file of files) {
+          if (file.size === 0) {
+            console.warn('POST /api/portfolio: Skipping empty file');
+            continue;
+          }
+          if (!file.type.startsWith('video/')) {
+            console.warn(`POST /api/portfolio: Skipping non-video file for videography: ${file.name}`);
+            continue;
+          }
+          console.log(`POST /api/portfolio: Uploading video file - Name: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
+          const result = await uploadToImageKit(file, `${title || 'video'}-${Date.now()}.mp4`, '/brain-works-studio');
+          uploadedVideoUrl = result.url;
+          console.log(`POST /api/portfolio: Stored video in videoUrl: ${result.url}`);
+        }
+      }
 
-    // Process thumbnail for videography
-    if (type === 'videography') {
+      // Process thumbnail for videography
       if (thumbnail) {
         console.log(`POST /api/portfolio: Uploading thumbnail - Name: ${thumbnail.name}, Type: ${thumbnail.type}, Size: ${thumbnail.size}`);
         const thumbnailResult = await uploadToImageKit(thumbnail, `${title || 'thumbnail'}-${Date.now()}.jpg`, '/brain-works-studio/thumbnails');
@@ -176,17 +196,6 @@ export async function POST(request: NextRequest) {
       } else {
         imageUrls.push('/video-placeholder.jpg');
         console.log('POST /api/portfolio: No thumbnail provided, using placeholder');
-      }
-    } else if (type === 'photography') {
-      // Process image files for photography
-      for (const file of files) {
-        if (!file.type.startsWith('image/')) {
-          console.warn(`POST /api/portfolio: Skipping non-image file for photography: ${file.name}`);
-          continue;
-        }
-        const result = await uploadToImageKit(file, file.name, '/brain-works-studio');
-        imageUrls.push(result.url);
-        console.log(`POST /api/portfolio: Stored image in imageUrls: ${result.url}`);
       }
     }
 

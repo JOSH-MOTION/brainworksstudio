@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description:
     'Professional photography and videography services for events, portraits, products, and commercial work.',
   icons: {
-    icon: '/brain1.png', // 👈 Add your logo here
+    icon: '/brain.jpeg', // 👈 Add your logo here
   },
 };
 
