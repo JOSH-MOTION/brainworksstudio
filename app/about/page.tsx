@@ -174,14 +174,18 @@ const teamMembers: TeamMember[] = [
 
 // Add your actual client logos here
 const clients: Client[] = [
-  { name: 'Company A', logo: '/clients/client-1.png', category: 'Corporate' },
+  { name: 'Modulo', logo: '/modulo.png', category: 'Corporate' },
   { name: 'Codetrain Africa', logo: '/code.png', category: 'Fashion' },
-  { name: 'Company C', logo: '/clients/client-3.png', category: 'Events' },
-  { name: 'Company D', logo: '/clients/client-4.png', category: 'Product' },
-  { name: 'Company E', logo: '/clients/client-5.png', category: 'Corporate' },
-  { name: 'Company F', logo: '/clients/client-6.png', category: 'Events' },
-  { name: 'Company G', logo: '/clients/client-7.png', category: 'Fashion' },
-  { name: 'Company H', logo: '/clients/client-8.png', category: 'Product' },
+  { name: 'StairCase Restruarant', logo: '/stair.jpg', category: 'Events' },
+  { name: 'Mahogany', logo: '/Maho.jpg', category: 'Product' },
+  { name: 'gcba', logo: '/gcba.jpg', category: 'Corporate' },
+  { name: 'cfa', logo: '/cfa.jpg', category: 'Events' },
+  { name: 'ESC', logo: '/ESC.jpg', category: 'Fashion' },
+  { name: 'pay', logo: '/pay.jpg', category: 'Product' },
+  { name: 'we', logo: '/we.jpg', category: 'Product' },
+  { name: 're', logo: '/re.jpg', category: 'Product' },
+  { name: 'ag', logo: '/ag.jpg', category: 'Product' },
+  { name: 'blue', logo: '/blue.jpg', category: 'Product' }
 ];
 
 export default function AboutPage() {
@@ -462,7 +466,7 @@ export default function AboutPage() {
                         src={client.logo}
                         alt={client.name}
                         fill
-                        className="object-contain grayscale hover:grayscale-0 transition-all duration-300"
+                        className="object-contain  hover:grayscale-0 transition-all duration-300"
                         sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
                         onError={(e) => {
                           // Fallback to text if image fails
