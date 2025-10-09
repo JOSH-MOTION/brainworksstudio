@@ -179,7 +179,7 @@ const clients: Client[] = [
   { name: 'StairCase Restruarant', logo: '/stair.jpg', category: 'Events' },
   { name: 'Mahogany', logo: '/Maho.jpg', category: 'Product' },
   { name: 'gcba', logo: '/gcba.jpg', category: 'Corporate' },
-  { name: 'cfa', logo: '/cfa.jpg', category: 'Events' },
+  { name: 'cfa', logo: '/Cfa.jpg', category: 'Events' },
   { name: 'ESC', logo: '/ESC.jpg', category: 'Fashion' },
   { name: 'pay', logo: '/pay.jpg', category: 'Product' },
   { name: 'we', logo: '/we.jpg', category: 'Product' },
