@@ -5,7 +5,14 @@ import { AuthProvider } from '@/hooks/useAuth';
 
 const inter = Inter({ subsets: ['latin'] });
 
+// --- FIX: Define BASE_URL and metadataBase to resolve absolute paths ---
+const BASE_URL = 'https://brainworksstudioafrica.com';
+// ---------------------------------------------------------------------
+
 export const metadata: Metadata = {
+  // --- ADDED: This resolves the 'metadataBase is not set' warning ---
+  metadataBase: new URL(BASE_URL),
+  // ------------------------------------------------------------------
   title: 'Brain Works Studio Africa – Professional Photography & Videography',
   description:
     'Brain Works Studio Africa offers professional photography and videography services for events, portraits, products, and commercial projects across Ghana and Africa.',
@@ -25,11 +32,11 @@ export const metadata: Metadata = {
     title: 'Brain Works Studio Africa',
     description:
       'Professional photography, videography, and storytelling across Ghana and Africa.',
-    url: 'https://brainworksstudioafrica.com',
+    url: BASE_URL, // Using BASE_URL constant for consistency
     siteName: 'Brain Works Studio Africa',
     images: [
       {
-        url: '/brain.jpeg',
+        url: '/brain.jpeg', // Now correctly resolves as absolute URL
         width: 1200,
         height: 630,
         alt: 'Brain Works Studio Africa logo',
@@ -43,11 +50,11 @@ export const metadata: Metadata = {
     title: 'Brain Works Studio Africa',
     description:
       'Photography, videography, and creative storytelling across Ghana and Africa.',
-    images: ['/brain.jpeg'],
+    images: ['/brain.jpeg'], // Now correctly resolves as absolute URL
   },
   other: {
-    // 👇 Replace this with your real Google Search Console code
-    'google-site-verification': 'YOUR_VERIFICATION_CODE_HERE',
+    // ✅ CORRECTED: Use the meta name as the key and the verification token as the value.
+    'google-site-verification': 'google7ba9027710f6a9e6',
   },
 };
 
