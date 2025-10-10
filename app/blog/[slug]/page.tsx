@@ -1,4 +1,3 @@
-// app/blog/[slug]/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -28,24 +27,38 @@ export default function BlogPostPage() {
   const slug = params.slug as string;
   const [post, setPost] = useState<BlogPost | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (slug) {
       fetchPost();
+    } else {
+      setError('No slug provided');
+      setLoading(false);
     }
   }, [slug]);
 
   const fetchPost = async () => {
     try {
-      const response = await fetch(`/api/blog?slug=${slug}&published=true`);
-      if (response.ok) {
-        const data = await response.json();
-        if (data.length > 0) {
-          setPost(data[0]);
-        }
+      console.log('Fetching post for slug:', slug);
+      const response = await fetch(`/api/blog?slug=${slug}&published=true`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      console.log('API response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch post: ${response.statusText}`);
       }
-    } catch (error) {
+      const data = await response.json();
+      console.log('API response data:', data);
+      if (data.length > 0) {
+        setPost(data[0]);
+      } else {
+        throw new Error('Post not found');
+      }
+    } catch (error: any) {
       console.error('Error fetching blog post:', error);
+      setError(error.message || 'Failed to load post');
     } finally {
       setLoading(false);
     }
@@ -61,13 +74,14 @@ export default function BlogPostPage() {
     );
   }
 
-  if (!post) {
+  if (error || !post) {
     return (
       <Layout>
         <div className="max-w-4xl mx-auto py-12 px-4 text-center">
           <h1 className="text-3xl font-bold text-teal-900 mb-4">Post Not Found</h1>
+          <p className="text-red-600 mb-4">{error || 'The requested blog post could not be found.'}</p>
           <Link href="/blog">
-            <Button className="bg-coral-500 hover:bg-coral-600">
+            <Button className="bg-coral-500 hover:bg-coral-600 text-white">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Blog
             </Button>
@@ -97,7 +111,7 @@ export default function BlogPostPage() {
         >
           <Image
             src={post.featuredImage || '/placeholder-image.jpg'}
-            alt={post.title}
+            alt={post.title || 'Blog post image'}
             fill
             className="object-cover"
           />
@@ -111,26 +125,34 @@ export default function BlogPostPage() {
           className="mb-8"
         >
           <div className="flex items-center gap-2 mb-4">
-            <Badge className="bg-coral-100 text-coral-600">{post.category}</Badge>
-            {post.tags.map((tag) => (
+            <Badge className="bg-coral-100 text-coral-600">{post.category || 'Uncategorized'}</Badge>
+            {post.tags?.map((tag) => (
               <Badge key={tag} variant="outline" className="border-teal-300 text-teal-600">
                 {tag}
               </Badge>
             ))}
           </div>
-          <h1 className="text-4xl font-bold text-teal-900 mb-4">{post.title}</h1>
+          <h1 className="text-4xl font-bold text-teal-900 mb-4">{post.title || 'Untitled'}</h1>
           <div className="flex items-center gap-6 text-gray-600">
             <div className="flex items-center gap-2">
               <User className="h-5 w-5" />
-              <span>{post.author.name}</span>
+              <span>{post.author?.name || 'Unknown Author'}</span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5" />
-              <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+              <span>
+                {post.createdAt
+                  ? new Date(post.createdAt).toLocaleDateString()
+                  : 'Unknown Date'}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-5 w-5" />
-              <span>{Math.ceil(post.content.split(' ').length / 200)} min read</span>
+              <span>
+                {post.content
+                  ? `${Math.ceil(post.content.split(' ').length / 200)} min read`
+                  : 'N/A'}
+              </span>
             </div>
           </div>
         </motion.div>
@@ -141,8 +163,13 @@ export default function BlogPostPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
           className="prose prose-lg max-w-none"
-          dangerouslySetInnerHTML={{ __html: post.content }}
-        />
+        >
+          {post.content ? (
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          ) : (
+            <p className="text-gray-600 italic">No content available for this post.</p>
+          )}
+        </motion.div>
 
         {/* Share Section */}
         <motion.div
@@ -159,7 +186,7 @@ export default function BlogPostPage() {
               onClick={() => {
                 if (navigator.share) {
                   navigator.share({
-                    title: post.title,
+                    title: post.title || 'Blog Post',
                     url: window.location.href,
                   });
                 }
