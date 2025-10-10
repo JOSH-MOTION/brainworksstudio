@@ -5,14 +5,12 @@ import { AuthProvider } from '@/hooks/useAuth';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// --- FIX: Define BASE_URL and metadataBase to resolve absolute paths ---
+// --- Define BASE_URL ---
 const BASE_URL = 'https://brainworksstudioafrica.com';
-// ---------------------------------------------------------------------
 
 export const metadata: Metadata = {
-  // --- ADDED: This resolves the 'metadataBase is not set' warning ---
   metadataBase: new URL(BASE_URL),
-  // ------------------------------------------------------------------
+
   title: 'Brain Works Studio Africa – Professional Photography & Videography',
   description:
     'Brain Works Studio Africa offers professional photography and videography services for events, portraits, products, and commercial projects across Ghana and Africa.',
@@ -26,17 +24,17 @@ export const metadata: Metadata = {
     'photo studio Accra',
   ],
   icons: {
-    icon: '/brain.jpeg',
+    icon: '/brain.jpeg', // ✅ your logo
   },
   openGraph: {
     title: 'Brain Works Studio Africa',
     description:
       'Professional photography, videography, and storytelling across Ghana and Africa.',
-    url: BASE_URL, // Using BASE_URL constant for consistency
+    url: BASE_URL,
     siteName: 'Brain Works Studio Africa',
     images: [
       {
-        url: '/brain.jpeg', // Now correctly resolves as absolute URL
+        url: `${BASE_URL}/brain.jpeg`,
         width: 1200,
         height: 630,
         alt: 'Brain Works Studio Africa logo',
@@ -50,10 +48,9 @@ export const metadata: Metadata = {
     title: 'Brain Works Studio Africa',
     description:
       'Photography, videography, and creative storytelling across Ghana and Africa.',
-    images: ['/brain.jpeg'], // Now correctly resolves as absolute URL
+    images: [`${BASE_URL}/brain.jpeg`],
   },
   other: {
-    // ✅ CORRECTED: Use the meta name as the key and the verification token as the value.
     'google-site-verification': 'google7ba9027710f6a9e6',
   },
 };
@@ -65,6 +62,25 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* ✅ Add Google Schema for Business + Logo */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Brain Works Studio Africa",
+              url: "https://brainworksstudioafrica.com",
+              logo: "https://brainworksstudioafrica.com/brain.jpeg",
+              sameAs: [
+                "https://www.instagram.com/brainworksstudioafrica",
+                "https://www.facebook.com/brainworksstudioafrica",
+              ],
+            }),
+          }}
+        />
+      </head>
       <body className={inter.className}>
         <AuthProvider>{children}</AuthProvider>
       </body>
