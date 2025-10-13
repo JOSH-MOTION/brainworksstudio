@@ -5,12 +5,10 @@ import { AuthProvider } from '@/hooks/useAuth';
 
 const inter = Inter({ subsets: ['latin'] });
 
-// --- Define BASE_URL ---
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-
   title: 'Brain Works Studio Africa – Professional Photography & Videography',
   description:
     'Brain Works Studio Africa offers professional photography and videography services for events, portraits, products, and commercial projects across Ghana and Africa.',
@@ -23,9 +21,7 @@ export const metadata: Metadata = {
     'Brain works',
     'photo studio Accra',
   ],
-  icons: {
-    icon: '/brain.jpeg', // ✅ your logo
-  },
+  icons: { icon: '/brain.jpeg' },
   openGraph: {
     title: 'Brain Works Studio Africa',
     description:
@@ -52,7 +48,7 @@ export const metadata: Metadata = {
   },
   other: {
     'google-site-verification': 'google7ba9027710f6a9e6',
-     'google-adsense-account': 'ca-pub-3845871149646341', 
+    'google-adsense-account': 'ca-pub-3845871149646341',
   },
 };
 
@@ -64,7 +60,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* ✅ Add Google Schema for Business + Logo */}
+        {/* ✅ Google AdSense Script */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3845871149646341"
+          crossOrigin="anonymous"
+        />
+
+        {/* ✅ Structured Data for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -72,8 +75,8 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Brain Works Studio Africa",
-              url: "https://brainworksstudioafrica.com",
-              logo: "https://brainworksstudioafrica.com/brain.jpeg",
+              url: BASE_URL,
+              logo: `${BASE_URL}/brain.jpeg`,
               sameAs: [
                 "https://www.instagram.com/brainworksstudioafrica",
                 "https://www.facebook.com/brainworksstudioafrica",
@@ -81,7 +84,11 @@ export default function RootLayout({
             }),
           }}
         />
-        <meta name="google-adsense-account" content="ca-pub-3845871149646341"></meta>
+
+        <meta
+          name="google-adsense-account"
+          content="ca-pub-3845871149646341"
+        />
       </head>
       <body className={inter.className}>
         <AuthProvider>{children}</AuthProvider>
