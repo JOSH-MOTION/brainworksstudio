@@ -52,6 +52,7 @@ export const metadata: Metadata = {
   },
   other: {
     'google-site-verification': 'google7ba9027710f6a9e6',
+     'google-adsense-account': 'ca-pub-3845871149646341', 
   },
 };
 
@@ -80,6 +81,7 @@ export default function RootLayout({
             }),
           }}
         />
+        <meta name="google-adsense-account" content="ca-pub-3845871149646341"></meta>
       </head>
       <body className={inter.className}>
         <AuthProvider>{children}</AuthProvider>
