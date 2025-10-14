@@ -1,6 +1,7 @@
 // app/api/portfolio/[id]/route.ts
 import { NextResponse, NextRequest } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
+import { uploadToImageKit } from '@/lib/imagekit';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,6 +106,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
     }
 
+    // Admin authentication
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.error('PUT /api/portfolio/[id]: Missing authorization header');
@@ -130,20 +132,26 @@ export async function PUT(
     const { id } = params;
     const formData = await request.formData();
     
+    // Get existing document first
+    const docRef = adminDb.collection('portfolio').doc(id);
+    const doc = await docRef.get();
+    
+    if (!doc.exists) {
+      console.error(`PUT /api/portfolio/${id}: Portfolio item not found`);
+      return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
+    }
+
+    const existingData = doc.data();
     const updateData: any = {
       updatedAt: new Date().toISOString(),
     };
 
-    if (formData.has('featured')) {
-      updateData.featured = formData.get('featured') === 'true';
-    }
-    if (formData.has('pin')) {
-      const pin = formData.get('pin') as string;
-      updateData.pin = pin.trim();
-      updateData.downloadPin = pin.trim(); // Keep both for backward compatibility
-    }
+    // Handle text fields - only update if provided
     if (formData.has('title')) {
       updateData.title = (formData.get('title') as string).trim();
+    }
+    if (formData.has('type')) {
+      updateData.type = formData.get('type') as string;
     }
     if (formData.has('category')) {
       updateData.category = formData.get('category') as string;
@@ -153,20 +161,106 @@ export async function PUT(
       updateData.tags = tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [];
     }
     if (formData.has('caption')) {
-      updateData.caption = (formData.get('caption') as string).trim() || null;
+      const caption = (formData.get('caption') as string).trim();
+      updateData.caption = caption || null;
     }
     if (formData.has('clientName')) {
-      updateData.clientName = (formData.get('clientName') as string).trim() || null;
+      const clientName = (formData.get('clientName') as string).trim();
+      updateData.clientName = clientName || null;
+    }
+    if (formData.has('clientId')) {
+      const clientId = (formData.get('clientId') as string).trim();
+      updateData.clientId = clientId || null;
+    }
+    if (formData.has('featured')) {
+      updateData.featured = formData.get('featured') === 'true';
+    }
+    if (formData.has('pin')) {
+      const pin = (formData.get('pin') as string).trim();
+      if (pin) {
+        updateData.pin = pin;
+        updateData.downloadPin = pin;
+      } else {
+        // If empty PIN, remove it
+        updateData.pin = null;
+        updateData.downloadPin = null;
+      }
     }
 
-    const docRef = adminDb.collection('portfolio').doc(id);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      console.error(`PUT /api/portfolio/${id}: Portfolio item not found`);
-      return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
+    // Handle video URL
+    if (formData.has('videoUrl')) {
+      const videoUrl = (formData.get('videoUrl') as string).trim();
+      updateData.videoUrl = videoUrl || null;
     }
 
+    // Handle file uploads - APPEND to existing files
+    const files = formData.getAll('files') as File[];
+    
+    if (files && files.length > 0 && files[0].size > 0) {
+      console.log(`PUT /api/portfolio/${id}: Processing ${files.length} new files`);
+      
+      const newImageUrls: string[] = [];
+      let newVideoUrl: string | null = null;
+
+      const itemType = updateData.type || existingData?.type || 'photography';
+
+      if (itemType === 'photography') {
+        // Upload new images and APPEND to existing ones
+        for (const file of files) {
+          if (file.size > 0 && file.type.startsWith('image/')) {
+            console.log(`PUT /api/portfolio/${id}: Uploading image - ${file.name}`);
+            const result = await uploadToImageKit(file, file.name, '/brain-works-studio');
+            newImageUrls.push(result.url);
+          }
+        }
+
+        if (newImageUrls.length > 0) {
+          const existingImages = existingData?.imageUrls || [];
+          // APPEND new images to existing ones
+          updateData.imageUrls = [...existingImages, ...newImageUrls];
+          console.log(`PUT /api/portfolio/${id}: Appended ${newImageUrls.length} images, now have ${updateData.imageUrls.length} total images`);
+        }
+      } else if (itemType === 'videography') {
+        // Handle video file upload
+        for (const file of files) {
+          if (file.size > 0 && file.type.startsWith('video/')) {
+            console.log(`PUT /api/portfolio/${id}: Uploading video - ${file.name}`);
+            const result = await uploadToImageKit(
+              file, 
+              `${updateData.title || existingData?.title || 'video'}-${Date.now()}.mp4`, 
+              '/brain-works-studio'
+            );
+            newVideoUrl = result.url;
+          } else if (file.size > 0 && file.type.startsWith('image/')) {
+            // Handle thumbnail upload for videos
+            console.log(`PUT /api/portfolio/${id}: Uploading thumbnail - ${file.name}`);
+            const result = await uploadToImageKit(
+              file,
+              `${updateData.title || existingData?.title || 'thumbnail'}-${Date.now()}.jpg`,
+              '/brain-works-studio/thumbnails'
+            );
+            newImageUrls.push(result.url);
+          }
+        }
+
+        // Update video URL if new video was uploaded
+        if (newVideoUrl) {
+          updateData.videoUrl = newVideoUrl;
+          console.log(`PUT /api/portfolio/${id}: Updated video URL`);
+        }
+
+        // Update thumbnails if new ones were uploaded
+        if (newImageUrls.length > 0) {
+          const existingThumbnails = existingData?.imageUrls || [];
+          updateData.imageUrls = [...existingThumbnails, ...newImageUrls];
+          console.log(`PUT /api/portfolio/${id}: Updated thumbnails, now have ${updateData.imageUrls.length} total`);
+        }
+      }
+    }
+
+    console.log(`PUT /api/portfolio/${id}: Updating with data:`, Object.keys(updateData));
+
+    // Update the document
     await docRef.update(updateData);
 
     const updatedDoc = await docRef.get();
