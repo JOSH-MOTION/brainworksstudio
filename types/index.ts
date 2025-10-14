@@ -109,6 +109,7 @@ export interface BlogPost {
 
 export interface RateCard {
   id: string;
+  serviceType: 'photography' | 'videography' | 'both'; 
   category: string;
   serviceName: string;
   description: string;

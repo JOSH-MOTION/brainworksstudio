@@ -6,11 +6,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { Check, Star } from 'lucide-react';
+import { Check, Star, Camera, Video, Zap } from 'lucide-react';
 import Link from 'next/link';
 
 interface RateCard {
   id?: string;
+  serviceType: 'photography' | 'videography' | 'both';
   category: string;
   serviceName: string;
   description: string;
@@ -21,10 +22,31 @@ interface RateCard {
   order: number;
 }
 
+const serviceTypes = [
+  { value: 'all', label: 'All Services', icon: Zap },
+  { value: 'photography', label: 'Photography', icon: Camera },
+  { value: 'videography', label: 'Videography', icon: Video },
+  { value: 'both', label: 'Combined Packages', icon: Zap }
+];
+
+const getServiceTypeColor = (type: string) => {
+  switch (type) {
+    case 'photography':
+      return 'bg-blue-100 text-blue-700 border-blue-300';
+    case 'videography':
+      return 'bg-purple-100 text-purple-700 border-purple-300';
+    case 'both':
+      return 'bg-amber-100 text-amber-700 border-amber-300';
+    default:
+      return 'bg-coral-100 text-coral-700 border-coral-300';
+  }
+};
+
 export default function PricingPage() {
   const [rateCards, setRateCards] = useState<RateCard[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedServiceType, setSelectedServiceType] = useState<'all' | 'photography' | 'videography' | 'both'>('all');
 
   useEffect(() => {
     fetchRateCards();
@@ -47,9 +69,12 @@ export default function PricingPage() {
   };
 
   const categories = ['all', ...Array.from(new Set(rateCards.map((card) => card.category)))];
-  const filteredCards = selectedCategory === 'all'
-    ? rateCards
-    : rateCards.filter((card) => card.category === selectedCategory);
+  
+  const filteredCards = rateCards.filter(card => {
+    const categoryMatch = selectedCategory === 'all' || card.category === selectedCategory;
+    const serviceTypeMatch = selectedServiceType === 'all' || card.serviceType === selectedServiceType;
+    return categoryMatch && serviceTypeMatch;
+  });
 
   if (loading) {
     return (
@@ -76,6 +101,26 @@ export default function PricingPage() {
           </p>
         </motion.div>
 
+        {/* Service Type Filter */}
+        <div className="flex flex-wrap justify-center gap-2 mb-6">
+          {serviceTypes.map((type) => (
+            <Badge
+              key={type.value}
+              variant={selectedServiceType === type.value ? 'default' : 'outline'}
+              className={`cursor-pointer px-4 py-2 text-sm flex items-center gap-2 ${
+                selectedServiceType === type.value
+                  ? 'bg-coral-500 text-white'
+                  : `${getServiceTypeColor(type.value)} hover:opacity-80`
+              }`}
+              onClick={() => setSelectedServiceType(type.value as any)}
+            >
+              <type.icon className="h-3 w-3" />
+              {type.label}
+            </Badge>
+          ))}
+        </div>
+
+        {/* Category Filter */}
         <div className="flex flex-wrap justify-center gap-2 mb-12">
           {categories.map((category) => (
             <Badge
@@ -117,9 +162,17 @@ export default function PricingPage() {
                   </div>
                 )}
                 <CardHeader className="text-center pb-4">
-                  <Badge className="mb-2 w-fit mx-auto bg-teal-100 text-teal-700">
-                    {card.category}
-                  </Badge>
+                  <div className="flex flex-col gap-2 mb-2">
+                    <Badge className={`w-fit mx-auto ${getServiceTypeColor(card.serviceType)} flex items-center gap-1`}>
+                      {card.serviceType === 'photography' && <Camera className="h-3 w-3" />}
+                      {card.serviceType === 'videography' && <Video className="h-3 w-3" />}
+                      {card.serviceType === 'both' && <Zap className="h-3 w-3" />}
+                      {card.serviceType.charAt(0).toUpperCase() + card.serviceType.slice(1)}
+                    </Badge>
+                    <Badge className="w-fit mx-auto bg-teal-100 text-teal-700">
+                      {card.category}
+                    </Badge>
+                  </div>
                   <CardTitle className="text-2xl text-teal-900">{card.serviceName}</CardTitle>
                   <CardDescription className="text-gray-600">{card.description}</CardDescription>
                   <div className="mt-4">
@@ -138,7 +191,7 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-                  <Link href={`/booking?rateCardId=${encodeURIComponent(card.id || card.serviceName)}&category=${encodeURIComponent(card.category)}`}>
+                  <Link href={`/booking?rateCardId=${encodeURIComponent(card.id || card.serviceName)}&category=${encodeURIComponent(card.category)}&serviceType=${encodeURIComponent(card.serviceType)}`}>
                     <Button
                       className={`w-full ${
                         card.featured
@@ -154,6 +207,25 @@ export default function PricingPage() {
             </motion.div>
           ))}
         </div>
+
+        {filteredCards.length === 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-12"
+          >
+            <p className="text-gray-600 text-lg">No pricing packages found for the selected filters.</p>
+            <Button
+              onClick={() => {
+                setSelectedCategory('all');
+                setSelectedServiceType('all');
+              }}
+              className="mt-4 bg-coral-500 hover:bg-coral-600 text-white"
+            >
+              Show All Packages
+            </Button>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

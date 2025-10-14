@@ -25,10 +25,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Edit, Trash2, Star, X } from 'lucide-react';
+import { Plus, Edit, Trash2, Star, X, Camera, Video, Zap } from 'lucide-react';
 
 interface RateCard {
   id?: string;
+  serviceType: 'photography' | 'videography' | 'both';
   category: string;
   serviceName: string;
   description: string;
@@ -43,11 +44,30 @@ const photographyCategories = [
   'Corporate', 'Event', 'Portrait', 'Fashion', 'Product', 'Travel & Landscape',
   'Documentary & Lifestyle', 'Creative/Artistic', 'Others'
 ];
+
 const videographyCategories = [
   'Corporate', 'Event', 'Music Videos', 'Commercials & Adverts', 'Documentary',
   'Short Films / Creative Projects', 'Promotional', 'Social Media', 'Others'
 ];
-const serviceCategories = Array.from(new Set([...photographyCategories, ...videographyCategories]));
+
+const combinedCategories = [
+  'Wedding', 'Corporate Event', 'Brand Campaign', 'Real Estate', 'Fashion Show',
+  'Product Launch', 'Conference', 'Workshop'
+];
+
+// Combine all categories for selection
+const allCategories = Array.from(new Set([
+  ...photographyCategories,
+  ...videographyCategories,
+  ...combinedCategories
+]));
+
+const serviceTypes = [
+  { value: 'photography', label: 'Photography', icon: Camera },
+  { value: 'videography', label: 'Videography', icon: Video },
+  { value: 'both', label: 'Photography & Videography', icon: Zap }
+];
+
 const MAX_INCLUDES = 17;
 
 const formatGHS = (value: string): string => {
@@ -69,8 +89,11 @@ export default function AdminPricingPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingCard, setEditingCard] = useState<RateCard | null>(null);
   const [includesInputs, setIncludesInputs] = useState<string[]>(['']);
+  const [selectedServiceType, setSelectedServiceType] = useState<'photography' | 'videography' | 'both'>('photography');
+  const [filterServiceType, setFilterServiceType] = useState<'all' | 'photography' | 'videography' | 'both'>('all');
 
   const [formData, setFormData] = useState({
+    serviceType: 'photography' as 'photography' | 'videography' | 'both',
     category: '',
     serviceName: '',
     description: '',
@@ -105,6 +128,26 @@ export default function AdminPricingPage() {
       console.error('Error fetching rate cards:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleServiceTypeChange = (type: 'photography' | 'videography' | 'both') => {
+    setSelectedServiceType(type);
+    setFormData({ ...formData, serviceType: type });
+    // Reset category when service type changes
+    setFormData({ ...formData, serviceType: type, category: '' });
+  };
+
+  const getFilteredCategories = () => {
+    switch (selectedServiceType) {
+      case 'photography':
+        return photographyCategories;
+      case 'videography':
+        return videographyCategories;
+      case 'both':
+        return combinedCategories;
+      default:
+        return allCategories;
     }
   };
 
@@ -168,7 +211,9 @@ export default function AdminPricingPage() {
 
   const handleEdit = (card: RateCard) => {
     setEditingCard(card);
+    setSelectedServiceType(card.serviceType);
     setFormData({
+      serviceType: card.serviceType,
       category: card.category,
       serviceName: card.serviceName,
       description: card.description,
@@ -183,6 +228,7 @@ export default function AdminPricingPage() {
 
   const resetForm = () => {
     setFormData({
+      serviceType: 'photography',
       category: '',
       serviceName: '',
       description: '',
@@ -192,6 +238,7 @@ export default function AdminPricingPage() {
       order: 0,
     });
     setIncludesInputs(['']);
+    setSelectedServiceType('photography');
     setEditingCard(null);
   };
 
@@ -211,6 +258,29 @@ export default function AdminPricingPage() {
     setIncludesInputs(newIncludes);
   };
 
+  const getServiceTypeIcon = (type: string) => {
+    const serviceType = serviceTypes.find(st => st.value === type);
+    const IconComponent = serviceType?.icon || Camera;
+    return <IconComponent className="h-4 w-4" />;
+  };
+
+  const getServiceTypeColor = (type: string) => {
+    switch (type) {
+      case 'photography':
+        return 'bg-blue-100 text-blue-700 border-blue-300';
+      case 'videography':
+        return 'bg-purple-100 text-purple-700 border-purple-300';
+      case 'both':
+        return 'bg-amber-100 text-amber-700 border-amber-300';
+      default:
+        return 'bg-gray-100 text-gray-700 border-gray-300';
+    }
+  };
+
+  const filteredRateCards = filterServiceType === 'all' 
+    ? rateCards 
+    : rateCards.filter(card => card.serviceType === filterServiceType);
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -229,7 +299,7 @@ export default function AdminPricingPage() {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Pricing Management</h1>
-          <p className="text-gray-600">Manage service rate cards and pricing packages</p>
+          <p className="text-gray-600">Manage service rate cards by photography, videography, or combined packages</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
@@ -249,6 +319,29 @@ export default function AdminPricingPage() {
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
+              {/* Service Type Selection */}
+              <div>
+                <Label>Service Type</Label>
+                <div className="grid grid-cols-3 gap-2 mt-2">
+                  {serviceTypes.map((type) => (
+                    <Button
+                      key={type.value}
+                      type="button"
+                      variant={selectedServiceType === type.value ? "default" : "outline"}
+                      className={`flex items-center gap-2 ${
+                        selectedServiceType === type.value 
+                          ? 'bg-teal-500 text-white' 
+                          : 'border-gray-300'
+                      }`}
+                      onClick={() => handleServiceTypeChange(type.value as any)}
+                    >
+                      <type.icon className="h-4 w-4" />
+                      {type.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+
               <div>
                 <Label>Category</Label>
                 <Select
@@ -259,7 +352,7 @@ export default function AdminPricingPage() {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    {serviceCategories.map((category) => (
+                    {getFilteredCategories().map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -267,6 +360,7 @@ export default function AdminPricingPage() {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label>Service Name</Label>
                 <Input
@@ -276,6 +370,7 @@ export default function AdminPricingPage() {
                   className="border-gray-300 focus:ring-teal-500"
                 />
               </div>
+
               <div>
                 <Label>Description</Label>
                 <Textarea
@@ -286,6 +381,7 @@ export default function AdminPricingPage() {
                   className="border-gray-300 focus:ring-teal-500"
                 />
               </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Price (GHS)</Label>
@@ -309,6 +405,7 @@ export default function AdminPricingPage() {
                   />
                 </div>
               </div>
+
               <div>
                 <Label>What's Included</Label>
                 {includesInputs.map((include, index) => (
@@ -343,6 +440,7 @@ export default function AdminPricingPage() {
                   </Button>
                 )}
               </div>
+
               <div>
                 <Label>Display Order</Label>
                 <Input
@@ -353,6 +451,7 @@ export default function AdminPricingPage() {
                   className="border-gray-300 focus:ring-teal-500"
                 />
               </div>
+
               <div className="flex items-center gap-2">
                 <Switch
                   checked={formData.featured}
@@ -360,6 +459,7 @@ export default function AdminPricingPage() {
                 />
                 <Label>Mark as Featured/Popular</Label>
               </div>
+
               <Button
                 onClick={handleSubmit}
                 className="w-full bg-teal-500 hover:bg-teal-600"
@@ -371,17 +471,46 @@ export default function AdminPricingPage() {
         </Dialog>
       </div>
 
+      {/* Service Type Filter */}
+      <div className="flex gap-2 mb-6">
+        <Badge
+          variant={filterServiceType === 'all' ? 'default' : 'outline'}
+          className="cursor-pointer px-4 py-2"
+          onClick={() => setFilterServiceType('all')}
+        >
+          All Services
+        </Badge>
+        {serviceTypes.map((type) => (
+          <Badge
+            key={type.value}
+            variant={filterServiceType === type.value ? 'default' : 'outline'}
+            className={`cursor-pointer px-4 py-2 flex items-center gap-2 ${getServiceTypeColor(type.value)}`}
+            onClick={() => setFilterServiceType(type.value as any)}
+          >
+            <type.icon className="h-3 w-3" />
+            {type.label}
+          </Badge>
+        ))}
+      </div>
+
+      {/* Rate Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {rateCards.map((card) => (
+        {filteredRateCards.map((card) => (
           <Card
             key={card.id || card.serviceName}
             className={card.featured ? 'border-2 border-teal-500' : 'border-gray-200'}
           >
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
-                <Badge variant="outline" className="text-xs border-teal-300 text-teal-600">
-                  {card.category}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge className={`text-xs border ${getServiceTypeColor(card.serviceType)} flex items-center gap-1`}>
+                    {getServiceTypeIcon(card.serviceType)}
+                    {card.serviceType.charAt(0).toUpperCase() + card.serviceType.slice(1)}
+                  </Badge>
+                  <Badge variant="outline" className="text-xs border-teal-300 text-teal-600">
+                    {card.category}
+                  </Badge>
+                </div>
                 {card.featured && (
                   <Badge className="bg-teal-100 text-teal-700 flex items-center gap-1">
                     <Star className="h-3 w-3" />
