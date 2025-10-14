@@ -4,6 +4,21 @@ import { adminDb, adminAuth } from '@/lib/firebase-admin';
 
 export const dynamic = 'force-dynamic';
 
+// Helper function to safely convert FormDataEntryValue to boolean
+function toBoolean(value: FormDataEntryValue | null | undefined): boolean {
+  if (value === null || value === undefined) return false;
+  
+  const stringValue = String(value).toLowerCase();
+  return stringValue === 'true' || stringValue === '1' || stringValue === 'yes';
+}
+
+// Helper function to safely get string value
+function getStringValue(formData: FormData, key: string): string | null {
+  const value = formData.get(key);
+  if (value === null || value === undefined) return null;
+  return String(value).trim();
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -32,10 +47,10 @@ export async function GET(
       ...data,
       createdAt: data?.createdAt?.toDate?.()?.toISOString() || data?.createdAt || new Date().toISOString(),
       updatedAt: data?.updatedAt?.toDate?.()?.toISOString() || data?.updatedAt || new Date().toISOString(),
-      pin: data?.pin || data?.downloadPin || null, // Map pin or downloadPin for consistency
+      pin: data?.pin || data?.downloadPin || null,
     };
 
-    console.log(`GET /api/portfolio/${id}: Returning item`, item);
+    console.log(`GET /api/portfolio/${id}: Returning item`);
     return NextResponse.json(item);
   } catch (error: any) {
     console.error(`GET /api/portfolio/[id]: Error fetching item:`, error);
@@ -67,12 +82,11 @@ export async function POST(
       return NextResponse.json({ error: 'PIN is required' }, { status: 400 });
     }
 
-    console.log(`POST /api/portfolio/${id}: Validating PIN for portfolio item`);
+    console.log(`POST /api/portfolio/${id}: Validating PIN`);
     const docRef = adminDb.collection('portfolio').doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      console.error(`POST /api/portfolio/${id}: Portfolio item not found`);
       return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
     }
 
@@ -80,11 +94,9 @@ export async function POST(
     const storedPin = data?.pin || data?.downloadPin || null;
 
     if (storedPin && storedPin !== pin) {
-      console.error(`POST /api/portfolio/${id}: Invalid PIN provided`);
       return NextResponse.json({ error: 'Invalid PIN' }, { status: 401 });
     }
 
-    console.log(`POST /api/portfolio/${id}: PIN validated successfully`);
     return NextResponse.json({ success: true });
   } catch (error: any) {
     console.error(`POST /api/portfolio/[id]: Error validating PIN:`, error);
@@ -101,13 +113,11 @@ export async function PUT(
 ) {
   try {
     if (!adminAuth || !adminDb) {
-      console.error('PUT /api/portfolio/[id]: Firebase Admin not initialized');
       return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
     }
 
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('PUT /api/portfolio/[id]: Missing authorization header');
       return NextResponse.json({ error: 'Authorization header required' }, { status: 401 });
     }
 
@@ -116,59 +126,109 @@ export async function PUT(
     try {
       decodedToken = await adminAuth.verifyIdToken(token);
     } catch (error) {
-      console.error('PUT /api/portfolio/[id]: Token verification failed:', error);
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
     const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
     const userData = userDoc.data();
     if (!userData?.role || userData.role !== 'admin') {
-      console.error('PUT /api/portfolio/[id]: User is not admin');
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     const { id } = params;
     const formData = await request.formData();
     
+    console.log('PUT /api/portfolio/[id]: FormData keys:', Array.from(formData.keys()));
+
     const updateData: any = {
       updatedAt: new Date().toISOString(),
     };
 
-    if (formData.has('featured')) {
-      updateData.featured = formData.get('featured') === 'true';
+    // ✅ FIXED: Proper featured handling without TypeScript error
+    const featuredRaw = formData.get('featured');
+    const featured = toBoolean(featuredRaw);
+    updateData.featured = featured;
+    console.log(`PUT: featured = ${featured} (raw: ${featuredRaw})`);
+
+    // Client gallery fields
+    const clientId = getStringValue(formData, 'clientId');
+    if (clientId) {
+      updateData.clientId = clientId;
+      console.log(`PUT: clientId = "${clientId}"`);
     }
-    if (formData.has('pin')) {
-      const pin = formData.get('pin') as string;
-      updateData.pin = pin.trim();
-      updateData.downloadPin = pin.trim(); // Keep both for backward compatibility
+
+    const clientName = getStringValue(formData, 'clientName');
+    if (clientName) {
+      updateData.clientName = clientName;
+      console.log(`PUT: clientName = "${clientName}"`);
     }
-    if (formData.has('title')) {
-      updateData.title = (formData.get('title') as string).trim();
+
+    // PIN handling
+    const pin = getStringValue(formData, 'pin');
+    if (pin) {
+      updateData.pin = pin;
+      updateData.downloadPin = pin; // Backward compatibility
+      console.log(`PUT: pin = "${pin}"`);
     }
-    if (formData.has('category')) {
-      updateData.category = formData.get('category') as string;
+
+    // Title
+    const title = getStringValue(formData, 'title');
+    if (title) {
+      updateData.title = title;
+      console.log(`PUT: title = "${title}"`);
     }
-    if (formData.has('tags')) {
-      const tags = formData.get('tags') as string;
-      updateData.tags = tags ? tags.split(',').map(t => t.trim()).filter(t => t) : [];
+
+    // Category
+    const category = getStringValue(formData, 'category');
+    if (category) {
+      updateData.category = category;
+      console.log(`PUT: category = "${category}"`);
     }
-    if (formData.has('caption')) {
-      updateData.caption = (formData.get('caption') as string).trim() || null;
+
+    // Tags
+    const tagsRaw = formData.get('tags');
+    if (tagsRaw !== null && tagsRaw !== undefined) {
+      const tagsString = String(tagsRaw).trim();
+      if (tagsString) {
+        updateData.tags = tagsString.split(',').map(t => t.trim()).filter(t => t);
+      } else {
+        updateData.tags = [];
+      }
+      console.log(`PUT: tags =`, updateData.tags);
     }
-    if (formData.has('clientName')) {
-      updateData.clientName = (formData.get('clientName') as string).trim() || null;
+
+    // Caption
+    const caption = getStringValue(formData, 'caption');
+    updateData.caption = caption || null;
+    console.log(`PUT: caption = "${updateData.caption}"`);
+
+    // Type (photography/videography)
+    const type = getStringValue(formData, 'type');
+    if (type && (type === 'photography' || type === 'videography')) {
+      updateData.type = type;
+      console.log(`PUT: type = "${type}"`);
+    }
+
+    console.log('PUT: updateData:', updateData);
+
+    // Check for meaningful updates
+    const hasUpdates = Object.keys(updateData).some(key => key !== 'updatedAt');
+    if (!hasUpdates) {
+      return NextResponse.json({ error: 'No valid updates provided' }, { status: 400 });
     }
 
     const docRef = adminDb.collection('portfolio').doc(id);
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      console.error(`PUT /api/portfolio/${id}: Portfolio item not found`);
       return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
     }
 
+    // Update Firestore
     await docRef.update(updateData);
+    console.log(`PUT /api/portfolio/${id}: Successfully updated client gallery`);
 
+    // Return updated item
     const updatedDoc = await docRef.get();
     const updatedData = updatedDoc.data();
     const updatedItem = {
@@ -179,10 +239,9 @@ export async function PUT(
       pin: updatedData?.pin || updatedData?.downloadPin || null,
     };
 
-    console.log(`PUT /api/portfolio/${id}: Item updated successfully`);
     return NextResponse.json(updatedItem);
   } catch (error: any) {
-    console.error(`PUT /api/portfolio/[id]: Error updating item:`, error);
+    console.error(`PUT /api/portfolio/[id]: Error:`, error);
     return NextResponse.json(
       { error: 'Failed to update portfolio item', debug: error.message },
       { status: 500 }
@@ -196,13 +255,11 @@ export async function DELETE(
 ) {
   try {
     if (!adminAuth || !adminDb) {
-      console.error('DELETE /api/portfolio/[id]: Firebase Admin not initialized');
       return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 });
     }
 
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.error('DELETE /api/portfolio/[id]: Missing authorization header');
       return NextResponse.json({ error: 'Authorization header required' }, { status: 401 });
     }
 
@@ -211,75 +268,30 @@ export async function DELETE(
     try {
       decodedToken = await adminAuth.verifyIdToken(token);
     } catch (error) {
-      console.error('DELETE /api/portfolio/[id]: Token verification failed:', error);
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
 
     const userDoc = await adminDb.collection('users').doc(decodedToken.uid).get();
     const userData = userDoc.data();
     if (!userData?.role || userData.role !== 'admin') {
-      console.error('DELETE /api/portfolio/[id]: User is not admin');
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     const { id } = params;
-    console.log(`DELETE /api/portfolio/${id}: Attempting to delete portfolio item`);
-
     const docRef = adminDb.collection('portfolio').doc(id);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      console.error(`DELETE /api/portfolio/${id}: Portfolio item not found`);
-      return NextResponse.json({ error: 'Portfolio item not found' }, { status: 404 });
-    }
-
-    const data = doc.data();
-    const imageUrls = data?.imageUrls || [];
-    const videoUrl = data?.videoUrl || null;
-
-    console.log(`DELETE /api/portfolio/${id}: Found ${imageUrls.length} images and ${videoUrl ? '1 video' : 'no video'}`);
-
-    // Optional cleanup for ImageKit files
-    if (imageUrls.length > 0) {
-      for (const url of imageUrls) {
-        try {
-          const urlParts = url.split('/');
-          const fileNameWithQuery = urlParts[urlParts.length - 1];
-          const fileName = fileNameWithQuery.split('?')[0];
-          
-          console.log(`DELETE /api/portfolio/${id}: Attempting to delete image: ${fileName}`);
-          // await deleteFromImageKit(fileName); // Uncomment if ImageKit cleanup is implemented
-        } catch (error) {
-          console.error(`DELETE /api/portfolio/${id}: Failed to delete image from ImageKit:`, error);
-        }
-      }
-    }
-
-    if (videoUrl && !videoUrl.includes('youtube.com') && !videoUrl.includes('vimeo.com')) {
-      try {
-        const urlParts = videoUrl.split('/');
-        const fileNameWithQuery = urlParts[urlParts.length - 1];
-        const fileName = fileNameWithQuery.split('?')[0];
-        
-        console.log(`DELETE /api/portfolio/${id}: Attempting to delete video: ${fileName}`);
-        // await deleteFromImageKit(fileName); // Uncomment if ImageKit cleanup is implemented
-      } catch (error) {
-        console.error(`DELETE /api/portfolio/${id}: Failed to delete video from ImageKit:`, error);
-      }
-    }
-
+    
     await docRef.delete();
+    console.log(`DELETE /api/portfolio/${id}: Client gallery deleted successfully`);
 
-    console.log(`DELETE /api/portfolio/${id}: Portfolio item deleted successfully from Firestore`);
     return NextResponse.json({ 
       success: true, 
-      message: 'Portfolio item deleted successfully',
+      message: 'Client gallery deleted successfully',
       id 
     });
   } catch (error: any) {
-    console.error(`DELETE /api/portfolio/[id]: Error deleting item:`, error);
+    console.error(`DELETE /api/portfolio/[id]: Error:`, error);
     return NextResponse.json(
-      { error: 'Failed to delete portfolio item', debug: error.message },
+      { error: 'Failed to delete item', debug: error.message },
       { status: 500 }
     );
   }
