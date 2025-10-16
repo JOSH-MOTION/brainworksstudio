@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Camera, User, LogOut, Menu, Instagram, Twitter, Facebook, Send } from 'lucide-react';
+import { Camera, User, LogOut, Menu, Instagram, Twitter, Facebook, Send,Linkedin } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -446,9 +446,10 @@ export default function RootLayout({ children }: LayoutProps) {
                 </p>
                 <div className="flex space-x-3">
                   {[
-                    { href: 'https://instagram.com', icon: Instagram, label: 'Instagram' },
-                    { href: 'https://twitter.com', icon: Twitter, label: 'Twitter' },
-                    { href: 'https://facebook.com', icon: Facebook, label: 'Facebook' },
+                    { href: 'https://www.instagram.com/brainworks_studio_africa?igsh=dmg2MzU5NDNnOXg%3D&utm_source=qr', icon: Instagram, label: 'Instagram' },
+                    { href: 'https://x.com/bws_africa?s=21', icon: Twitter, label: 'Twitter' },
+                    { href: 'https://www.facebook.com/share/17AbCs7VRQ/?mibextid=wwXIfr', icon: Facebook, label: 'Facebook' },
+                     { href: 'https://www.linkedin.com/in/brain-works-studio-africa-06491b381?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app', icon: Linkedin, label: 'Linkedin' },
                   ].map((social, index) => (
                     <motion.a
                       key={index}
