@@ -364,7 +364,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
             <Button
               type="submit"
               disabled={loading || !token}
-              className="bg-coral-500 text-white hover:bg-coral-600 rounded-lg text-sm"
+              className="bg-coral-500 text-teal-700 hover:bg-coral-600 rounded-lg text-sm"
             >
               {loading ? 'Updating...' : 'Update Portfolio Item'}
             </Button>
