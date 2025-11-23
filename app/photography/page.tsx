@@ -97,17 +97,20 @@ export default function PhotographyPortfolio({ params }: { params: { category?: 
           animate="visible"
           className="absolute inset-0"
         >
-          <Image
-            src={`/images/${category === 'all' ? 'photography' : category}-hero.jpg`}
-            alt={`${displayCategory} Hero`}
-            fill
-            className="object-cover"
-            priority
-            onError={(e) => {
-              console.error(`Failed to load hero image for ${displayCategory}`);
-              e.currentTarget.src = '/placeholder-hero.jpg';
-            }}
-          />
+         // Replace ONLY this part (the hero Image line):
+<Image
+  src={`/hero/${category === 'all' ? 'photography' : category.toLowerCase()}-brain.jpg`}
+  alt={`${displayCategory} Hero`}
+  fill
+  priority
+  quality={95}
+  className="object-cover"
+  placeholder="blur"
+  blurDataURL="/hero/placeholder.jpg"  // optional but looks smooth
+  onError={(e) => {
+    e.currentTarget.src = '/hero/photography-brain.jpg'; // safe fallback
+  }}
+/>
           <div className="absolute inset-0 bg-navy-900 bg-opacity-50 bg-[#001F44]"></div>
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center ">

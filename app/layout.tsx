@@ -21,7 +21,13 @@ export const metadata: Metadata = {
     'Brain works',
     'photo studio Accra',
   ],
-  icons: { icon: '/newlogo3.jpg' },
+  icons: {
+  icon: [
+    { url: '/newlogo3.png', sizes: '512x512' },
+    { url: '/newlogo3.png' } // fallback
+  ],
+  apple: '/newlogo3.png',
+},
   openGraph: {
     title: 'Brain Works Studio Africa',
     description:
@@ -30,7 +36,7 @@ export const metadata: Metadata = {
     siteName: 'Brain Works Studio Africa',
     images: [
       {
-        url: `${BASE_URL}/newlogo3.jpg`,
+        url: `${BASE_URL}/newlogo3.png`,
         width: 1200,
         height: 630,
         alt: 'Brain Works Studio Africa logo',
@@ -44,7 +50,7 @@ export const metadata: Metadata = {
     title: 'Brain Works Studio Africa',
     description:
       'Photography, videography, and creative storytelling across Ghana and Africa.',
-    images: [`${BASE_URL}/newlogo3.jpg`],
+    images: [`${BASE_URL}/newlogo3.png`],
   },
   other: {
     'google-site-verification': 'google7ba9027710f6a9e6',
@@ -60,6 +66,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+       
+
         {/* ✅ Google AdSense Script */}
         <script
           async
