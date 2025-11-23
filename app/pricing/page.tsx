@@ -5,8 +5,9 @@ import Layout from '@/components/Layout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import { motion } from 'framer-motion';
-import { Check, Star, Camera, Video, Zap } from 'lucide-react';
+import { Check, Star, Camera, Video, Zap, Search, X } from 'lucide-react';
 import Link from 'next/link';
 
 interface RateCard {
@@ -47,6 +48,7 @@ export default function PricingPage() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedServiceType, setSelectedServiceType] = useState<'all' | 'photography' | 'videography' | 'both'>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchRateCards();
@@ -73,8 +75,25 @@ export default function PricingPage() {
   const filteredCards = rateCards.filter(card => {
     const categoryMatch = selectedCategory === 'all' || card.category === selectedCategory;
     const serviceTypeMatch = selectedServiceType === 'all' || card.serviceType === selectedServiceType;
-    return categoryMatch && serviceTypeMatch;
+    
+    // Search functionality - searches in multiple fields
+    const searchMatch = searchQuery === '' || 
+      card.serviceName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.price.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      card.includes.some(item => item.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return categoryMatch && serviceTypeMatch && searchMatch;
   });
+
+  const clearAllFilters = () => {
+    setSelectedCategory('all');
+    setSelectedServiceType('all');
+    setSearchQuery('');
+  };
+
+  const hasActiveFilters = selectedCategory !== 'all' || selectedServiceType !== 'all' || searchQuery !== '';
 
   if (loading) {
     return (
@@ -101,13 +120,45 @@ export default function PricingPage() {
           </p>
         </motion.div>
 
+        {/* Search Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="max-w-2xl mx-auto mb-8"
+        >
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search by service name, description, price, or features..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 pr-10 py-6 text-base border-2 border-gray-200 focus:border-coral-500 focus:ring-coral-500"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            )}
+          </div>
+          {searchQuery && (
+            <p className="text-sm text-gray-600 mt-2 text-center">
+              Found {filteredCards.length} result{filteredCards.length !== 1 ? 's' : ''} for "{searchQuery}"
+            </p>
+          )}
+        </motion.div>
+
         {/* Service Type Filter */}
         <div className="flex flex-wrap justify-center gap-2 mb-6">
           {serviceTypes.map((type) => (
             <Badge
               key={type.value}
               variant={selectedServiceType === type.value ? 'default' : 'outline'}
-              className={`cursor-pointer px-4 py-2 text-sm flex items-center gap-2 ${
+              className={`cursor-pointer px-4 py-2 text-sm flex items-center gap-2 transition-all ${
                 selectedServiceType === type.value
                   ? 'bg-coral-500 text-white'
                   : `${getServiceTypeColor(type.value)} hover:opacity-80`
@@ -121,12 +172,12 @@ export default function PricingPage() {
         </div>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-2 mb-12">
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
           {categories.map((category) => (
             <Badge
               key={category}
               variant={selectedCategory === category ? 'default' : 'outline'}
-              className={`cursor-pointer px-4 py-2 text-sm ${
+              className={`cursor-pointer px-4 py-2 text-sm transition-all ${
                 selectedCategory === category
                   ? 'bg-coral-500 text-white'
                   : 'border-coral-300 text-coral-600 hover:bg-coral-50'
@@ -137,6 +188,24 @@ export default function PricingPage() {
             </Badge>
           ))}
         </div>
+
+        {/* Clear Filters Button */}
+        {hasActiveFilters && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex justify-center mb-6"
+          >
+            <Button
+              onClick={clearAllFilters}
+              variant="outline"
+              className="border-coral-300 text-coral-600 hover:bg-coral-50 flex items-center gap-2"
+            >
+              <X className="h-4 w-4" />
+              Clear All Filters
+            </Button>
+          </motion.div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredCards.map((card, index) => (
@@ -214,15 +283,20 @@ export default function PricingPage() {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <p className="text-gray-600 text-lg">No pricing packages found for the selected filters.</p>
+            <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <p className="text-gray-600 text-lg mb-2">
+              {searchQuery 
+                ? `No results found for "${searchQuery}"`
+                : 'No pricing packages found for the selected filters.'}
+            </p>
+            <p className="text-gray-500 text-sm mb-4">
+              Try adjusting your search or filters
+            </p>
             <Button
-              onClick={() => {
-                setSelectedCategory('all');
-                setSelectedServiceType('all');
-              }}
-              className="mt-4 bg-coral-500 hover:bg-coral-600 text-white"
+              onClick={clearAllFilters}
+              className="bg-coral-500 hover:bg-coral-600 text-white"
             >
-              Show All Packages
+              Clear All Filters
             </Button>
           </motion.div>
         )}
