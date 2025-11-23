@@ -279,7 +279,7 @@ export default function AdminReviewsPage() {
                   )}
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor={`response-${review.id}`} className="text-teal-900 text-sm">
+                      <Label htmlFor={`response-${review.id}`} className="text-[#001F44] text-sm">
                         Admin Response
                       </Label>
                       <Textarea
@@ -319,14 +319,14 @@ export default function AdminReviewsPage() {
                           checked={review.approved}
                           onCheckedChange={(checked) => updateReview(review.id, { approved: checked })}
                         />
-                        <Label className="text-teal-900 text-sm">Approve</Label>
+                        <Label className="text-[#001F44] text-sm">Approve</Label>
                       </div>
                       <div className="flex items-center gap-2">
                         <Switch
                           checked={review.featured}
                           onCheckedChange={(checked) => updateReview(review.id, { featured: checked })}
                         />
-                        <Label className="text-teal-900 text-sm">Feature</Label>
+                        <Label className="text-[#001F44] text-sm">Feature</Label>
                       </div>
                     </div>
                   </div>

@@ -175,7 +175,7 @@ export default function UserBookingsPage() {
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="text-2xl md:text-3xl font-bold text-teal-900 mb-3">
+          <motion.h1 className="text-2xl md:text-3xl font-bold text-[#001F44] mb-3">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}
@@ -210,7 +210,7 @@ export default function UserBookingsPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
           {[
-            { number: bookings.length, label: 'Total Bookings', color: 'text-teal-900' },
+            { number: bookings.length, label: 'Total Bookings', color: 'text-[#001F44]' },
             { number: bookings.filter((b) => b.status === 'pending').length, label: 'Pending', color: 'text-teal-600' },
             { number: bookings.filter((b) => b.status === 'accepted').length, label: 'Approved', color: 'text-teal-600' },
             { number: bookings.filter((b) => b.status === 'rejected').length, label: 'Declined', color: 'text-coral-600' },
@@ -283,7 +283,7 @@ export default function UserBookingsPage() {
         >
           <Card className="bg-teal-50 border-coral-100 rounded-xl shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl text-teal-900">Your Booking History</CardTitle>
+              <CardTitle className="text-xl text-[#001F44]">Your Booking History</CardTitle>
               <CardDescription className="text-sm text-gray-600">
                 All your session requests and their current status
               </CardDescription>
@@ -292,7 +292,7 @@ export default function UserBookingsPage() {
               {filteredBookings.length === 0 ? (
                 <div className="text-center py-6">
                   <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <h3 className="text-base font-medium text-teal-900 mb-2">
+                  <h3 className="text-base font-medium text-[#001F44] mb-2">
                     {bookings.length === 0 ? 'No bookings yet' : 'No bookings match your filters'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3">
@@ -326,7 +326,7 @@ export default function UserBookingsPage() {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-base font-semibold text-teal-900">{booking.serviceCategory}</h3>
+                            <h3 className="text-base font-semibold text-[#001F44]">{booking.serviceCategory}</h3>
                             <Badge className={getStatusColor(booking.status)}>
                               {getStatusText(booking.status)}
                             </Badge>

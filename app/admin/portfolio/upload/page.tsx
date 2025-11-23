@@ -162,7 +162,7 @@ export default function UploadPortfolio() {
             <Button
               onClick={() => router.push('/admin/portfolio')}
               variant="outline"
-              className="flex items-center text-teal-900 hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
+              className="flex items-center text-[#001F44] hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Portfolio
@@ -173,14 +173,14 @@ export default function UploadPortfolio() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-2xl font-bold text-teal-900 mb-6"
+            className="text-2xl font-bold text-[#001F44] mb-6"
           >
             Upload Portfolio
           </motion.h2>
 
           <div className="space-y-6">
             <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="title" className="text-teal-900 text-sm">Title *</Label>
+              <Label htmlFor="title" className="text-[#001F44] text-sm">Title *</Label>
               <Input
                 id="title"
                 type="text"
@@ -192,7 +192,7 @@ export default function UploadPortfolio() {
             </motion.div>
 
             <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="type" className="text-teal-900 text-sm">Type *</Label>
+              <Label htmlFor="type" className="text-[#001F44] text-sm">Type *</Label>
               <Select value={type} onValueChange={(value: 'photography' | 'videography') => setType(value)}>
                 <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                   <SelectValue placeholder="Select type" />
@@ -205,7 +205,7 @@ export default function UploadPortfolio() {
             </motion.div>
 
             <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="category" className="text-teal-900 text-sm">Category *</Label>
+              <Label htmlFor="category" className="text-[#001F44] text-sm">Category *</Label>
               <Select value={category} onValueChange={(value: string) => setCategory(value)}>
                 <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                   <SelectValue placeholder="Select category" />
@@ -219,7 +219,7 @@ export default function UploadPortfolio() {
             </motion.div>
 
             <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="tags" className="text-teal-900 text-sm">Tags (comma separated)</Label>
+              <Label htmlFor="tags" className="text-[#001F44] text-sm">Tags (comma separated)</Label>
               <Input
                 id="tags"
                 type="text"
@@ -231,7 +231,7 @@ export default function UploadPortfolio() {
             </motion.div>
 
             <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="caption" className="text-teal-900 text-sm">Caption</Label>
+              <Label htmlFor="caption" className="text-[#001F44] text-sm">Caption</Label>
               <Textarea
                 id="caption"
                 value={caption}
@@ -243,7 +243,7 @@ export default function UploadPortfolio() {
             </motion.div>
 
             <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
-              <Label htmlFor="clientName" className="text-teal-900 text-sm">Client Name *</Label>
+              <Label htmlFor="clientName" className="text-[#001F44] text-sm">Client Name *</Label>
               <Input
                 id="clientName"
                 type="text"
@@ -258,9 +258,9 @@ export default function UploadPortfolio() {
               <div className="bg-coral-50 border border-coral-100 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Lock className="w-5 h-5 text-coral-500" />
-                  <Label className="text-teal-900 font-semibold text-sm">PIN *</Label>
+                  <Label className="text-[#001F44] font-semibold text-sm">PIN *</Label>
                 </div>
-                <p className="text-xs text-teal-900 mb-3">
+                <p className="text-xs text-[#001F44] mb-3">
                   Set a unique PIN that clients will use to access their portfolio
                 </p>
                 <div className="flex gap-2">
@@ -276,7 +276,7 @@ export default function UploadPortfolio() {
                     <button
                       type="button"
                       onClick={() => setShowPin(!showPin)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-teal-900 hover:text-coral-500"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#001F44] hover:text-coral-500"
                     >
                       {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -297,7 +297,7 @@ export default function UploadPortfolio() {
 
             {type === 'photography' && (
               <motion.div custom={7} variants={formElementVariants} initial="hidden" animate="visible">
-                <Label htmlFor="images" className="text-teal-900 text-sm">Upload Images *</Label>
+                <Label htmlFor="images" className="text-[#001F44] text-sm">Upload Images *</Label>
                 <Input
                   id="images"
                   type="file"
@@ -312,7 +312,7 @@ export default function UploadPortfolio() {
             {type === 'videography' && (
               <>
                 <motion.div custom={8} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="videoUrl" className="text-teal-900 text-sm">YouTube Video URL (optional)</Label>
+                  <Label htmlFor="videoUrl" className="text-[#001F44] text-sm">YouTube Video URL (optional)</Label>
                   <Input
                     id="videoUrl"
                     type="text"
@@ -323,7 +323,7 @@ export default function UploadPortfolio() {
                   />
                 </motion.div>
                 <motion.div custom={9} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="videoFiles" className="text-teal-900 text-sm">Upload Video (optional)</Label>
+                  <Label htmlFor="videoFiles" className="text-[#001F44] text-sm">Upload Video (optional)</Label>
                   <Input
                     id="videoFiles"
                     type="file"
@@ -334,9 +334,9 @@ export default function UploadPortfolio() {
                 </motion.div>
                 {files && (
                   <motion.div custom={10} variants={formElementVariants} initial="hidden" animate="visible">
-                    <Label htmlFor="thumbnail" className="text-teal-900 text-sm">Video Thumbnail * (required for local video)</Label>
+                    <Label htmlFor="thumbnail" className="text-[#001F44] text-sm">Video Thumbnail * (required for local video)</Label>
                     <div className="relative">
-                      <ImageIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-teal-900 h-4 w-4" />
+                      <ImageIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#001F44] h-4 w-4" />
                       <Input
                         id="thumbnail"
                         type="file"

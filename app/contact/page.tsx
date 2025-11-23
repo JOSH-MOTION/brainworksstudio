@@ -144,7 +144,7 @@ export default function ContactPage() {
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="text-3xl md:text-4xl font-bold text-teal-900 mb-4">
+          <motion.h1 className="text-3xl md:text-4xl font-bold text-[#001F44] mb-4">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}
@@ -234,7 +234,7 @@ export default function ContactPage() {
                       <info.icon className="h-5 w-5 text-coral-500" />
                     </motion.div>
                     <div>
-                      <h3 className="font-semibold text-teal-900 text-base">{info.title}</h3>
+                      <h3 className="font-semibold text-[#001F44] text-base">{info.title}</h3>
                       <p className="text-gray-600 text-sm">{info.value}</p>
                       <p className="text-xs text-gray-500">{info.note}</p>
                     </div>
@@ -251,7 +251,7 @@ export default function ContactPage() {
                 viewport={{ once: true }}
               >
                 <div className="bg-teal-50 rounded-xl shadow-sm p-5 text-center border border-coral-100">
-                  <h3 className="font-semibold text-teal-900 text-base mb-2">Urgent Project?</h3>
+                  <h3 className="font-semibold text-[#001F44] text-base mb-2">Urgent Project?</h3>
                   <p className="text-xs text-gray-600 mb-3">Reach out for time-sensitive bookings.</p>
                   <Button
                     variant="outline"
@@ -288,7 +288,7 @@ export default function ContactPage() {
                     >
                       <Send className="h-6 w-6 text-coral-500" />
                     </motion.div>
-                    <h3 className="text-lg font-semibold text-teal-900 mb-2">Message Sent!</h3>
+                    <h3 className="text-lg font-semibold text-[#001F44] mb-2">Message Sent!</h3>
                     <p className="text-gray-600 text-sm mb-4">
                       We've received your message and will respond soon.
                     </p>
@@ -319,7 +319,7 @@ export default function ContactPage() {
                           whileInView="visible"
                           viewport={{ once: true }}
                         >
-                          <Label htmlFor={field.id} className="text-teal-900 font-medium text-sm">{field.label}</Label>
+                          <Label htmlFor={field.id} className="text-[#001F44] font-medium text-sm">{field.label}</Label>
                           <Input
                             id={field.id}
                             name={field.id}
@@ -340,7 +340,7 @@ export default function ContactPage() {
                       whileInView="visible"
                       viewport={{ once: true }}
                     >
-                      <Label htmlFor="message" className="text-teal-900 font-medium text-sm">Message *</Label>
+                      <Label htmlFor="message" className="text-[#001F44] font-medium text-sm">Message *</Label>
                       <Textarea
                         id="message"
                         name="message"

@@ -117,7 +117,7 @@ export default function PortfolioPage() {
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="rounded-full h-16 w-16 border-t-2 border-teal-500 mx-auto"
             />
-            <p className="mt-4 text-teal-900 text-lg font-medium">Loading portfolio...</p>
+            <p className="mt-4 text-[#001F44] text-lg font-medium">Loading portfolio...</p>
           </div>
         </motion.div>
       </Layout>
@@ -134,7 +134,7 @@ export default function PortfolioPage() {
       >
         <div className="text-center mb-12">
           <motion.h1
-            className="text-4xl md:text-5xl font-bold text-teal-900 mb-4 tracking-tight"
+            className="text-4xl md:text-5xl font-bold text-[#001F44] mb-4 tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -158,8 +158,8 @@ export default function PortfolioPage() {
           className="flex flex-col sm:flex-row gap-4 mb-12 items-center justify-center"
         >
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-teal-900" />
-            <span className="font-medium text-teal-900">Filters:</span>
+            <Filter className="h-5 w-5 text-[#001F44]" />
+            <span className="font-medium text-[#001F44]">Filters:</span>
           </div>
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-[180px] bg-white border-teal-200 focus:ring-teal-500 rounded-full shadow-sm">
@@ -235,18 +235,18 @@ export default function PortfolioPage() {
                       onLoad={() => console.log(`Successfully loaded image: ${item.imageUrls[0] || item.videoUrl}`)}
                     />
                     {item.videoUrl && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-teal-900/40">
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#001F44]/40">
                         <Play className="h-12 w-12 text-white" />
                       </div>
                     )}
                   </div>
                   <div className="p-4">
-                    <h3 className="font-semibold text-lg text-teal-900 mb-2">{item.title}</h3>
+                    <h3 className="font-semibold text-lg text-[#001F44] mb-2">{item.title}</h3>
                     <div className="flex flex-wrap gap-2 mb-4">
                       <Badge className="bg-coral-500 text-white hover:bg-coral-600 transition-colors">
                         {item.category}
                       </Badge>
-                      <Badge className="bg-teal-100 text-teal-900 hover:bg-teal-200 transition-colors">
+                      <Badge className="bg-teal-100 text-[#001F44] hover:bg-teal-200 transition-colors">
                         {item.type}
                       </Badge>
                       {item.tags.slice(0, 2).map((tag) => (
@@ -280,7 +280,7 @@ export default function PortfolioPage() {
             transition={{ duration: 0.5 }}
             className="text-center py-12"
           >
-            <p className="text-teal-900 text-lg font-medium">No items found matching your filters.</p>
+            <p className="text-[#001F44] text-lg font-medium">No items found matching your filters.</p>
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"

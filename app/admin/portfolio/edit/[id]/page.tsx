@@ -197,7 +197,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         <div className="min-h-screen flex items-center justify-center bg-teal-50">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-coral-500 mx-auto"></div>
-            <p className="mt-4 text-sm text-teal-900">Loading...</p>
+            <p className="mt-4 text-sm text-[#001F44]">Loading...</p>
           </div>
         </div>
       </Layout>
@@ -231,9 +231,9 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         className="py-20 bg-teal-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-teal-900 mb-8">Edit Portfolio Item</h1>
+          <h1 className="text-3xl font-bold text-[#001F44] mb-8">Edit Portfolio Item</h1>
           <div className="mb-6">
-            <Label className="text-teal-900 text-sm">Current PIN</Label>
+            <Label className="text-[#001F44] text-sm">Current PIN</Label>
             <Input
               value={formData.pin || 'No PIN set'}
               readOnly
@@ -242,7 +242,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <Label htmlFor="title" className="text-teal-900 text-sm">Title</Label>
+              <Label htmlFor="title" className="text-[#001F44] text-sm">Title</Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -252,7 +252,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               />
             </div>
             <div>
-              <Label htmlFor="type" className="text-teal-900 text-sm">Type</Label>
+              <Label htmlFor="type" className="text-[#001F44] text-sm">Type</Label>
               <Select
                 value={formData.type}
                 onValueChange={(value: 'photography' | 'videography') =>
@@ -269,7 +269,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="category" className="text-teal-900 text-sm">Category</Label>
+              <Label htmlFor="category" className="text-[#001F44] text-sm">Category</Label>
               <Select
                 value={formData.category}
                 onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -285,7 +285,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               </Select>
             </div>
             <div>
-              <Label htmlFor="tags" className="text-teal-900 text-sm">Tags (comma-separated)</Label>
+              <Label htmlFor="tags" className="text-[#001F44] text-sm">Tags (comma-separated)</Label>
               <Input
                 id="tags"
                 value={formData.tags}
@@ -294,7 +294,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               />
             </div>
             <div>
-              <Label htmlFor="caption" className="text-teal-900 text-sm">Caption</Label>
+              <Label htmlFor="caption" className="text-[#001F44] text-sm">Caption</Label>
               <Input
                 id="caption"
                 value={formData.caption}
@@ -303,7 +303,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               />
             </div>
             <div>
-              <Label htmlFor="clientName" className="text-teal-900 text-sm">Client Name</Label>
+              <Label htmlFor="clientName" className="text-[#001F44] text-sm">Client Name</Label>
               <Input
                 id="clientName"
                 value={formData.clientName}
@@ -312,7 +312,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               />
             </div>
             <div>
-              <Label htmlFor="clientId" className="text-teal-900 text-sm">Client ID</Label>
+              <Label htmlFor="clientId" className="text-[#001F44] text-sm">Client ID</Label>
               <Input
                 id="clientId"
                 value={formData.clientId}
@@ -321,7 +321,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               />
             </div>
             <div>
-              <Label htmlFor="pin" className="text-teal-900 text-sm">PIN (Client Access)</Label>
+              <Label htmlFor="pin" className="text-[#001F44] text-sm">PIN (Client Access)</Label>
               <Input
                 id="pin"
                 type="text"
@@ -333,7 +333,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               {pinError && <p className="text-xs text-red-600 mt-1">{pinError}</p>}
             </div>
             <div>
-              <Label htmlFor="featured" className="text-teal-900 text-sm">Featured</Label>
+              <Label htmlFor="featured" className="text-[#001F44] text-sm">Featured</Label>
               <Checkbox
                 id="featured"
                 checked={formData.featured}
@@ -342,7 +342,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
             </div>
             {formData.type === 'videography' && (
               <div>
-                <Label htmlFor="videoUrl" className="text-teal-900 text-sm">Video URL</Label>
+                <Label htmlFor="videoUrl" className="text-[#001F44] text-sm">Video URL</Label>
                 <Input
                   id="videoUrl"
                   value={formData.videoUrl}
@@ -352,7 +352,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
               </div>
             )}
             <div>
-              <Label htmlFor="files" className="text-teal-900 text-sm">Upload Additional Files</Label>
+              <Label htmlFor="files" className="text-[#001F44] text-sm">Upload Additional Files</Label>
               <Input
                 id="files"
                 type="file"

@@ -93,7 +93,7 @@ export default function BlogPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-teal-900 mb-4">Our Blog</h1>
+          <h1 className="text-4xl font-bold text-[#001F44] mb-4">Our Blog</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Tips, insights, and inspiration from the world of photography and videography
           </p>
@@ -155,7 +155,7 @@ export default function BlogPage() {
                       <div className="flex items-center gap-2 mb-2">
                         <Badge className="bg-coral-100 text-coral-600">{post.category}</Badge>
                       </div>
-                      <CardTitle className="text-xl text-teal-900 line-clamp-2">
+                      <CardTitle className="text-xl text-[#001F44] line-clamp-2">
                         {post.title}
                       </CardTitle>
                       <CardDescription className="line-clamp-3">{post.excerpt}</CardDescription>

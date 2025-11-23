@@ -216,7 +216,7 @@ export default function AboutPage() {
             animate="visible"
             className="space-y-6"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-teal-900">
+            <h1 className="text-4xl md:text-5xl font-bold text-[#001F44]">
               {headingText.map((word, index) => (
                 <motion.span
                   key={index}
@@ -256,9 +256,9 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-teal-900 mb-4">Our Story</h2>
+            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Story</h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
-              Founded in 2010, Brain Works Studio began as a small team of passionate photographers dedicated to capturing life's most meaningful moments. Over the years, we've grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
+              Founded in 2019, Brain Works Studio began as a small team of passionate photographers dedicated to capturing life's most meaningful moments. Over the years, we've grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
             </p>
           </motion.div>
           <motion.div
@@ -271,7 +271,7 @@ export default function AboutPage() {
             <motion.div variants={cardVariants}>
               <Card className="bg-teal-50 border border-teal-200 shadow-sm">
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-teal-900 mb-2">Our Mission</h3>
+                  <h3 className="text-xl font-semibold text-[#001F44] mb-2">Our Mission</h3>
                   <p className="text-gray-600">
                     To create timeless memories through exceptional photography, tailored to each client's unique vision.
                   </p>
@@ -281,7 +281,7 @@ export default function AboutPage() {
             <motion.div variants={cardVariants}>
               <Card className="bg-teal-50 border border-teal-200 shadow-sm">
                 <CardContent className="p-6">
-                  <h3 className="text-xl font-semibold text-teal-900 mb-2">Our Vision</h3>
+                  <h3 className="text-xl font-semibold text-[#001F44] mb-2">Our Vision</h3>
                   <p className="text-gray-600">
                     To be the leading photography studio known for innovation, quality, and heartfelt storytelling.
                   </p>
@@ -302,7 +302,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-teal-900 mb-4">Our Core Values</h2>
+            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Core Values</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               The principles that guide every shot we take and every client we serve.
             </p>
@@ -320,7 +320,7 @@ export default function AboutPage() {
                 <Card className="bg-white shadow-sm border border-teal-200 hover:bg-teal-50 transition-colors">
                   <CardContent className="p-6 text-center">
                     <value.icon className="h-10 w-10 mx-auto text-teal-600 mb-4" />
-                    <h3 className="text-lg font-semibold text-teal-900 mb-2">{value.title}</h3>
+                    <h3 className="text-lg font-semibold text-[#001F44] mb-2">{value.title}</h3>
                     <p className="text-gray-600 text-sm">{value.description}</p>
                   </CardContent>
                 </Card>
@@ -341,7 +341,7 @@ export default function AboutPage() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-teal-900 mb-4">Meet Our Team</h2>
+            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Meet Our Team</h2>
             <p className="text-gray-600 max-w-lg mx-auto">
               Our dedicated creatives bring years of expertise to every project.
             </p>
@@ -379,7 +379,7 @@ export default function AboutPage() {
                     <motion.h3
                       custom={0}
                       variants={teamContentVariants}
-                      className="text-xl font-bold text-teal-900 mb-1"
+                      className="text-xl font-bold text-[#001F44] mb-1"
                     >
                       {member.name}
                     </motion.h3>
@@ -393,7 +393,7 @@ export default function AboutPage() {
                     <motion.div
                       custom={2}
                       variants={badgeVariants}
-                      className="inline-block bg-teal-100 text-teal-900 text-xs font-medium px-3 py-1 rounded-full mb-3"
+                      className="inline-block bg-teal-100 text-[#001F44] text-xs font-medium px-3 py-1 rounded-full mb-3"
                     >
                       {member.years} Years of Experience
                     </motion.div>
@@ -443,7 +443,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-teal-900 mb-4">Trusted By</h2>
+            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Trusted By</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We're proud to have worked with amazing brands and businesses across various industries.
             </p>
@@ -473,7 +473,7 @@ export default function AboutPage() {
                           e.currentTarget.style.display = 'none';
                           const parent = e.currentTarget.parentElement;
                           if (parent) {
-                            parent.innerHTML = `<p class="text-teal-900 font-semibold text-center">${client.name}</p>`;
+                            parent.innerHTML = `<p class="text-[#001F44] font-semibold text-center">${client.name}</p>`;
                           }
                         }}
                       />
@@ -507,7 +507,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-teal-900 mb-4">Our Impact</h2>
+            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Impact</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Numbers that showcase our dedication to excellence.
             </p>
@@ -525,7 +525,7 @@ export default function AboutPage() {
                 <Card className="bg-white shadow-sm border border-teal-200 text-center">
                   <CardContent className="p-6">
                     <stat.icon className="h-10 w-10 mx-auto text-teal-600 mb-4" />
-                    <p className="text-2xl font-bold text-teal-900">{stat.value}</p>
+                    <p className="text-2xl font-bold text-[#001F44]">{stat.value}</p>
                     <p className="text-gray-600 text-sm">{stat.label}</p>
                   </CardContent>
                 </Card>
@@ -545,7 +545,7 @@ export default function AboutPage() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-teal-900 mb-4">Where We Create</h2>
+            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Where We Create</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We serve clients across multiple locations, bringing our expertise to you.
             </p>
@@ -569,7 +569,7 @@ export default function AboutPage() {
                 <Card className="bg-white border border-teal-200 shadow-sm text-center">
                   <CardContent className="p-6">
                     <MapPin className="h-8 w-8 mx-auto text-teal-600 mb-4" />
-                    <p className="text-lg font-semibold text-teal-900">{location}</p>
+                    <p className="text-lg font-semibold text-[#001F44]">{location}</p>
                   </CardContent>
                 </Card>
               </motion.div>

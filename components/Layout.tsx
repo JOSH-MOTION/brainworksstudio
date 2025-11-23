@@ -129,14 +129,14 @@ export default function RootLayout({ children }: LayoutProps) {
     transition={{ duration: 0.3 }}
   >
     <Image
-      src="/brain2.png"     // 👈 your logo from public/
+      src="/newlogo.png"     // 👈 your logo from public/
       alt="Brain Works Studio Logo"
-      width={32}            // adjust size as needed
-      height={32}
+      width={60}            // adjust size as needed
+      height={60}
       // className="filter invert-[0.35] sepia-[1] saturate-[8] hue-rotate-[140deg]" // teal tint
     />
   </motion.div>
-  <span className="text-base font-bold text-teal-900">
+  <span className="text-base font-bold text-[#001F44]">
     Brain Works Studio
   </span>
 </Link>
@@ -164,8 +164,8 @@ export default function RootLayout({ children }: LayoutProps) {
                   >
                     <Link
                       href={item.href}
-                      className={`text-teal-900 hover:text-coral-500 text-sm ${
-                        pathname === item.href ? 'text-coral-500 font-semibold' : ''
+                      className={`text-[#001F44] hover:text-[#CB9D06] text-sm ${
+                        pathname === item.href ? 'text-[#CB9D06] font-semibold' : ''
                       }`}
                     >
                       {item.label}
@@ -175,12 +175,12 @@ export default function RootLayout({ children }: LayoutProps) {
                 {user ? (
                   <div className="flex items-center space-x-4">
                     <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                      <Link href="/dashboard" className="text-teal-900 hover:text-coral-500 text-sm">
+                      <Link href="/dashboard" className="text-[#001F44] hover:text-coral-500 text-sm">
                         Dashboard
                       </Link>
                     </motion.div>
                     <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                      <Link href="/bookings" className="text-teal-900 hover:text-coral-500 text-sm">
+                      <Link href="/bookings" className="text-[#001F44] hover:text-coral-500 text-sm">
                         Bookings
                       </Link>
                     </motion.div>
@@ -271,7 +271,7 @@ export default function RootLayout({ children }: LayoutProps) {
                       >
                         <Link
                           href={item.href}
-                          className={`block px-3 py-1 text-teal-900 hover:bg-coral-50 hover:text-coral-500 text-sm ${
+                          className={`block px-3 py-1 text-[#001F44] hover:bg-coral-50 hover:text-coral-500 text-sm ${
                             pathname === item.href ? 'text-coral-500 font-semibold' : ''
                           }`}
                           onClick={() => setMobileMenuOpen(false)}
@@ -304,7 +304,7 @@ export default function RootLayout({ children }: LayoutProps) {
                         >
                           <Link
                             href="/dashboard"
-                            className="block px-3 py-1 text-teal-900 hover:bg-coral-50 hover:text-coral-500 text-sm"
+                            className="block px-3 py-1 text-[#001F44] hover:bg-coral-50 hover:text-coral-500 text-sm"
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             Dashboard
@@ -318,7 +318,7 @@ export default function RootLayout({ children }: LayoutProps) {
                         >
                           <Link
                             href="/bookings"
-                            className="block px-3 py-1 text-teal-900 hover:bg-coral-50 hover:text-coral-500 text-sm"
+                            className="block px-3 py-1 text-[#001F44] hover:bg-coral-50 hover:text-coral-500 text-sm"
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             Bookings
@@ -365,7 +365,7 @@ export default function RootLayout({ children }: LayoutProps) {
                             signOut();
                             setMobileMenuOpen(false);
                           }}
-                          className="block text-left px-3 py-1 text-teal-900 hover:bg-coral-50 hover:text-coral-500 text-sm"
+                          className="block text-left px-3 py-1 text-[#001F44] hover:bg-coral-50 hover:text-coral-500 text-sm"
                         >
                           Logout
                         </motion.button>
@@ -380,7 +380,7 @@ export default function RootLayout({ children }: LayoutProps) {
                         >
                           <Link
                             href="/auth/login"
-                            className="block px-3 py-1 text-teal-900 hover:bg-coral-50 hover:text-coral-500 text-sm"
+                            className="block px-3 py-1 text-[#001F44] hover:bg-coral-50 hover:text-coral-500 text-sm"
                             onClick={() => setMobileMenuOpen(false)}
                           >
                             Login
@@ -418,7 +418,7 @@ export default function RootLayout({ children }: LayoutProps) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={footerVariants}
-          className="bg-teal-50 text-teal-900"
+          className="bg-teal-50 text-[#001F44]"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -430,14 +430,14 @@ export default function RootLayout({ children }: LayoutProps) {
     transition={{ duration: 0.3 }}
   >
     <Image
-      src="/brain2.png"     // 👈 your logo from public/
+      src="/newlogo.png"     // 👈 your logo from public/
       alt="Brain Works Studio Logo"
       width={32}            // adjust size as needed
       height={32}
       // className="filter invert-[0.35] sepia-[1] saturate-[8] hue-rotate-[140deg]" // teal tint
     />
   </motion.div>
-  <span className="text-base font-bold text-teal-900">
+  <span className="text-base font-bold text-[#001F44]">
     Brain Works Studio
   </span>
 </Link>
@@ -469,7 +469,7 @@ export default function RootLayout({ children }: LayoutProps) {
 
               {/* Services */}
               <motion.div custom={1} variants={footerSectionVariants}>
-                <h3 className="text-base font-semibold text-teal-900 mb-3">Our Services</h3>
+                <h3 className="text-base font-semibold text-[#001F44] mb-3">Our Services</h3>
                 <ul className="space-y-1 text-sm text-gray-600">
                   {[
                     'Event Photography',
@@ -492,7 +492,7 @@ export default function RootLayout({ children }: LayoutProps) {
 
               {/* Quick Links */}
               <motion.div custom={2} variants={footerSectionVariants}>
-                <h3 className="text-base font-semibold text-teal-900 mb-3">Quick Links</h3>
+                <h3 className="text-base font-semibold text-[#001F44] mb-3">Quick Links</h3>
                 <ul className="space-y-1 text-sm text-gray-600">
                   {[
                     { href: '/about', label: 'About Us' },
@@ -518,7 +518,7 @@ export default function RootLayout({ children }: LayoutProps) {
 
               {/* Newsletter */}
               <motion.div custom={3} variants={footerSectionVariants}>
-                <h3 className="text-base font-semibold text-teal-900 mb-3">Stay Connected</h3>
+                <h3 className="text-base font-semibold text-[#001F44] mb-3">Stay Connected</h3>
                 <p className="text-sm text-gray-600 mb-3">Subscribe for updates and exclusive offers.</p>
                 <form onSubmit={handleNewsletterSubmit} className="flex flex-col space-y-2">
                   <Input

@@ -32,7 +32,7 @@ export default function VideoPlayer({ videoSrc, onClose }: VideoPlayerProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-teal-900/80 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-[#001F44]/80 flex items-center justify-center z-50"
     >
       <div className="relative w-full max-w-4xl mx-4 sm:mx-6">
         <button

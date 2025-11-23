@@ -195,15 +195,15 @@ export default function Home() {
           className="absolute inset-0"
         >
           <Image
-            src="/hero-bg.jpg"
+            src="/brand.jpg"
             alt="Hero Background"
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover filter brightness-75"
             priority
             onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
           />
-          <div className="absolute inset-0 bg-teal-900/50" />
+          <div className="absolute inset-0 bg-black/40" />
         </motion.div>
 
         <motion.div
@@ -276,7 +276,7 @@ export default function Home() {
               <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-teal-500 text-white hover:bg-teal-600 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
+                  className="w-full sm:w-auto bg-[#CB9D06] text-white hover:bg-teal-600 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
                 >
                   Discover Our Work
                   <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -288,7 +288,7 @@ export default function Home() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto border-2 border-white text-teal-600 hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
+                  className="w-full sm:w-auto border-2 border-white text-[#001F44] hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
                 >
                   Start Your Journey
                 </Button>
@@ -311,7 +311,7 @@ export default function Home() {
             variants={heroChildVariants}
             className="text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-teal-900">Our Craft</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44]">Our Craft</h2>
             <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
               Tailored services to capture your vision with creativity and precision.
             </p>
@@ -364,7 +364,7 @@ export default function Home() {
                     >
                       <service.icon className="h-10 w-10 sm:h-12 sm:w-12 text-teal-500" />
                     </motion.div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-teal-900 text-center">
+                    <h3 className="text-lg sm:text-xl font-semibold text-[#001F44] text-center">
                       {service.title}
                     </h3>
                     <p className="text-sm sm:text-base text-gray-600 text-center mt-2">
@@ -391,7 +391,7 @@ export default function Home() {
             variants={heroChildVariants}
             className="text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-teal-900">Our Masterpieces</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44]">Our Masterpieces</h2>
             <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
               A glimpse into our portfolio of unforgettable moments.
             </p>
@@ -462,7 +462,7 @@ export default function Home() {
             variants={heroChildVariants}
             className="text-center mb-8 sm:mb-12"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-teal-900">Client Testimonials</h2>
+            <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44]">Client Testimonials</h2>
             <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
               Hear what our clients have to say about their experience with us.
             </p>
@@ -532,7 +532,7 @@ export default function Home() {
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg text-teal-900 truncate">
+                            <CardTitle className="text-lg text-[#001F44] truncate">
                               {review.clientName}
                             </CardTitle>
                             <p className="text-sm text-gray-600 truncate">{review.serviceType}</p>

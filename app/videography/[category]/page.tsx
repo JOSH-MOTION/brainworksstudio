@@ -78,7 +78,7 @@ export default function VideographyPortfolio({ params }: { params: { category?: 
         <div className="min-h-[80vh] sm:min-h-screen flex items-center justify-center bg-teal-50">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-coral-500 mx-auto"></div>
-            <p className="mt-4 text-sm text-teal-900">Loading...</p>
+            <p className="mt-4 text-sm text-[#001F44]">Loading...</p>
           </div>
         </div>
       </Layout>
@@ -121,7 +121,7 @@ export default function VideographyPortfolio({ params }: { params: { category?: 
               e.currentTarget.src = '/images/video-hero-placeholder.jpg';
             }}
           />
-          <div className="absolute inset-0 bg-teal-900/50"></div>
+          <div className="absolute inset-0 bg-[#001F44]/50"></div>
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
           <motion.h1
@@ -153,7 +153,7 @@ export default function VideographyPortfolio({ params }: { params: { category?: 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {items.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-teal-900 text-sm sm:text-base">No videos found in this category.</p>
+              <p className="text-[#001F44] text-sm sm:text-base">No videos found in this category.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -198,7 +198,7 @@ export default function VideographyPortfolio({ params }: { params: { category?: 
                       }}
                     />
                     {item.videoUrl && (
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-teal-900/50">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-[#001F44]/50">
                         <Play className="h-8 w-8 text-white" />
                       </div>
                     )}

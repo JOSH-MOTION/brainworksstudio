@@ -93,14 +93,14 @@ export default function SubmitReview() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-2xl font-bold text-teal-900 mb-6"
+          className="text-2xl font-bold text-[#001F44] mb-6"
         >
           Submit Your Review
         </motion.h2>
 
         <div className="space-y-6">
           <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientName" className="text-teal-900 text-sm">Name *</Label>
+            <Label htmlFor="clientName" className="text-[#001F44] text-sm">Name *</Label>
             <Input
               id="clientName"
               type="text"
@@ -112,7 +112,7 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientEmail" className="text-teal-900 text-sm">Email *</Label>
+            <Label htmlFor="clientEmail" className="text-[#001F44] text-sm">Email *</Label>
             <Input
               id="clientEmail"
               type="email"
@@ -124,7 +124,7 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientImage" className="text-teal-900 text-sm">Profile Image (optional)</Label>
+            <Label htmlFor="clientImage" className="text-[#001F44] text-sm">Profile Image (optional)</Label>
             <Input
               id="clientImage"
               type="file"
@@ -135,7 +135,7 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label className="text-teal-900 text-sm">Rating *</Label>
+            <Label className="text-[#001F44] text-sm">Rating *</Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -150,7 +150,7 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="serviceType" className="text-teal-900 text-sm">Service Type *</Label>
+            <Label htmlFor="serviceType" className="text-[#001F44] text-sm">Service Type *</Label>
             <Select value={serviceType} onValueChange={setServiceType}>
               <SelectTrigger className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg">
                 <SelectValue placeholder="Select service type" />
@@ -166,7 +166,7 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="reviewText" className="text-teal-900 text-sm">Review *</Label>
+            <Label htmlFor="reviewText" className="text-[#001F44] text-sm">Review *</Label>
             <Textarea
               id="reviewText"
               value={reviewText}

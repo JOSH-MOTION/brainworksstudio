@@ -78,7 +78,7 @@ export default function BlogPostPage() {
     return (
       <Layout>
         <div className="max-w-4xl mx-auto py-12 px-4 text-center">
-          <h1 className="text-3xl font-bold text-teal-900 mb-4">Post Not Found</h1>
+          <h1 className="text-3xl font-bold text-[#001F44] mb-4">Post Not Found</h1>
           <p className="text-red-600 mb-4">{error || 'The requested blog post could not be found.'}</p>
           <Link href="/blog">
             <Button className="bg-coral-500 hover:bg-coral-600 text-white">
@@ -132,7 +132,7 @@ export default function BlogPostPage() {
               </Badge>
             ))}
           </div>
-          <h1 className="text-4xl font-bold text-teal-900 mb-4">{post.title || 'Untitled'}</h1>
+          <h1 className="text-4xl font-bold text-[#001F44] mb-4">{post.title || 'Untitled'}</h1>
           <div className="flex items-center gap-6 text-gray-600">
             <div className="flex items-center gap-2">
               <User className="h-5 w-5" />
@@ -178,7 +178,7 @@ export default function BlogPostPage() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-12 pt-8 border-t border-gray-200"
         >
-          <h3 className="text-xl font-semibold text-teal-900 mb-4">Share this post</h3>
+          <h3 className="text-xl font-semibold text-[#001F44] mb-4">Share this post</h3>
           <div className="flex gap-4">
             <Button
               variant="outline"

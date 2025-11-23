@@ -127,14 +127,14 @@ export default function SignupPage() {
             <CardHeader className="text-center">
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
-                  src="/brain2.png"
+                  src="/newlogo.png"
                   alt="Brain Works Studio Logo"
                   width={48}
                   height={48}
                   className="object-contain"
                 />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-teal-900">Create Your Account</CardTitle>
+              <CardTitle className="text-3xl font-bold text-[#001F44]">Create Your Account</CardTitle>
               <CardDescription className="text-gray-600">
                 Join Brain Works Studio to start capturing your moments
               </CardDescription>
@@ -142,7 +142,7 @@ export default function SignupPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="displayName" className="text-teal-900 font-semibold">
+                  <Label htmlFor="displayName" className="text-[#001F44] font-semibold">
                     Full Name
                   </Label>
                   <Input
@@ -158,7 +158,7 @@ export default function SignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="profileImage" className="text-teal-900 font-semibold">
+                  <Label htmlFor="profileImage" className="text-[#001F44] font-semibold">
                     Profile Picture (Optional)
                   </Label>
                   <div className="flex items-center gap-4">
@@ -198,7 +198,7 @@ export default function SignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="email" className="text-teal-900 font-semibold">
+                  <Label htmlFor="email" className="text-[#001F44] font-semibold">
                     Email
                   </Label>
                   <Input
@@ -214,7 +214,7 @@ export default function SignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="password" className="text-teal-900 font-semibold">
+                  <Label htmlFor="password" className="text-[#001F44] font-semibold">
                     Password
                   </Label>
                   <div className="relative">
@@ -239,7 +239,7 @@ export default function SignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-teal-900 font-semibold">
+                  <Label htmlFor="confirmPassword" className="text-[#001F44] font-semibold">
                     Confirm Password
                   </Label>
                   <div className="relative">

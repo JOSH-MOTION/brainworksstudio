@@ -58,7 +58,7 @@ export default function ReviewsSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-teal-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44] mb-4">
             What Our Clients Say
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
@@ -114,7 +114,7 @@ export default function ReviewsSection() {
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-teal-900">{review.clientName}</p>
+                      <p className="font-semibold text-[#001F44]">{review.clientName}</p>
                       <p className="text-sm text-gray-600">{review.serviceType}</p>
                     </div>
                   </div>

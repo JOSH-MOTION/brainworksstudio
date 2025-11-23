@@ -136,14 +136,14 @@ export default function LoginPage() {
             <CardHeader className="text-center">
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
-                  src="/brain2.png"
+                  src="/newlogo.png"
                   alt="Brain Works Studio Logo"
                   width={48}
                   height={48}
                   className="object-contain"
                 />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-teal-900">
+              <CardTitle className="text-3xl font-bold text-[#001F44]">
                 {isResetMode ? 'Reset Password' : 'Welcome Back'}
               </CardTitle>
               <CardDescription className="text-gray-600">
@@ -156,7 +156,7 @@ export default function LoginPage() {
               {!isResetMode ? (
                 <form onSubmit={handleLoginSubmit} className="space-y-5">
                   <motion.div variants={inputVariants} className="space-y-2">
-                    <Label htmlFor="email" className="text-teal-900 font-semibold">
+                    <Label htmlFor="email" className="text-[#001F44] font-semibold">
                       Email
                     </Label>
                     <Input
@@ -171,7 +171,7 @@ export default function LoginPage() {
                   </motion.div>
 
                   <motion.div variants={inputVariants} className="space-y-2">
-                    <Label htmlFor="password" className="text-teal-900 font-semibold">
+                    <Label htmlFor="password" className="text-[#001F44] font-semibold">
                       Password
                     </Label>
                     <div className="relative">
@@ -228,7 +228,7 @@ export default function LoginPage() {
               ) : (
                 <form onSubmit={handleResetSubmit} className="space-y-5">
                   <motion.div variants={inputVariants} className="space-y-2">
-                    <Label htmlFor="resetEmail" className="text-teal-900 font-semibold">
+                    <Label htmlFor="resetEmail" className="text-[#001F44] font-semibold">
                       Email
                     </Label>
                     <Input

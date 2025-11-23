@@ -108,7 +108,7 @@ export default function PhotographyPortfolio({ params }: { params: { category?: 
               e.currentTarget.src = '/placeholder-hero.jpg';
             }}
           />
-          <div className="absolute inset-0 bg-navy-900 bg-opacity-50 bg-teal-900"></div>
+          <div className="absolute inset-0 bg-navy-900 bg-opacity-50 bg-[#001F44]"></div>
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center ">
           <motion.h1

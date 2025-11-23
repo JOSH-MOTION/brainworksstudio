@@ -95,7 +95,7 @@ export default function PricingPage() {
           transition={{ duration: 0.5 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl font-bold text-teal-900 mb-4">Our Pricing</h1>
+          <h1 className="text-4xl font-bold text-[#001F44] mb-4">Our Pricing</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Transparent pricing for professional photography and videography services
           </p>
@@ -173,7 +173,7 @@ export default function PricingPage() {
                       {card.category}
                     </Badge>
                   </div>
-                  <CardTitle className="text-2xl text-teal-900">{card.serviceName}</CardTitle>
+                  <CardTitle className="text-2xl text-[#001F44]">{card.serviceName}</CardTitle>
                   <CardDescription className="text-gray-600">{card.description}</CardDescription>
                   <div className="mt-4">
                     <span className="text-4xl font-bold text-coral-600">{card.price}</span>
@@ -235,7 +235,7 @@ export default function PricingPage() {
         >
           <Card className="bg-gradient-to-br from-teal-50 to-coral-50 border-none">
             <CardContent className="p-8">
-              <h2 className="text-2xl font-bold text-teal-900 mb-4">
+              <h2 className="text-2xl font-bold text-[#001F44] mb-4">
                 Need a Custom Package?
               </h2>
               <p className="text-gray-600 mb-6 max-w-2xl mx-auto">

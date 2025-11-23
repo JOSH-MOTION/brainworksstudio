@@ -281,7 +281,7 @@ export default function ClientPortfolioPage() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md"
         >
-          <h2 className="text-2xl font-bold text-teal-900 mb-2">Not Found</h2>
+          <h2 className="text-2xl font-bold text-[#001F44] mb-2">Not Found</h2>
           <p className="text-gray-600 mb-6">
             This portfolio item doesn't exist.
           </p>
@@ -309,7 +309,7 @@ export default function ClientPortfolioPage() {
             <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 mb-8 shadow-xl border border-coral-100">
               <div className="flex flex-col md:flex-row justify-between items-start gap-6">
                 <div className="flex-1">
-                  <h1 className="text-3xl md:text-4xl font-bold text-teal-900 mb-3">
+                  <h1 className="text-3xl md:text-4xl font-bold text-[#001F44] mb-3">
                     {item.title}
                   </h1>
                   {item.caption && (
@@ -408,7 +408,7 @@ export default function ClientPortfolioPage() {
                           className="p-3 bg-white/90 hover:bg-white rounded-full shadow-lg backdrop-blur-sm"
                           title="View Fullscreen"
                         >
-                          <Eye className="h-5 w-5 text-teal-900" />
+                          <Eye className="h-5 w-5 text-[#001F44]" />
                         </button>
                         <button
                           onClick={(e) => {
@@ -532,7 +532,7 @@ export default function ClientPortfolioPage() {
                     <Lock className="h-6 w-6 text-coral-600" />
                   </div>
                 </div>
-                <h2 className="text-xl font-bold text-center text-teal-900 mb-2">
+                <h2 className="text-xl font-bold text-center text-[#001F44] mb-2">
                   PIN Required
                 </h2>
                 <p className="text-sm text-center text-gray-600 mb-5">

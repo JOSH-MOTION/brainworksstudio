@@ -136,18 +136,18 @@ export default function AdminDashboard() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <User className="h-6 w-6 text-teal-900 dark:text-teal-400" />
+                <User className="h-6 w-6 text-[#001F44] dark:text-teal-400" />
               </motion.div>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-teal-900 dark:text-teal-300">Studio Dashboard</h1>
+              <h1 className="text-2xl font-bold text-[#001F44] dark:text-teal-300">Studio Dashboard</h1>
               <p className="text-sm text-gray-600 dark:text-gray-400">Welcome, {userProfile?.displayName || user.displayName || 'User'}</p>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/admin/profile">
                 <Button
                   variant="outline"
-                  className="ml-4 border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-900 rounded-full"
+                  className="ml-4 border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-[#001F44] rounded-full"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
           <Button
             onClick={toggleTheme}
             variant="outline"
-            className="border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-900 rounded-full"
+            className="border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-[#001F44] rounded-full"
           >
             {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
           </Button>
@@ -221,7 +221,7 @@ export default function AdminDashboard() {
             <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-teal-100 dark:bg-teal-900/50 rounded-full">
+                  <div className="p-2 bg-teal-100 dark:bg-[#001F44]/50 rounded-full">
                     <Calendar className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                   </div>
                   <div>
@@ -331,7 +331,7 @@ export default function AdminDashboard() {
                   <Link href="/admin/users?role=admin">
                     <Button
                       variant="outline"
-                      className="w-full border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-teal-900/50 rounded-lg"
+                      className="w-full border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-[#001F44]/50 rounded-lg"
                     >
                       Team Members
                     </Button>
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
                       className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="p-2 bg-teal-100 dark:bg-teal-900/50 rounded-full">
+                        <div className="p-2 bg-teal-100 dark:bg-[#001F44]/50 rounded-full">
                           <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
                         </div>
                         <div>

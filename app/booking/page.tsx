@@ -240,7 +240,7 @@ export default function BookingPage() {
         >
           <Card className="max-w-md mx-auto bg-teal-50 border-coral-100 rounded-xl shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl text-teal-900">Please Sign In</CardTitle>
+              <CardTitle className="text-xl text-[#001F44]">Please Sign In</CardTitle>
               <CardDescription className="text-sm text-gray-600">
                 You need to be signed in to book a session.
               </CardDescription>
@@ -280,7 +280,7 @@ export default function BookingPage() {
                 <div className="mx-auto mb-3 p-2 bg-coral-50 rounded-full w-fit">
                   <CheckCircle className="h-6 w-6 text-coral-500" />
                 </div>
-                <h2 className="text-xl font-bold text-teal-900 mb-2">Booking Submitted!</h2>
+                <h2 className="text-xl font-bold text-[#001F44] mb-2">Booking Submitted!</h2>
                 <p className="text-sm text-gray-600 mb-3">
                   Thank you for your booking request. We'll respond within 24 hours.
                 </p>
@@ -308,7 +308,7 @@ export default function BookingPage() {
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="text-2xl md:text-3xl font-bold text-teal-900 mb-3">
+          <motion.h1 className="text-2xl md:text-3xl font-bold text-[#001F44] mb-3">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}
@@ -342,7 +342,7 @@ export default function BookingPage() {
       >
         <Card className="bg-teal-50 border-coral-100 rounded-xl shadow-sm">
           <CardHeader>
-            <CardTitle className="text-xl text-teal-900">Book a Session</CardTitle>
+            <CardTitle className="text-xl text-[#001F44]">Book a Session</CardTitle>
             <CardDescription className="text-sm text-gray-600">
               Share your project details, and we'll provide a personalized quote.
             </CardDescription>
@@ -358,7 +358,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="serviceCategory" className="text-sm text-teal-900">
+                <Label htmlFor="serviceCategory" className="text-sm text-[#001F44]">
                   Service Type
                 </Label>
                 <Select onValueChange={handleSelectChange} value={formData.serviceCategory}>
@@ -385,7 +385,7 @@ export default function BookingPage() {
                   viewport={{ once: true }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="serviceName" className="text-sm text-teal-900">
+                  <Label htmlFor="serviceName" className="text-sm text-[#001F44]">
                     Selected Package
                   </Label>
                   <Input
@@ -435,7 +435,7 @@ export default function BookingPage() {
                     viewport={{ once: true }}
                     className="space-y-2"
                   >
-                    <Label htmlFor={field.id} className="text-sm text-teal-900 flex items-center">
+                    <Label htmlFor={field.id} className="text-sm text-[#001F44] flex items-center">
                       <field.icon className="h-4 w-4 mr-1 text-coral-500" />
                       {field.label}
                     </Label>
@@ -462,7 +462,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="address" className="text-sm text-teal-900 flex items-center">
+                <Label htmlFor="address" className="text-sm text-[#001F44] flex items-center">
                   <MapPin className="h-4 w-4 mr-1 text-coral-500" />
                   Location Address
                 </Label>
@@ -486,7 +486,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="additionalNotes" className="text-sm text-teal-900">
+                <Label htmlFor="additionalNotes" className="text-sm text-[#001F44]">
                   Additional Notes
                 </Label>
                 <Textarea
@@ -509,7 +509,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="attachments" className="text-sm text-teal-900 flex items-center">
+                <Label htmlFor="attachments" className="text-sm text-[#001F44] flex items-center">
                   <Upload className="h-4 w-4 mr-1 text-coral-500" />
                   Reference Images (Optional)
                 </Label>

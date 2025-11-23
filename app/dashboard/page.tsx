@@ -137,7 +137,7 @@ export default function DashboardPage() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <User className="h-8 w-8 text-teal-900" />
+                <User className="h-8 w-8 text-[#001F44]" />
               </motion.div>
             )}
             <div>
@@ -172,7 +172,7 @@ export default function DashboardPage() {
             {
               title: 'Book New Session',
               description: 'Schedule your next photography session',
-              icon: <Camera className="h-6 w-6 text-teal-900" />,
+              icon: <Camera className="h-6 w-6 text-[#001F44]" />,
               link: '/booking',
               buttonText: 'Book Now',
               buttonClass: 'bg-teal-500 hover:bg-teal-600 text-white',
@@ -180,7 +180,7 @@ export default function DashboardPage() {
             {
               title: 'Update Profile',
               description: 'Edit your personal information',
-              icon: <User className="h-6 w-6 text-teal-900" />,
+              icon: <User className="h-6 w-6 text-[#001F44]" />,
               link: '/profile',
               buttonText: 'Edit Profile',
               buttonClass: 'border-teal-500 text-teal-500 hover:bg-teal-100',
@@ -188,7 +188,7 @@ export default function DashboardPage() {
             {
               title: 'View Portfolio',
               description: 'Browse our latest work',
-              icon: <Camera className="h-6 w-6 text-teal-900" />,
+              icon: <Camera className="h-6 w-6 text-[#001F44]" />,
               link: '/portfolio',
               buttonText: 'View Gallery',
               buttonClass: 'border-teal-500 text-teal-500 hover:bg-teal-100',
@@ -211,7 +211,7 @@ export default function DashboardPage() {
                   >
                     {action.icon}
                   </motion.div>
-                  <h3 className="font-semibold text-teal-900 mb-2">{action.title}</h3>
+                  <h3 className="font-semibold text-[#001F44] mb-2">{action.title}</h3>
                   <p className="text-gray-600 text-sm mb-4">{action.description}</p>
                   <Link href={action.link}>
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         <motion.div variants={sectionVariants}>
           <Card className="bg-white rounded-xl shadow-md">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-teal-900">
+              <CardTitle className="flex items-center gap-2 text-[#001F44]">
                 <Calendar className="h-5 w-5" />
                 Recent Bookings
               </CardTitle>
@@ -240,7 +240,7 @@ export default function DashboardPage() {
               {loading ? (
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-teal-500 mx-auto"></div>
-                  <p className="mt-4 text-teal-900 text-lg font-medium">Loading bookings...</p>
+                  <p className="mt-4 text-[#001F44] text-lg font-medium">Loading bookings...</p>
                 </div>
               ) : bookings.length === 0 ? (
                 <motion.div
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                   className="text-center py-8"
                 >
                   <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-teal-900 mb-2">No bookings yet</h3>
+                  <h3 className="text-lg font-medium text-[#001F44] mb-2">No bookings yet</h3>
                   <p className="text-gray-600 mb-4">Start by booking your first photography session!</p>
                   <Link href="/booking">
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-semibold text-teal-900">{booking.serviceCategory}</h3>
+                            <h3 className="text-lg font-semibold text-[#001F44]">{booking.serviceCategory}</h3>
                             <Badge className={getStatusColor(booking.status)}>
                               {getStatusText(booking.status)}
                             </Badge>
@@ -298,7 +298,7 @@ export default function DashboardPage() {
                           </div>
                           {booking.additionalNotes && (
                             <div className="mt-3 p-3 bg-teal-50 rounded-md">
-                              <p className="text-sm text-teal-900">
+                              <p className="text-sm text-[#001F44]">
                                 <strong>Notes:</strong> {booking.additionalNotes}
                               </p>
                             </div>
