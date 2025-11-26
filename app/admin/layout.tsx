@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   // Add metadataBase for proper path resolution (optional, but good practice)
   metadataBase: new URL(BASE_URL),
   
-  title: 'Admin Dashboard | Brain Works Studio',
-  description: 'Manage users, content, and settings for Brain Works Studio.',
+  title: 'Admin Dashboard | Brain Works Studio Africa',
+  description: 'Manage users, content, and settings for Brain Works Studio Africa.',
   icons: {
     icon: '/newlogo3.png', // 👈 use your logo from public/
   },

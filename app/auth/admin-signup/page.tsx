@@ -107,7 +107,7 @@ export default function AdminSignupPage() {
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
                   src="/newlogo.png"
-                  alt="Brain Works Studio Logo"
+                  alt="Brain Works Studio Africa Logo"
                   width={48}
                   height={48}
                   className="object-contain"
@@ -115,7 +115,7 @@ export default function AdminSignupPage() {
               </motion.div>
               <CardTitle className="text-3xl font-bold text-[#001F44]">Admin Registration</CardTitle>
               <CardDescription className="text-gray-600">
-                Create an administrator account for Brain Works Studio
+                Create an administrator account for Brain Works Studio Africa
               </CardDescription>
             </CardHeader>
             <CardContent>

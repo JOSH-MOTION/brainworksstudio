@@ -35,12 +35,12 @@ export async function POST(request: NextRequest) {
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: formData.email,
-      subject: 'Thank you for contacting Brain Works Studio',
+      subject: 'Thank you for contacting Brain Works Studio Africa',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #8B4513;">Thank You for Reaching Out</h2>
           <p>Dear ${formData.name},</p>
-          <p>Thank you for contacting Brain Works Studio. We've received your message and will get back to you within 24 hours.</p>
+          <p>Thank you for contacting Brain Works Studio Africa. We've received your message and will get back to you within 24 hours.</p>
           
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>Your Message:</h3>
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
           </div>
           
           <p>We look forward to discussing your project!</p>
-          <p>Best regards,<br>Brain Works Studio Team</p>
+          <p>Best regards,<br>Brain Works Studio Africa Team</p>
         </div>
       `,
     });

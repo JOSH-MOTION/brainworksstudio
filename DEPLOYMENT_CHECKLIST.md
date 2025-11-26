@@ -1,4 +1,4 @@
-# Deployment Checklist for Brain Works Studio
+# Deployment Checklist for Brain Works Studio Africa
 
 ## Pre-Deployment Setup
 

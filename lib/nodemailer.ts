@@ -16,12 +16,12 @@ export const sendBookingConfirmation = async (userEmail: string, bookingDetails:
   const mailOptions = {
     from: process.env.GMAIL_USER,
     to: userEmail,
-    subject: 'Booking Confirmation - Brain Works Studio',
+    subject: 'Booking Confirmation - Brain Works Studio Africa',
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #8B4513;">Booking Confirmation</h2>
         <p>Dear ${bookingDetails.userName},</p>
-        <p>Thank you for booking with Brain Works Studio. Your booking has been received and is pending review.</p>
+        <p>Thank you for booking with Brain Works Studio Africa. Your booking has been received and is pending review.</p>
         
         <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3>Booking Details:</h3>
@@ -32,7 +32,7 @@ export const sendBookingConfirmation = async (userEmail: string, bookingDetails:
         </div>
         
         <p>We will review your booking and get back to you within 24 hours.</p>
-        <p>Best regards,<br>Brain Works Studio Team</p>
+        <p>Best regards,<br>Brain Works Studio Africa Team</p>
       </div>
     `,
   };
@@ -49,7 +49,7 @@ export const sendBookingStatusUpdate = async (userEmail: string, status: string,
   const mailOptions = {
     from: process.env.GMAIL_USER,
     to: userEmail,
-    subject: `Booking ${statusText} - Brain Works Studio`,
+    subject: `Booking ${statusText} - Brain Works Studio Africa`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: ${statusColor};">Booking ${statusText}</h2>
@@ -66,8 +66,8 @@ export const sendBookingStatusUpdate = async (userEmail: string, status: string,
         
         ${bookingDetails.adminNotes ? `<p><strong>Notes:</strong> ${bookingDetails.adminNotes}</p>` : ''}
         
-        <p>Thank you for choosing Brain Works Studio!</p>
-        <p>Best regards,<br>Brain Works Studio Team</p>
+        <p>Thank you for choosing Brain Works Studio Africa!</p>
+        <p>Best regards,<br>Brain Works Studio Africa Team</p>
       </div>
     `,
   };

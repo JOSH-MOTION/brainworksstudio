@@ -130,14 +130,14 @@ export default function RootLayout({ children }: LayoutProps) {
   >
     <Image
       src="/newlogo.png"     // 👈 your logo from public/
-      alt="Brain Works Studio Logo"
+      alt="Brain Works Studio Africa Logo"
       width={60}            // adjust size as needed
       height={60}
       // className="filter invert-[0.35] sepia-[1] saturate-[8] hue-rotate-[140deg]" // teal tint
     />
   </motion.div>
   <span className="text-base font-bold text-[#001F44]">
-    Brain Works Studio
+    Brain Works Studio Africa
   </span>
 </Link>
 
@@ -431,14 +431,14 @@ export default function RootLayout({ children }: LayoutProps) {
   >
     <Image
       src="/newlogo.png"     // 👈 your logo from public/
-      alt="Brain Works Studio Logo"
+      alt="Brain Works Studio Africa Logo"
       width={32}            // adjust size as needed
       height={32}
       // className="filter invert-[0.35] sepia-[1] saturate-[8] hue-rotate-[140deg]" // teal tint
     />
   </motion.div>
   <span className="text-base font-bold text-[#001F44]">
-    Brain Works Studio
+    Brain Works Studio Africa
   </span>
 </Link>
                 <p className="text-sm text-gray-600 mb-3">
@@ -550,7 +550,7 @@ export default function RootLayout({ children }: LayoutProps) {
               transition={{ duration: 0.4, delay: 0.4 }}
               className="border-t border-coral-100 mt-8 pt-6 text-center text-sm text-gray-600"
             >
-              <p>&copy; 2025 Brain Works Studio. All rights reserved.</p>
+              <p>&copy; 2025 Brain Works Studio Africa . All rights reserved.</p>
             </motion.div>
           </div>
         </motion.footer>

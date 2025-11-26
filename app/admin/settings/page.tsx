@@ -70,7 +70,7 @@ export default function AdminSettingsPage() {
 
       const data = await res.json();
       setSettings({
-        studioName: data.studioName || 'Brain Works Studio',
+        studioName: data.studioName || 'Brain Works Studio Africa',
         address: data.address || '',
         contactEmail: data.contactEmail || '',
         maxBookingsPerDay: data.maxBookingsPerDay || 5,

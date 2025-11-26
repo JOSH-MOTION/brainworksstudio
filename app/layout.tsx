@@ -9,11 +9,11 @@ const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: 'Brain Works Studio Africa – Professional Photography & Videography',
+  title: 'Brain Works Studio Africa  – Professional Photography & Videography',
   description:
-    'Brain Works Studio Africa offers professional photography and videography services for events, portraits, products, and commercial projects across Ghana and Africa.',
+    'Brain Works Studio Africa  offers professional photography and videography services for events, portraits, products, and commercial projects across Ghana and Africa.',
   keywords: [
-    'Brain Works Studio Africa',
+    'Brain Works Studio Africa ',
     'photography Ghana',
     'videography Ghana',
     'creative studio',
@@ -32,17 +32,17 @@ export const metadata: Metadata = {
   apple: '/apple-touch-icon.png',
 },
   openGraph: {
-    title: 'Brain Works Studio Africa',
+    title: 'Brain Works Studio Africa ',
     description:
       'Professional photography, videography, and storytelling across Ghana and Africa.',
     url: BASE_URL,
-    siteName: 'Brain Works Studio Africa',
+    siteName: 'Brain Works Studio Africa ',
     images: [
       {
         url: `${BASE_URL}/newlogo3.png`,
         width: 1200,
         height: 630,
-        alt: 'Brain Works Studio Africa logo',
+        alt: 'Brain Works Studio Africa  logo',
       },
     ],
     locale: 'en_GB',
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Brain Works Studio Africa',
+    title: 'Brain Works Studio Africa ',
     description:
       'Photography, videography, and creative storytelling across Ghana and Africa.',
     images: [`${BASE_URL}/newlogo3.png`],
@@ -85,7 +85,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              name: "Brain Works Studio Africa",
+              name: "Brain Works Studio Africa ",
               url: BASE_URL,
               logo: `${BASE_URL}/newlogo3.png`,
               sameAs: [

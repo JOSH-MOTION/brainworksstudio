@@ -137,7 +137,7 @@ export default function LoginPage() {
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
                   src="/newlogo.png"
-                  alt="Brain Works Studio Logo"
+                  alt="Brain Works Studio Africa Logo"
                   width={48}
                   height={48}
                   className="object-contain"
@@ -149,7 +149,7 @@ export default function LoginPage() {
               <CardDescription className="text-gray-600">
                 {isResetMode
                   ? 'Enter your email to receive a password reset link'
-                  : 'Sign in to your Brain Works Studio account'}
+                  : 'Sign in to your Brain Works Studio Africa account'}
               </CardDescription>
             </CardHeader>
             <CardContent>

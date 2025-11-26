@@ -182,7 +182,7 @@ export default function ProfilePage() {
               Profile Settings
             </CardTitle>
             <CardDescription>
-              Update your personal information for Brain Works Studio
+              Update your personal information for Brain Works Studio Africa
             </CardDescription>
           </CardHeader>
           <CardContent>

@@ -114,7 +114,7 @@ const teamMembers: TeamMember[] = [
     name: 'Joshua Doe',
     position: 'CEO - Photographer',
     years: '4+',
-    description: 'With over 4 years of experience, Joshua Doe is a visionary leader dedicated to driving creative excellence and innovation. As the CEO of Brain Works Studio, he leads with passion, turning ideas into impactful visual stories that inspire and connect audiences.',
+    description: 'With over 4 years of experience, Joshua Doe is a visionary leader dedicated to driving creative excellence and innovation. As the CEO of Brain Works Studio Africa , he leads with passion, turning ideas into impactful visual stories that inspire and connect audiences.',
     profileImageUrl: '/me.jpg',
     socials: [
       { platform: 'Instagram', url: 'https://instagram.com/johndoe', icon: InstagramIcon },
@@ -258,7 +258,7 @@ export default function AboutPage() {
           >
             <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Story</h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
-              Founded in 2019, Brain Works Studio began as a small team of passionate photographers dedicated to capturing life's most meaningful moments. Over the years, we've grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
+              Founded in 2019, Brain Works Studio Africa began as a small team of passionate photographers dedicated to capturing life's most meaningful moments. Over the years, we've grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
             </p>
           </motion.div>
           <motion.div

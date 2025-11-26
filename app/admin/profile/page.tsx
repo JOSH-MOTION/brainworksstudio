@@ -180,7 +180,7 @@ export default function AdminProfilePage() {
               Admin Profile Settings
             </CardTitle>
             <CardDescription>
-              Manage your admin profile and position for Brain Works Studio
+              Manage your admin profile and position for Brain Works Studio Africa
             </CardDescription>
           </CardHeader>
           <CardContent>

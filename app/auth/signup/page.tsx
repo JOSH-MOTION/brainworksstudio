@@ -128,7 +128,7 @@ export default function SignupPage() {
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
                   src="/newlogo.png"
-                  alt="Brain Works Studio Logo"
+                  alt="Brain Works Studio Africa Logo"
                   width={48}
                   height={48}
                   className="object-contain"
@@ -136,7 +136,7 @@ export default function SignupPage() {
               </motion.div>
               <CardTitle className="text-3xl font-bold text-[#001F44]">Create Your Account</CardTitle>
               <CardDescription className="text-gray-600">
-                Join Brain Works Studio to start capturing your moments
+                Join Brain Works Studio Africa to start capturing your moments
               </CardDescription>
             </CardHeader>
             <CardContent>

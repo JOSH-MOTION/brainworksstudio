@@ -489,7 +489,7 @@ export default function Home() {
             <div className="text-center bg-white rounded-lg shadow-md p-12">
               <p className="text-gray-600 mb-4 text-lg">No testimonials available yet.</p>
               <p className="text-sm text-gray-500 mb-6">
-                Be the first to share your experience with Brain Works Studio!
+                Be the first to share your experience with Brain Works Studio Africa Africa!
               </p>
               <Link href="/reviews/submit">
                 <Button className="bg-teal-500 text-white hover:bg-teal-600">

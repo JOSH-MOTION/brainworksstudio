@@ -132,8 +132,8 @@ export default function AdminReviewsPage() {
   };
 
   const sendReviewEmail = (email: string) => {
-    const subject = 'Share Your Experience with Brain Works Studio';
-    const body = `Hi there!\n\nWe hope you enjoyed our services. We'd love to hear about your experience!\n\nPlease share your review here: ${window.location.origin}/reviews/submit\n\nThank you!\nBrain Works Studio`;
+    const subject = 'Share Your Experience with Brain Works Studio Africa';
+    const body = `Hi there!\n\nWe hope you enjoyed our services. We'd love to hear about your experience!\n\nPlease share your review here: ${window.location.origin}/reviews/submit\n\nThank you!\nBrain Works Studio Africa`;
     window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 

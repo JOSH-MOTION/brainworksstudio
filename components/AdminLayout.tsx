@@ -80,13 +80,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 >
                   <Image
                     src="/newlogo.png"
-                    alt="Brain Works Studio Logo"
+                    alt="Brain Works Studio Africa Logo"
                     width={60}
                     height={60}
                   />
                 </motion.div>
                 <span className="text-base font-bold text-[#001F44]">
-                  Brain Works Studio
+                  Brain Works Studio Africa
                 </span>
               </Link>
 
@@ -219,7 +219,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           className="bg-[#001F44] text-white"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
-            <p className="text-sm">&copy; 2025 Brain Works Studio - Admin Portal. All rights reserved.</p>
+            <p className="text-sm">&copy; 2025 Brain Works Studio Africa Africa - Admin Portal. All rights reserved.</p>
           </div>
         </motion.footer>
       </body>
