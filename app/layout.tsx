@@ -22,25 +22,21 @@ export const metadata: Metadata = {
     'photo studio Accra',
   ],
   icons: {
-    icon: [
-      { url: '/favicon.ico', sizes: '16x16 32x32 48x48', type: 'image/x-icon' },
-      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
-      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
-      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' }, // optional
-      { url: '/favicon.svg', sizes: 'any', type: 'image/svg+xml' } // optional
-    ],
-    apple: [
-      { url: '/apple-touch-icon.png', sizes: '180x180' }
-    ],
-  },
+  icon: [
+    { url: '/newlogo3.png', sizes: '512x512' },
+    { url: '/newlogo3.png' } // fallback
+  ],
+  apple: '/newlogo3.png',
+},
   openGraph: {
     title: 'Brain Works Studio Africa',
-    description: 'Professional photography, videography, and storytelling across Ghana and Africa.',
+    description:
+      'Professional photography, videography, and storytelling across Ghana and Africa.',
     url: BASE_URL,
     siteName: 'Brain Works Studio Africa',
     images: [
       {
-        url: `${BASE_URL}/newlogo1.png`,
+        url: `${BASE_URL}/newlogo3.png`,
         width: 1200,
         height: 630,
         alt: 'Brain Works Studio Africa logo',
@@ -52,8 +48,9 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Brain Works Studio Africa',
-    description: 'Photography, videography, and creative storytelling across Ghana and Africa.',
-    images: [`${BASE_URL}/newlogo1.png`],
+    description:
+      'Photography, videography, and creative storytelling across Ghana and Africa.',
+    images: [`${BASE_URL}/newlogo3.png`],
   },
   other: {
     'google-site-verification': 'google7ba9027710f6a9e6',
@@ -69,21 +66,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Web App Manifest & iOS Meta Tags */}
-        <link rel="manifest" href="/site.webmanifest" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Brain Works Studio Africa" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+       
 
-        {/* Google AdSense Script */}
+        {/* ✅ Google AdSense Script */}
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3845871149646341"
           crossOrigin="anonymous"
         />
 
-        {/* Structured Data for SEO */}
+        {/* ✅ Structured Data for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -92,7 +84,7 @@ export default function RootLayout({
               "@type": "Organization",
               name: "Brain Works Studio Africa",
               url: BASE_URL,
-              logo: `${BASE_URL}/newlogo1.png`,
+              logo: `${BASE_URL}/newlogo3.png`,
               sameAs: [
                 "https://www.instagram.com/brainworksstudioafrica",
                 "https://www.facebook.com/brainworksstudioafrica",
