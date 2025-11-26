@@ -31,7 +31,7 @@ export const metadata: Metadata = {
       { url: '/apple-touch-icon.png', sizes: '180x180' }
     ],
   },
-  
+
   openGraph: {
     title: 'Brain Works Studio Africa',
     description:
@@ -70,6 +70,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+
+        <link rel="manifest" href="/manifest.json" />
+<meta name="theme-color" content="#000000" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Brain Works Studio Africa" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+
        
 
         {/* ✅ Google AdSense Script */}
