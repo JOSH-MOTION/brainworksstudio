@@ -70,7 +70,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Web App Manifest & iOS Meta Tags */}
-        <link rel="manifest" href="/manifest.json" />
+        <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-title" content="Brain Works Studio Africa" />
