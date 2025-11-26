@@ -21,13 +21,17 @@ export const metadata: Metadata = {
     'Brain works',
     'photo studio Accra',
   ],
+   // ✅ Added favicon sizes here
   icons: {
-  icon: [
-    { url: '/newlogo3.png', sizes: '512x512' },
-    { url: '/newlogo3.png' } // fallback
-  ],
-  apple: '/newlogo3.png',
-},
+    icon: [
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/favicon-512x512.png', sizes: '512x512', type: 'image/png' }
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180' }
+    ],
+  },
+  
   openGraph: {
     title: 'Brain Works Studio Africa',
     description:
