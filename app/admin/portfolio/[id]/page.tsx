@@ -11,6 +11,7 @@ import { PortfolioItem } from '@/types';
 import Image from 'next/image';
 import { X, Play, ArrowDown, Edit, Trash2, Eye, Lock, Download, Share2 } from 'lucide-react';
 import Link from 'next/link';
+import logo from "../../../../public/newlogo1.png"
 
 const sectionVariants: Variants = {
   hidden: { opacity: 0, y: 50 },
@@ -261,7 +262,7 @@ export default function PortfolioDetailPage({ params }: { params: { id: string }
           >
             <div className="bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 mb-2">
               <Image
-                src="/logo.png"
+                src={logo}
                 alt="Brain Works Studio"
                 width={40}
                 height={40}
@@ -272,7 +273,7 @@ export default function PortfolioDetailPage({ params }: { params: { id: string }
               />
             </div>
             <p className="text-white text-sm tracking-widest font-medium">
-              BRAIN WORKS STUDIO
+              BRAIN WORKS STUDIO AFRICA
             </p>
           </motion.div>
         </motion.div>

@@ -20,6 +20,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import logo from "../../../../public/newlogo1.png"
 import Image from 'next/image';
 
 // ---------------------------------------------------
@@ -386,12 +387,12 @@ export default function ClientPortfolioPage() {
             transition={{ delay: 0.5, duration: 0.8 }}
             className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center"
           >
-            <div className="bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 mb-2">
+            <div className="bg-white/90 backdrop-blur-sm rounded-full p-2  mb-2">
               <Image
-                src="/logo.png"
+                src={logo}
                 alt="Brain Works Studio"
-                width={40}
-                height={40}
+                width={80}
+                height={80}
                 className="mx-auto"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
@@ -399,7 +400,7 @@ export default function ClientPortfolioPage() {
               />
             </div>
             <p className="text-white text-sm tracking-widest font-medium">
-              BRAIN WORKS STUDIO
+              BRAIN WORKS STUDIO AFRICA
             </p>
           </motion.div>
         </motion.div>
@@ -414,7 +415,7 @@ export default function ClientPortfolioPage() {
                   {item.title}
                 </h2>
                 <p className="text-sm text-gray-600 uppercase tracking-wide">
-                  {item.clientName ? `${item.clientName} • ` : ''}Brain Works Studio
+                  {item.clientName ? `${item.clientName} • ` : ''}Brain Works Studio Africa
                 </p>
               </div>
 
