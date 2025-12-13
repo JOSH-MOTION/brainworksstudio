@@ -13,10 +13,14 @@ import {
   ChevronRight,
   Eye,
   Loader2,
+  Heart,
+  Share2,
+  ArrowDown,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import Image from 'next/image';
 
 // ---------------------------------------------------
 //  Types & Variants
@@ -25,6 +29,11 @@ const itemVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
   hover: { scale: 1.03, transition: { duration: 0.2 } },
+};
+
+const heroVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 1, ease: 'easeOut' } },
 };
 
 interface MediaItem {
@@ -258,16 +267,34 @@ export default function ClientPortfolioPage() {
     return () => window.removeEventListener('keydown', handleKey);
   }, [lightboxOpen, mediaList.length]);
 
+  // Scroll to gallery
+  const scrollToGallery = () => {
+    const gallerySection = document.getElementById('gallery-section');
+    if (gallerySection) {
+      gallerySection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    }).toUpperCase();
+  };
+
   // ---------------------------------------------------
   //  Render
   // ---------------------------------------------------
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-blue-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="h-12 w-12 border-4 border-coral-500 border-t-transparent rounded-full"
+          className="h-12 w-12 border-4 border-gray-300 border-t-gray-800 rounded-full"
         />
       </div>
     );
@@ -275,19 +302,19 @@ export default function ClientPortfolioPage() {
 
   if (!item) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-blue-50 p-4">
+      <div className="min-h-screen flex items-center justify-center bg-white p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center bg-white p-8 rounded-xl shadow-lg max-w-md"
+          className="text-center bg-white p-8 rounded-xl max-w-md"
         >
-          <h2 className="text-2xl font-bold text-[#001F44] mb-2">Not Found</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Not Found</h2>
           <p className="text-gray-600 mb-6">
             This portfolio item doesn't exist.
           </p>
           <Button
             onClick={() => router.push('/')}
-            className="bg-coral-500 hover:bg-coral-600 text-white"
+            className="bg-gray-900 hover:bg-gray-800 text-white"
           >
             Back to Home
           </Button>
@@ -298,75 +325,151 @@ export default function ClientPortfolioPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 via-white to-blue-50 py-8 px-4">
-        <div className="max-w-7xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {/* Header */}
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 md:p-8 mb-8 shadow-xl border border-coral-100">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-6">
-                <div className="flex-1">
-                  <h1 className="text-3xl md:text-4xl font-bold text-[#001F44] mb-3">
-                    {item.title}
-                  </h1>
-                  {item.caption && (
-                    <p className="text-base text-gray-700 mb-4 leading-relaxed">
-                      {item.caption}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap gap-3 text-sm">
-                    <span className="px-3 py-1 bg-coral-100 text-coral-700 rounded-full font-medium">
-                      {item.clientName}
-                    </span>
-                    <span className="text-gray-600">• {item.category}</span>
-                    <span className="text-gray-600">• {item.type}</span>
-                  </div>
-                </div>
+      <div className="min-h-screen bg-white">
+        {/* Hero Section */}
+        <motion.div
+          variants={heroVariants}
+          initial="hidden"
+          animate="visible"
+          className="relative h-screen w-full overflow-hidden"
+        >
+          {/* Hero Image */}
+          <div className="absolute inset-0">
+            <Image
+              src={mediaList[0]?.url || '/placeholder-image.jpg'}
+              alt={item.title}
+              fill
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/30" />
+          </div>
 
-                {/* Download All as ZIP */}
-                <Button
-                  onClick={downloadAllAsZip}
-                  size="lg"
-                  disabled={isZipping}
-                  className="bg-coral-500 hover:bg-coral-600 text-teal-700 shadow-lg relative"
-                >
-                  {isZipping ? (
-                    <>
-                      <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                      Zipping... {zipProgress}%
-                    </>
-                  ) : (
-                    <>
-                      <Download className="h-5 w-5 mr-2" />
-                      Download All as ZIP
-                    </>
-                  )}
-                </Button>
+          {/* Hero Content */}
+          <div className="relative z-10 h-full flex flex-col items-center justify-center px-4">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-center text-white max-w-4xl"
+            >
+              <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+                {item.title.toUpperCase()}
+              </h1>
+              <p className="text-lg md:text-xl mb-8 tracking-widest">
+                {formatDate(item.createdAt)}
+              </p>
+              <Button
+                onClick={scrollToGallery}
+                size="lg"
+                className="bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-gray-900 transition-all duration-300 px-8 py-6 text-lg tracking-wider"
+              >
+                VIEW GALLERY
+              </Button>
+            </motion.div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 1, duration: 1 }}
+              className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+            >
+              <ArrowDown className="h-8 w-8 text-white animate-bounce" />
+            </motion.div>
+          </div>
+
+          {/* Studio Branding */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center"
+          >
+            <div className="bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 mb-2">
+              <Image
+                src="/logo.png"
+                alt="Brain Works Studio"
+                width={40}
+                height={40}
+                className="mx-auto"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+            <p className="text-white text-sm tracking-widest font-medium">
+              BRAIN WORKS STUDIO
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* Gallery Section - Below Hero */}
+        <div id="gallery-section" className="bg-white py-12">
+          {/* Gallery Header */}
+          <div className="max-w-7xl mx-auto px-4 mb-8">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-b border-gray-200 pb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-1">
+                  {item.title}
+                </h2>
+                <p className="text-sm text-gray-600 uppercase tracking-wide">
+                  {item.clientName ? `${item.clientName} • ` : ''}Brain Works Studio
+                </p>
               </div>
 
-              {/* Admin Panel */}
-              {isAdmin && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl"
+              <div className="flex items-center gap-4">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-600 hover:text-gray-900"
+                  title="Favorite"
                 >
-                  <h3 className="font-semibold text-blue-900 mb-1">
-                    Download Pin
-                  </h3>
-                  <p className="text-xs text-blue-700 font-mono break-all">
-                    
-                    {item.pin && `PIN: ${item.pin}`}
-                  </p>
-                </motion.div>
-              )}
+                  <Heart className="h-5 w-5" />
+                </Button>
+                <Button
+                  onClick={downloadAllAsZip}
+                  disabled={isZipping}
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-600 hover:text-gray-900"
+                  title="Download All"
+                >
+                  {isZipping ? (
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                  ) : (
+                    <Download className="h-5 w-5" />
+                  )}
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-gray-600 hover:text-gray-900"
+                  title="Share"
+                >
+                  <Share2 className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
 
-            {/* Media Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Admin Info */}
+            {isAdmin && item.pin && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
+              >
+                <p className="text-sm text-blue-900 font-mono">
+                  <Lock className="inline h-4 w-4 mr-2" />
+                  Download PIN: {item.pin}
+                </p>
+              </motion.div>
+            )}
+          </div>
+
+          {/* Gallery Grid */}
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
               {mediaList.map((media, index) => (
                 <motion.div
                   key={index}
@@ -374,65 +477,78 @@ export default function ClientPortfolioPage() {
                   initial="hidden"
                   animate="visible"
                   whileHover="hover"
-                  className="group relative bg-white rounded-2xl overflow-hidden shadow-lg border border-coral-100 cursor-pointer transition-all duration-300"
+                  className="group relative bg-gray-100 aspect-square overflow-hidden cursor-pointer"
                   onClick={() => openLightbox(index)}
                 >
-                  <div className="aspect-video relative overflow-hidden">
-                    {media.type === 'video' ? (
-                      <video
-                        src={media.url}
-                        className="w-full h-full object-cover"
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
-                      <img
-                        src={media.url}
-                        alt={`${item.title} - ${media.type} ${index + 1}`}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/images/image-placeholder.jpg';
+                  {media.type === 'video' ? (
+                    <video
+                      src={media.url}
+                      className="w-full h-full object-cover"
+                      muted
+                      loop
+                      playsInline
+                    />
+                  ) : (
+                    <img
+                      src={media.url}
+                      alt={`${item.title} - ${index + 1}`}
+                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-image.jpg';
+                      }}
+                    />
+                  )}
+
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-2">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openLightbox(index);
                         }}
-                      />
-                    )}
-
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex gap-3">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openLightbox(index);
-                          }}
-                          className="p-3 bg-white/90 hover:bg-white rounded-full shadow-lg backdrop-blur-sm"
-                          title="View Fullscreen"
-                        >
-                          <Eye className="h-5 w-5 text-[#001F44]" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            requestDownload(media);
-                          }}
-                          className="p-3 bg-coral-500/90 hover:bg-coral-500 text-white rounded-full shadow-lg backdrop-blur-sm"
-                          title="Download"
-                        >
-                          <Download className="h-5 w-5" />
-                        </button>
-                      </div>
+                        className="p-2 bg-white/90 rounded-full shadow-lg"
+                        title="View"
+                      >
+                        <Eye className="h-4 w-4 text-gray-900" />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          requestDownload(media);
+                        }}
+                        className="p-2 bg-white/90 rounded-full shadow-lg"
+                        title="Download"
+                      >
+                        <Download className="h-4 w-4 text-gray-900" />
+                      </button>
                     </div>
-                  </div>
-
-                  <div className="p-4">
-                    <p className="text-sm font-medium text-gray-700">
-                      {media.type === 'video' ? 'Video' : `Image ${index + 1}`}
-                    </p>
                   </div>
                 </motion.div>
               ))}
             </div>
-          </motion.div>
+          </div>
+
+          {/* Studio Footer */}
+          <div className="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-gray-200 text-center">
+            <div className="inline-flex items-center gap-3 mb-4">
+              <Image
+                src="/logo.png"
+                alt="Brain Works Studio"
+                width={32}
+                height={32}
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+              <span className="text-gray-900 font-semibold tracking-wide">
+                BRAIN WORKS STUDIO
+              </span>
+            </div>
+            <p className="text-gray-600 text-sm">
+              Professional Photography & Videography
+            </p>
+          </div>
         </div>
 
         {/* Lightbox */}
@@ -442,19 +558,19 @@ export default function ClientPortfolioPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
+              className="fixed inset-0 bg-black z-50 flex items-center justify-center"
               onClick={closeLightbox}
             >
               <motion.div
                 initial={{ scale: 0.9 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0.9 }}
-                className="relative max-w-6xl w-full"
+                className="relative max-w-7xl w-full h-full p-4"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
                   onClick={closeLightbox}
-                  className="absolute -top-12 right-0 text-white/80 hover:text-white p-2 transition"
+                  className="absolute top-8 right-8 text-white/80 hover:text-white p-2 transition z-10"
                 >
                   <X className="h-8 w-8" />
                 </button>
@@ -462,7 +578,7 @@ export default function ClientPortfolioPage() {
                 {mediaList[lightboxIndex].type === 'video' ? (
                   <video
                     src={mediaList[lightboxIndex].url}
-                    className="w-full h-auto max-h-[90vh] rounded-lg"
+                    className="w-full h-full object-contain"
                     controls
                     autoPlay
                   />
@@ -470,7 +586,7 @@ export default function ClientPortfolioPage() {
                   <img
                     src={mediaList[lightboxIndex].url}
                     alt=""
-                    className="w-full h-auto max-h-[90vh] object-contain rounded-lg"
+                    className="w-full h-full object-contain"
                   />
                 )}
 
@@ -478,13 +594,13 @@ export default function ClientPortfolioPage() {
                   <>
                     <button
                       onClick={goToPrev}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-sm text-white transition"
+                      className="absolute left-8 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-white transition"
                     >
                       <ChevronLeft className="h-6 w-6" />
                     </button>
                     <button
                       onClick={goToNext}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/40 rounded-full backdrop-blur-sm text-white transition"
+                      className="absolute right-8 top-1/2 -translate-y-1/2 p-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full text-white transition"
                     >
                       <ChevronRight className="h-6 w-6" />
                     </button>
@@ -493,12 +609,12 @@ export default function ClientPortfolioPage() {
 
                 <button
                   onClick={() => requestDownload(mediaList[lightboxIndex])}
-                  className="absolute bottom-4 right-4 p-3 bg-coral-500 hover:bg-coral-600 text-white rounded-full shadow-lg transition"
+                  className="absolute bottom-8 right-8 p-4 bg-white hover:bg-gray-100 rounded-full shadow-lg transition"
                 >
-                  <Download className="h-5 w-5" />
+                  <Download className="h-5 w-5 text-gray-900" />
                 </button>
 
-                <div className="absolute bottom-4 left-4 text-white/80 text-sm font-medium">
+                <div className="absolute bottom-8 left-8 text-white/80 text-sm font-medium bg-black/20 backdrop-blur-sm px-4 py-2 rounded-full">
                   {lightboxIndex + 1} / {mediaList.length}
                 </div>
               </motion.div>
@@ -513,7 +629,7 @@ export default function ClientPortfolioPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={() => {
                 setShowPinModal(false);
                 setPendingDownload(null);
@@ -524,19 +640,19 @@ export default function ClientPortfolioPage() {
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.95, opacity: 0 }}
-                className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl"
+                className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center justify-center mb-5">
-                  <div className="p-3 bg-coral-100 rounded-full">
-                    <Lock className="h-6 w-6 text-coral-600" />
+                <div className="flex items-center justify-center mb-6">
+                  <div className="p-4 bg-gray-100 rounded-full">
+                    <Lock className="h-6 w-6 text-gray-900" />
                   </div>
                 </div>
-                <h2 className="text-xl font-bold text-center text-[#001F44] mb-2">
-                  PIN Required
+                <h2 className="text-2xl font-bold text-center text-gray-900 mb-2">
+                  Enter PIN
                 </h2>
-                <p className="text-sm text-center text-gray-600 mb-5">
-                  Enter the PIN to download media files.
+                <p className="text-sm text-center text-gray-600 mb-6">
+                  Please enter the PIN provided by your photographer
                 </p>
 
                 <form onSubmit={handlePinSubmit} className="space-y-4">
@@ -545,7 +661,7 @@ export default function ClientPortfolioPage() {
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
                     placeholder="••••"
-                    className="text-center text-lg tracking-widest border-coral-200 focus:border-coral-500"
+                    className="text-center text-lg tracking-widest border-gray-300 focus:border-gray-900"
                     maxLength={6}
                     autoFocus
                   />
@@ -559,7 +675,7 @@ export default function ClientPortfolioPage() {
                     <Button
                       type="button"
                       variant="outline"
-                      className="flex-1 border-coral-200 text-coral-600 hover:bg-coral-50"
+                      className="flex-1 border-gray-300 text-gray-900"
                       onClick={() => {
                         setShowPinModal(false);
                         setPendingDownload(null);
@@ -570,7 +686,7 @@ export default function ClientPortfolioPage() {
                     </Button>
                     <Button
                       type="submit"
-                      className="flex-1 bg-coral-500 hover:bg-coral-600 text-white"
+                      className="flex-1 bg-gray-900 hover:bg-gray-800 text-white"
                     >
                       Unlock
                     </Button>
