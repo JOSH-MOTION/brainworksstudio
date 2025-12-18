@@ -9,6 +9,7 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const published = searchParams.get('published');
     const slug = searchParams.get('slug');
+    const incrementView = searchParams.get('incrementView'); // New parameter to track views
 
     let query: any = adminDb?.collection('blog-posts');
 
@@ -18,6 +19,21 @@ export async function GET(req: NextRequest) {
 
     if (slug) {
       query = query.where('slug', '==', slug);
+      
+      // If incrementView is true and we have a slug, increment the view count
+      if (incrementView === 'true') {
+        const snapshot = await query.limit(1).get();
+        if (!snapshot.empty) {
+          const postDoc = snapshot.docs[0];
+          const currentViews = postDoc.data().views || 0;
+          
+          // Increment view count in background (don't await to avoid blocking response)
+          postDoc.ref.update({
+            views: currentViews + 1,
+            lastViewed: new Date(),
+          }).catch((err: Error) => console.error('Error updating views:', err));
+        }
+      }
     }
 
     const snapshot = await query.orderBy('createdAt', 'desc').get();
