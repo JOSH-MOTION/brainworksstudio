@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: 'Admin Dashboard | Brain Works Studio Africa',
   description: 'Manage users, content, and settings for Brain Works Studio Africa.',
   icons: {
-    icon: '/newlogo3.png', // 👈 use your logo from public/
+    icon: '/newlogo2.jpg', // 👈 use your logo from public/
   },
   
   // --- ADDED: Explicitly tell crawlers not to index this page ---
