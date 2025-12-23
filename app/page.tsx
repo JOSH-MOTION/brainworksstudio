@@ -6,120 +6,47 @@ import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Camera, Video, Star } from 'lucide-react';
+import { ArrowRight, Camera, Video, Star, Sparkles, Zap, Award } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-// Animation variants for sections
-const sectionVariants: Variants = {
-  hidden: { opacity: 0, y: 50 },
+// Animation variants
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 60 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: 'easeInOut', staggerChildren: 0.2 },
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
-// Animation variants for hero content
-const heroContentVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.9, rotate: -10 },
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const scaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    rotate: 0,
-    transition: { duration: 1, type: 'spring', stiffness: 120, damping: 15 },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
-// Animation variants for hero children
-const heroChildVariants: Variants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: 'easeOut' },
-  },
-};
-
-// Animation variants for hero images
-const heroImageVariants: Variants = {
-  hidden: (direction: string) => ({
-    opacity: 0,
-    x: direction === 'left' ? -100 : direction === 'right' ? 100 : 0,
-    y: direction === 'top' ? -100 : direction === 'bottom' ? 100 : 0,
-    rotate: direction === 'left' || direction === 'right' ? 15 : 0,
-  }),
-  visible: {
-    opacity: 1,
-    x: 0,
-    y: 0,
-    rotate: 0,
-    transition: { duration: 1.2, type: 'spring', stiffness: 100, damping: 20 },
-  },
-};
-
-// Animation variants for cards
-const cardVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.8, rotateX: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    scale: 1,
-    rotateX: 0,
-    transition: { duration: 0.8, delay: i * 0.2, type: 'spring', stiffness: 90 },
-  }),
-  hover: {
-    scale: 1.05,
-    y: -10,
-    transition: { duration: 0.4, type: 'spring', stiffness: 130 },
-  },
-};
-
-// Animation variants for buttons
-const buttonVariants: Variants = {
+const slideIn: Variants = {
   hidden: { opacity: 0, x: -30 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-  hover: { scale: 1.1, rotate: 5, transition: { duration: 0.3 } },
-  tap: { scale: 0.95 },
-};
-
-// Animation variants for featured work images
-const imageVariants: Variants = {
-  hidden: (i: number) => ({
-    opacity: 0,
-    x: i % 2 === 0 ? -50 : 50,
-    scale: 1.1,
-  }),
   visible: {
     opacity: 1,
     x: 0,
-    scale: 1,
-    transition: { duration: 1, ease: 'easeInOut', type: 'spring', stiffness: 80 },
+    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
   },
-  hover: {
-    scale: 1.05,
-    transition: { duration: 0.5, type: 'spring', stiffness: 110 },
-  },
-};
-
-// Animation variants for CTA section
-const ctaVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.8, type: 'spring', stiffness: 100, damping: 15 },
-  },
-};
-
-// Animation variants for CTA children
-const ctaChildVariants: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.9 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.6, delay: i * 0.2, ease: 'easeOut' },
-  }),
 };
 
 interface Review {
@@ -147,7 +74,6 @@ export default function Home() {
     setError(null);
     
     try {
-      console.log('Fetching approved reviews...');
       const response = await fetch('/api/reviews?approved=true', {
         cache: 'no-store',
         headers: {
@@ -155,20 +81,11 @@ export default function Home() {
         },
       });
       
-      console.log('Response status:', response.status);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log('Fetched reviews:', data.length, 'approved reviews');
-        
-        // Filter to ensure only approved reviews
         const approvedReviews = data.filter((r: Review) => r.approved === true);
-        console.log('After filtering:', approvedReviews.length, 'approved reviews');
-        
         setReviews(approvedReviews);
       } else {
-        const errorText = await response.text();
-        console.error('Failed to fetch reviews:', response.status, errorText);
         setError('Failed to load testimonials');
       }
     } catch (err) {
@@ -181,389 +98,472 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <motion.section
-        initial="hidden"
-        animate="visible"
-        variants={sectionVariants}
-        className="relative min-h-[80vh] sm:min-h-screen flex items-center justify-center text-white overflow-hidden"
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 1.2 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease: 'easeInOut' }}
-          className="absolute inset-0"
-        >
+      {/* Modern Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
           <Image
             src="/brand.jpg"
             alt="Hero Background"
             fill
             sizes="100vw"
-            className="object-cover filter brightness-75"
+            className="object-cover opacity-30"
             priority
             onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
           />
-          <div className="absolute inset-0 bg-black/40" />
-        </motion.div>
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/30 to-slate-900" />
+        </div>
 
-        <motion.div
-          custom="left"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute top-4 left-4 w-24 h-32 sm:w-32 sm:h-40 lg:w-48 lg:h-64 hidden md:block"
-        >
-          <Image
-            src="/Pic1.jpeg"
-            alt="Hero Image 1"
-            fill
-            sizes="(max-width: 768px) 96px, (max-width: 1024px) 128px, 192px"
-            className="object-cover rounded-lg shadow-2xl"
-          />
-        </motion.div>
-        <motion.div
-          custom="right"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute bottom-4 right-4 w-28 h-36 sm:w-36 sm:h-44 lg:w-56 lg:h-72 hidden md:block"
-        >
-          <Image
-            src="/Pic.jpeg"
-            alt="Hero Image 2"
-            fill
-            sizes="(max-width: 768px) 112px, (max-width: 1024px) 144px, 224px"
-            className="object-cover rounded-lg shadow-2xl"
-          />
-        </motion.div>
-        <motion.div
-          custom="top"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute top-16 right-8 w-20 h-28 sm:w-28 sm:h-36 lg:w-40 lg:h-56 hidden md:block"
-        >
-          <Image
-            src="/vid.jpeg"
-            alt="Hero Image 3"
-            fill
-            sizes="(max-width: 768px) 80px, (max-width: 1024px) 112px, 160px"
-            className="object-cover rounded-lg shadow-2xl"
-          />
-        </motion.div>
-
-        <motion.div
-          variants={heroContentVariants}
-          className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10"
-        >
-          <motion.h1
-            variants={heroChildVariants}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-4 sm:mb-6"
-          >
-            Immortalize Your Moments
-          </motion.h1>
-          <motion.p
-            variants={heroChildVariants}
-            className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-xl sm:max-w-2xl mx-auto opacity-80"
-          >
-            Transform your story into breathtaking visuals with our expert photography and videography.
-          </motion.p>
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
-            variants={heroChildVariants}
-            className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute top-1/4 -left-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute bottom-1/4 -right-1/4 w-96 h-96 bg-[#CB9D06]/20 rounded-full blur-3xl"
+          />
+        </div>
+
+        {/* Hero Content */}
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+        >
+          <motion.div
+            variants={fadeInUp}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full mb-8"
+          >
+            <Sparkles className="w-4 h-4 text-[#CB9D06]" />
+            <span className="text-sm text-white/90 font-medium">Award-Winning Visual Studio</span>
+          </motion.div>
+
+          <motion.h1
+            variants={fadeInUp}
+            className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 tracking-tight"
+          >
+            Immortalize Your
+            <span className="block bg-gradient-to-r from-teal-400 to-[#CB9D06] bg-clip-text text-transparent">
+              Moments
+            </span>
+          </motion.h1>
+
+          <motion.p
+            variants={fadeInUp}
+            className="text-lg sm:text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl leading-relaxed"
+          >
+            Transform your story into breathtaking visuals with our expert photography and videography services.
+          </motion.p>
+
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-col sm:flex-row items-start gap-4"
           >
             <Link href="/portfolio">
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto bg-[#CB9D06] text-white hover:bg-teal-600 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
-                >
-                  Discover Our Work
-                  <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
-              </motion.div>
+              <Button
+                size="lg"
+                className="group w-full sm:w-auto bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white border-0 text-base font-semibold py-6 px-8 rounded-full shadow-lg shadow-teal-500/30 transition-all duration-300"
+              >
+                Discover Our Work
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </Link>
             <Link href="/booking">
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto border-2 border-white text-[#001F44] hover:bg-white hover:text-teal-500 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8"
-                >
-                  Start Your Journey
-                </Button>
-              </motion.div>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white hover:bg-white hover:text-slate-900 text-base font-semibold py-6 px-8 rounded-full transition-all duration-300"
+              >
+                Book Your Session
+              </Button>
             </Link>
           </motion.div>
-        </motion.div>
-      </motion.section>
 
-      {/* Services Section */}
-      <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={sectionVariants}
-        className="py-16 sm:py-20 lg:py-24 bg-teal-50"
-      >
+          {/* Stats Section */}
+          <motion.div
+            variants={fadeInUp}
+            className="grid grid-cols-3 gap-8 mt-20 max-w-2xl"
+          >
+            {[
+              { number: '500+', label: 'Happy Clients' },
+              { number: '1000+', label: 'Projects Done' },
+              { number: '15+', label: 'Awards Won' },
+            ].map((stat, index) => (
+              <div key={index}>
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                  {stat.number}
+                </div>
+                <div className="text-sm text-gray-400">{stat.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+        >
+          <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
+            <motion.div
+              animate={{ y: [0, 12, 0] }}
+              transition={{ duration: 2, repeat: Infinity }}
+              className="w-1.5 h-1.5 bg-white rounded-full"
+            />
+          </div>
+        </motion.div>
+      </section>
+
+      {/* Services Section - Modern Grid */}
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            variants={heroChildVariants}
-            className="text-center mb-8 sm:mb-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44]">Our Craft</h2>
-            <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
-              Tailored services to capture your vision with creativity and precision.
-            </p>
+            <motion.div variants={fadeInUp} className="inline-block mb-4">
+              <span className="px-4 py-2 bg-teal-50 text-teal-600 rounded-full text-sm font-semibold">
+                Our Services
+              </span>
+            </motion.div>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4"
+            >
+              What We Offer
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-xl text-gray-600 max-w-2xl mx-auto"
+            >
+              Professional services tailored to capture your vision with creativity and precision
+            </motion.p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto"
+          >
             {[
               {
                 icon: Camera,
                 title: 'Photography',
-                description: 'Stunning images that freeze your moments in time.',
+                description: 'Stunning images that freeze your most precious moments in time with artistic precision.',
+                features: ['Portrait Sessions', 'Event Coverage', 'Commercial Shoots'],
                 link: '/photography',
                 image: '/Pic1.jpeg',
+                gradient: 'from-blue-500 to-cyan-500',
               },
               {
                 icon: Video,
                 title: 'Videography',
-                description: 'Cinematic videos that bring your story to life.',
+                description: 'Cinematic videos that bring your story to life with emotion and professional quality.',
+                features: ['Wedding Films', 'Corporate Videos', 'Documentary Style'],
                 link: '/videography',
                 image: '/Pic3.jpeg',
+                gradient: 'from-purple-500 to-pink-500',
               },
             ].map((service, index) => (
-              <motion.div
-                key={index}
-                custom={index}
-                initial="hidden"
-                whileInView="visible"
-                whileHover="hover"
-                viewport={{ once: true }}
-                variants={cardVariants}
-              >
+              <motion.div key={index} variants={scaleIn}>
                 <Link href={service.link}>
-                  <div className="bg-white p-4 sm:p-6 rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300">
-                    <motion.div
-                      className="relative w-full h-32 sm:h-40 mb-4"
-                      whileHover={{ scale: 1.03 }}
-                      transition={{ duration: 0.3 }}
-                    >
+                  <Card className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-white">
+                    <div className="relative h-64 overflow-hidden">
                       <Image
                         src={service.image}
-                        alt={`${service.title} preview`}
+                        alt={service.title}
                         fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover rounded-md"
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                         onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
                       />
-                    </motion.div>
-                    <motion.div
-                      className="flex items-center justify-center mb-3 sm:mb-4"
-                      whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
-                    >
-                      <service.icon className="h-10 w-10 sm:h-12 sm:w-12 text-teal-500" />
-                    </motion.div>
-                    <h3 className="text-lg sm:text-xl font-semibold text-[#001F44] text-center">
-                      {service.title}
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-600 text-center mt-2">
-                      {service.description}
-                    </p>
-                  </div>
+                      <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient} opacity-60 group-hover:opacity-70 transition-opacity`} />
+                      <div className="absolute top-6 left-6">
+                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg">
+                          <service.icon className="w-7 h-7 text-slate-900" />
+                        </div>
+                      </div>
+                    </div>
+                    <CardContent className="p-8">
+                      <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-teal-600 transition-colors">
+                        {service.title}
+                      </h3>
+                      <p className="text-gray-600 mb-6 leading-relaxed">
+                        {service.description}
+                      </p>
+                      <ul className="space-y-2 mb-6">
+                        {service.features.map((feature, idx) => (
+                          <li key={idx} className="flex items-center gap-2 text-sm text-gray-700">
+                            <Zap className="w-4 h-4 text-[#CB9D06]" />
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="flex items-center text-teal-600 font-semibold group-hover:gap-3 gap-2 transition-all">
+                        Learn More
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                      </div>
+                    </CardContent>
+                  </Card>
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Featured Work Section */}
-      <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={sectionVariants}
-        className="py-16 sm:py-20 lg:py-24 bg-white"
-      >
+      <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            variants={heroChildVariants}
-            className="text-center mb-8 sm:mb-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44]">Our Masterpieces</h2>
-            <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
-              A glimpse into our portfolio of unforgettable moments.
-            </p>
+            <motion.div variants={fadeInUp} className="inline-block mb-4">
+              <span className="px-4 py-2 bg-[#CB9D06]/10 text-[#CB9D06] rounded-full text-sm font-semibold">
+                Portfolio
+              </span>
+            </motion.div>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4"
+            >
+              Featured Work
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-xl text-gray-600 max-w-2xl mx-auto"
+            >
+              A glimpse into our portfolio of unforgettable moments
+            </motion.p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="grid md:grid-cols-2 gap-6"
+          >
             {[
-              { image: '/image.jpg', title: 'Timeless Wedding', link: '/portfolio/wedding' },
-              { image: '/brand.jpg', title: 'Brand Campaign', link: '/portfolio/corporate' },
+              { image: '/image.jpg', title: 'Timeless Wedding', category: 'Wedding', link: '/portfolio/wedding' },
+              { image: '/brand.jpg', title: 'Brand Campaign', category: 'Corporate', link: '/portfolio/corporate' },
             ].map((work, index) => (
-              <motion.div
-                key={index}
-                custom={index}
-                initial="hidden"
-                whileInView="visible"
-                whileHover="hover"
-                viewport={{ once: true }}
-                variants={imageVariants}
-              >
+              <motion.div key={index} variants={scaleIn}>
                 <Link href={work.link}>
-                  <div className="relative group overflow-hidden rounded-xl">
+                  <div className="group relative overflow-hidden rounded-2xl aspect-[4/3]">
                     <Image
                       src={work.image}
                       alt={work.title}
-                      width={600}
-                      height={400}
-                      sizes="(max-width: 640px) 100vw, 50vw"
-                      className="object-cover w-full h-64 sm:h-80"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-110"
                       onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
                     />
-                    <motion.div
-                      className="absolute inset-0 bg-teal-500/60 flex items-center justify-center"
-                      initial={{ opacity: 0 }}
-                      whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.4 }}
-                    >
-                      <p className="text-white text-base sm:text-lg font-semibold">{work.title}</p>
-                    </motion.div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-60 group-hover:opacity-80 transition-opacity" />
+                    <div className="absolute inset-0 flex flex-col justify-end p-8">
+                      <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full mb-3 w-fit">
+                        {work.category}
+                      </span>
+                      <h3 className="text-2xl font-bold text-white mb-2 group-hover:translate-y-0 translate-y-2 transition-transform">
+                        {work.title}
+                      </h3>
+                      <div className="flex items-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                        View Project
+                        <ArrowRight className="ml-2 w-5 h-5" />
+                      </div>
+                    </div>
                   </div>
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
+
           <motion.div
-            variants={heroChildVariants}
-            className="text-center mt-6 sm:mt-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            variants={fadeInUp}
+            className="text-center mt-12"
           >
             <Link href="/portfolio">
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button className="bg-teal-500 text-white hover:bg-teal-600 text-sm sm:text-base py-3 sm:py-4 px-6 sm:px-8">
-                  Explore Full Portfolio
-                </Button>
-              </motion.div>
+              <Button
+                size="lg"
+                className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 py-6 text-base font-semibold shadow-lg"
+              >
+                Explore Full Portfolio
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
             </Link>
           </motion.div>
         </div>
-      </motion.section>
+      </section>
 
       {/* Testimonials Section */}
-      <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={sectionVariants}
-        className="py-16 sm:py-20 lg:py-24 bg-teal-50"
-      >
+      <section className="py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            variants={heroChildVariants}
-            className="text-center mb-8 sm:mb-12"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#001F44]">Client Testimonials</h2>
-            <p className="text-base sm:text-lg text-gray-600 mt-3 sm:mt-4 max-w-xl mx-auto">
-              Hear what our clients have to say about their experience with us.
-            </p>
+            <motion.div variants={fadeInUp} className="inline-block mb-4">
+              <span className="px-4 py-2 bg-teal-50 text-teal-600 rounded-full text-sm font-semibold flex items-center gap-2 w-fit mx-auto">
+                <Award className="w-4 h-4" />
+                Client Reviews
+              </span>
+            </motion.div>
+            <motion.h2
+              variants={fadeInUp}
+              className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4"
+            >
+              What Clients Say
+            </motion.h2>
+            <motion.p
+              variants={fadeInUp}
+              className="text-xl text-gray-600 max-w-2xl mx-auto"
+            >
+              Hear from those who trusted us with their special moments
+            </motion.p>
           </motion.div>
-          
+
           {loading ? (
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-teal-500 mx-auto"></div>
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-teal-500 border-t-transparent"></div>
               <p className="mt-4 text-gray-600">Loading testimonials...</p>
             </div>
           ) : error ? (
-            <div className="text-center">
-              <div className="bg-white rounded-lg shadow-md p-8">
-                <p className="text-red-600 mb-4">{error}</p>
-                <Button 
-                  onClick={fetchReviews}
-                  className="bg-teal-500 text-white hover:bg-teal-600"
-                >
-                  Try Again
-                </Button>
-              </div>
+            <div className="text-center py-12">
+              <Card className="max-w-md mx-auto shadow-lg">
+                <CardContent className="p-8">
+                  <p className="text-red-600 mb-4">{error}</p>
+                  <Button 
+                    onClick={fetchReviews}
+                    className="bg-teal-500 hover:bg-teal-600 text-white"
+                  >
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           ) : reviews.length === 0 ? (
-            <div className="text-center bg-white rounded-lg shadow-md p-12">
-              <p className="text-gray-600 mb-4 text-lg">No testimonials available yet.</p>
-              <p className="text-sm text-gray-500 mb-6">
-                Be the first to share your experience with Brain Works Studio Africa Africa!
-              </p>
-              <Link href="/reviews/submit">
-                <Button className="bg-teal-500 text-white hover:bg-teal-600">
-                  Submit a Review
-                </Button>
-              </Link>
-            </div>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={scaleIn}
+            >
+              <Card className="max-w-2xl mx-auto shadow-lg border-0">
+                <CardContent className="p-12 text-center">
+                  <div className="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Star className="w-8 h-8 text-teal-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-3">
+                    Be the First to Review
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Share your experience with Brain Works Studio Africa!
+                  </p>
+                  <Link href="/reviews/submit">
+                    <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-8 py-6">
+                      Submit a Review
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </motion.div>
           ) : (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-100px" }}
+                variants={staggerContainer}
+                className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
                 {reviews.slice(0, 6).map((review, index) => (
-                  <motion.div
-                    key={review.id}
-                    custom={index}
-                    initial="hidden"
-                    whileInView="visible"
-                    whileHover="hover"
-                    viewport={{ once: true }}
-                    variants={cardVariants}
-                  >
-                    <Card className="border-gray-200 h-full flex flex-col">
-                      <CardHeader>
+                  <motion.div key={review.id} variants={scaleIn}>
+                    <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-shadow duration-300 bg-white">
+                      <CardHeader className="pb-4">
                         <div className="flex items-center gap-4">
                           {review.clientImage ? (
                             <Image
                               src={review.clientImage}
                               alt={review.clientName}
-                              width={50}
-                              height={50}
+                              width={56}
+                              height={56}
                               className="rounded-full object-cover"
                               onError={(e) => {
                                 e.currentTarget.src = '/images/profile-placeholder.jpg';
                               }}
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center flex-shrink-0">
-                              <span className="text-teal-500 font-semibold text-lg">
+                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0">
+                              <span className="text-white font-bold text-xl">
                                 {review.clientName.charAt(0).toUpperCase()}
                               </span>
                             </div>
                           )}
                           <div className="flex-1 min-w-0">
-                            <CardTitle className="text-lg text-[#001F44] truncate">
+                            <CardTitle className="text-lg font-bold text-slate-900 truncate">
                               {review.clientName}
                             </CardTitle>
-                            <p className="text-sm text-gray-600 truncate">{review.serviceType}</p>
+                            <p className="text-sm text-gray-500 truncate">{review.serviceType}</p>
                           </div>
                         </div>
                       </CardHeader>
-                      <CardContent className="flex-1 flex flex-col">
-                        <div className="flex items-center gap-1 mb-3">
+                      <CardContent>
+                        <div className="flex items-center gap-1 mb-4">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
-                              className={`h-4 w-4 ${
+                              className={`h-5 w-5 ${
                                 i < review.rating 
-                                  ? 'fill-yellow-400 text-yellow-400' 
+                                  ? 'fill-[#CB9D06] text-[#CB9D06]' 
                                   : 'text-gray-300'
                               }`}
                             />
                           ))}
-                          <span className="ml-2 text-sm text-gray-600 font-medium">
-                            {review.rating}/5
-                          </span>
                         </div>
-                        <p className="text-sm text-gray-700 mb-4 flex-1">
+                        <p className="text-gray-700 leading-relaxed mb-4">
                           &ldquo;{review.reviewText}&rdquo;
                         </p>
                         {review.adminResponse && (
-                          <div className="p-3 bg-teal-50 border border-teal-200 rounded-md mt-auto">
-                            <p className="text-xs font-semibold text-teal-600 mb-1">
+                          <div className="p-4 bg-slate-50 rounded-lg border-l-4 border-teal-500">
+                            <p className="text-xs font-semibold text-teal-600 mb-2">
                               Our Response:
                             </p>
-                            <p className="text-xs text-gray-700">
+                            <p className="text-sm text-gray-700">
                               {review.adminResponse}
                             </p>
                           </div>
@@ -572,18 +572,21 @@ export default function Home() {
                     </Card>
                   </motion.div>
                 ))}
-              </div>
-              
+              </motion.div>
+
               {reviews.length > 6 && (
                 <motion.div
-                  variants={heroChildVariants}
-                  className="text-center mt-8"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeInUp}
+                  className="text-center mt-12"
                 >
                   <p className="text-gray-600 mb-4">
                     Showing 6 of {reviews.length} testimonials
                   </p>
                   <Link href="/reviews">
-                    <Button className="bg-teal-500 text-white hover:bg-teal-600">
+                    <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-8 py-6">
                       View All Testimonials
                     </Button>
                   </Link>
@@ -592,110 +595,77 @@ export default function Home() {
             </>
           )}
         </div>
-      </motion.section>
+      </section>
 
-      {/* CTA Section */}
-      <motion.section
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-        variants={sectionVariants}
-        className="relative py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-teal-600 to-teal-500 text-white overflow-hidden"
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 1.3 }}
-          animate={{ opacity: 0.2, scale: 1 }}
-          transition={{ duration: 1.5, ease: 'easeInOut' }}
-          className="absolute inset-0"
-        >
-          <Image
-            src="/cta-bg.jpg"
-            alt="CTA Background"
-            fill
-            sizes="100vw"
-            className="object-cover opacity-20"
-            onError={(e) => (e.currentTarget.src = '/placeholder-image.jpeg')}
-          />
-        </motion.div>
+      {/* Modern CTA Section */}
+      <section className="relative py-24 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+            backgroundSize: '40px 40px'
+          }} />
+        </div>
+
+        {/* Gradient Orbs */}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#CB9D06]/20 rounded-full blur-3xl" />
 
         <motion.div
-          custom="left"
-          variants={heroImageVariants}
           initial="hidden"
-          animate="visible"
-          className="absolute top-4 left-4 w-20 h-20 sm:w-24 sm:h-24 lg:w-32 lg:h-32 hidden md:block"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+          className="relative max-w-5xl mx-auto text-center px-4 sm:px-6 lg:px-8"
         >
-          <Image
-            src="/Pic3.jpeg"
-            alt="CTA Decor 1"
-            fill
-            sizes="(max-width: 768px) 80px, (max-width: 1024px) 96px, 128px"
-            className="object-cover rounded-full shadow-lg"
-          />
-        </motion.div>
-        <motion.div
-          custom="right"
-          variants={heroImageVariants}
-          initial="hidden"
-          animate="visible"
-          className="absolute bottom-4 right-4 w-24 h-24 sm:w-28 sm:h-28 lg:w-40 lg:h-40 hidden md:block"
-        >
-          <Image
-            src="/wed.jpeg"
-            alt="CTA Decor 2"
-            fill
-            sizes="(max-width: 768px) 96px, (max-width: 1024px) 112px, 160px"
-            className="object-cover rounded-full shadow-lg"
-          />
-        </motion.div>
+          <motion.div variants={fadeInUp} className="inline-block mb-6">
+            <span className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-semibold">
+              Ready to Get Started?
+            </span>
+          </motion.div>
 
-        <motion.div
-          variants={ctaVariants}
-          className="relative max-w-4xl mx-auto text-center px-4 sm:px-6 lg:px-8 z-10"
-        >
           <motion.h2
-            custom={0}
-            variants={ctaChildVariants}
-            className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 sm:mb-6 drop-shadow-lg"
+            variants={fadeInUp}
+            className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-6"
           >
-            Begin Your Visual Story
+            Let&rsquo;s Create Something
+            <span className="block bg-gradient-to-r from-teal-400 to-[#CB9D06] bg-clip-text text-transparent">
+              Extraordinary
+            </span>
           </motion.h2>
+
           <motion.p
-            custom={1}
-            variants={ctaChildVariants}
-            className="text-base sm:text-lg md:text-xl mb-6 sm:mb-8 text-gray-100 drop-shadow-md"
+            variants={fadeInUp}
+            className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto"
           >
-            Let&rsquo;s craft something extraordinary. Book your session or reach out now.
+            Book your session today and let us turn your vision into stunning visual stories
           </motion.p>
+
           <motion.div
-            custom={2}
-            variants={ctaChildVariants}
-            className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6"
+            variants={fadeInUp}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Link href="/booking">
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
-                  size="lg"
-                  className="w-full sm:w-auto bg-white text-teal-600 hover:bg-gray-100 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
-                >
-                  Book a Session
-                </Button>
-              </motion.div>
+              <Button
+                size="lg"
+                className="group w-full sm:w-auto bg-white text-slate-900 hover:bg-gray-100 text-base font-semibold py-6 px-8 rounded-full shadow-xl"
+              >
+                Book a Session
+                <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </Link>
             <Link href="/contact">
-              <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto border-2 border-white bg-transparent text-white hover:bg-white hover:text-teal-600 text-sm sm:text-base font-semibold py-3 sm:py-4 px-6 sm:px-8 shadow-md"
-                >
-                  Get in Touch
-                </Button>
-              </motion.div>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:bg-white hover:text-slate-900 text-base font-semibold py-6 px-8 rounded-full backdrop-blur-sm"
+              >
+                Get in Touch
+              </Button>
             </Link>
           </motion.div>
         </motion.div>
-      </motion.section>
+      </section>
     </Layout>
   );
 }
