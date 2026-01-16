@@ -1,4 +1,3 @@
-// components/Layout.tsx
 'use client';
 
 import { ReactNode, FormEvent, useEffect } from 'react';
@@ -133,7 +132,7 @@ export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <body className="min-h-screen font-sans">
-        {/* Header - Conditional Background Based on Route */}
+        {/* Header - Conditional Background Based on Route and Screen Size */}
         <motion.header
           initial="hidden"
           animate={showNavbar ? "visible" : "hidden"}
@@ -143,7 +142,7 @@ export default function RootLayout({ children }: LayoutProps) {
           }}
           transition={{ duration: 0.3 }}
           className={`fixed top-0 left-0 w-full backdrop-blur-md z-50 ${
-            pathname === '/' ? '' : 'bg-slate-900/95'
+            pathname === '/' ? 'bg-slate-900/95 lg:bg-transparent' : 'bg-slate-900/95'
           }`}
         >
           <div className="max-w-[95%] mx-auto px-4 sm:px-6">
@@ -268,7 +267,7 @@ export default function RootLayout({ children }: LayoutProps) {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="lg:hidden absolute top-full left-0 w-full backdrop-blur-xl"
+                  className="lg:hidden absolute top-full left-0 w-full bg-slate-900/95 backdrop-blur-xl"
                 >
                   <div className="flex flex-col space-y-1 py-6 px-6">
                     {[
