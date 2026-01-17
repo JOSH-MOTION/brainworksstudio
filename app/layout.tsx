@@ -23,16 +23,16 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: '/newlogo2.jpg', sizes: '16x16', type: 'image/jpeg' },
-      { url: '/newlogo2.jpg', sizes: '32x32', type: 'image/jpeg' },
-      { url: '/newlogo2.jpg', sizes: '48x48', type: 'image/jpeg' },
-      { url: '/newlogo2.jpg', sizes: '192x192', type: 'image/jpeg' },
-      { url: '/newlogo2.jpg', sizes: '512x512', type: 'image/jpeg' }
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/android-chrome-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/android-chrome-512x512.png', sizes: '512x512', type: 'image/png' }
     ],
     apple: [
-      { url: '/newlogo2.jpg', sizes: '180x180', type: 'image/jpeg' }
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }
     ],
-    shortcut: '/newlogo2.jpg',
+    shortcut: '/favicon.ico',
   },
   openGraph: {
     title: 'Brain Works Studio Africa – Professional Photography & Videography',
@@ -72,19 +72,19 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Force favicon refresh with versioning */}
-        <link rel="icon" type="image/jpeg" sizes="16x16" href="/newlogo2.jpg?v=2" />
-        <link rel="icon" type="image/jpeg" sizes="32x32" href="/newlogo2.jpg?v=2" />
-        <link rel="icon" type="image/jpeg" sizes="48x48" href="/newlogo2.jpg?v=2" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/newlogo2.jpg?v=2" />
-        <link rel="shortcut icon" href="/newlogo2.jpg?v=2" />
+        {/* Favicon Package - All sizes for maximum compatibility */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
 
         {/* Open Graph & Social Media Meta Tags */}
-        <meta property="og:image" content={`${BASE_URL}/newlogo2.jpg?v=2`} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:type" content="image/jpeg" />
-        <meta name="twitter:image" content={`${BASE_URL}/newlogo2.jpg?v=2`} />
+        <meta property="og:image" content={`${BASE_URL}/android-chrome-512x512.png`} />
+        <meta property="og:image:width" content="512" />
+        <meta property="og:image:height" content="512" />
+        <meta property="og:image:type" content="image/png" />
+        <meta name="twitter:image" content={`${BASE_URL}/android-chrome-512x512.png`} />
 
         {/* ✅ Google AdSense Script */}
         <script
@@ -102,8 +102,8 @@ export default function RootLayout({
               "@type": "Organization",
               name: "Brain Works Studio Africa",
               url: BASE_URL,
-              logo: `${BASE_URL}/newlogo2.jpg`,
-              image: `${BASE_URL}/newlogo2.jpg`,
+              logo: `${BASE_URL}/android-chrome-512x512.png`,
+              image: `${BASE_URL}/android-chrome-512x512.png`,
               sameAs: [
                 "https://www.instagram.com/brainworks_studio_africa",
                 "https://www.facebook.com/brainworksstudioafrica",
