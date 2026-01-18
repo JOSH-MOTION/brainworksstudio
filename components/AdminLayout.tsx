@@ -98,6 +98,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   { href: '/admin/portfolio', label: 'Portfolio', icon: Folder },
                   { href: '/admin/blog', label: 'Blog', icon: FileText },
                   { href: '/admin/pricing', label: 'Pricing', icon: DollarSign },
+                  { href: '/admin/pricing-categories', label: 'Pricing Categories', icon: DollarSign },
                   { href: '/admin/reviews', label: 'Reviews', icon: Star },
                   { href: '/admin/users', label: 'Clients', icon: Users },
                   { href: '/admin/profile', label: 'Profile', icon: User }, // Updated to /admin/profile
