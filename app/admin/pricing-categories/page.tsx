@@ -87,9 +87,9 @@ export default function AdminPricingCategoriesPage() {
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
 
- 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  
 
   const [packageForm, setPackageForm] = useState({
     name: '',
@@ -446,6 +446,7 @@ export default function AdminPricingCategoriesPage() {
   };
 
   const handleEditPackage = (categoryId: string, packageIndex: number, pkg: PricingPackage) => {
+    setSelectedCategoryId(categoryId);
     setEditingPackage({ categoryId, packageIndex, package: pkg });
     setPackageForm({
       name: pkg.name,
@@ -756,14 +757,17 @@ export default function AdminPricingCategoriesPage() {
                 <div className="border-t pt-4">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-semibold text-gray-900">Packages</h3>
-                    <Dialog open={packageDialogOpen && selectedCategoryId === category.id} onOpenChange={(open) => {
-                      setPackageDialogOpen(open);
-                      if (!open) {
-                        resetPackageForm();
-                      } else {
-                        setSelectedCategoryId(category.id!);
-                      }
-                    }}>
+                    <Dialog 
+                      open={packageDialogOpen && (selectedCategoryId === category.id || editingPackage?.categoryId === category.id)} 
+                      onOpenChange={(open) => {
+                        if (selectedCategoryId === category.id || editingPackage?.categoryId === category.id) {
+                          setPackageDialogOpen(open);
+                          if (!open) {
+                            resetPackageForm();
+                          }
+                        }
+                      }}
+                    >
                       <DialogTrigger asChild>
                         <Button 
                           size="sm"
@@ -771,6 +775,7 @@ export default function AdminPricingCategoriesPage() {
                           onClick={() => {
                             setSelectedCategoryId(category.id!);
                             setEditingPackage(null);
+                            resetPackageForm();
                           }}
                         >
                           <Plus className="h-4 w-4 mr-1" />
@@ -963,6 +968,7 @@ export default function AdminPricingCategoriesPage() {
                         onClick={() => {
                           setSelectedCategoryId(category.id!);
                           setEditingPackage(null);
+                          resetPackageForm();
                           setPackageDialogOpen(true);
                         }}
                       >

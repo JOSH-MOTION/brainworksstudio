@@ -302,7 +302,7 @@ export default function CategoryPackagesPage() {
               </Button>
             </Link>
             <Link href="/pricing">
-              <Button variant="outline" className="border-white/30 text-white hover:bg-white/10 font-bold px-8 py-6 rounded-full">
+              <Button variant="outline" className="border-white/30 text-teal-500 hover:text-white hover:bg-white/10 font-bold px-8 py-6 rounded-full">
                 View Other Categories
               </Button>
             </Link>
