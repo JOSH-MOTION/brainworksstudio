@@ -86,7 +86,7 @@ export default function CategoryPackagesPage() {
         <div className="min-h-screen flex items-center justify-center px-4">
           <div className="text-center">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Category Not Found</h1>
-            <p className="text-gray-600 mb-8">The pricing category you're looking for doesn't exist.</p>
+            <p className="text-gray-600 mb-8">The pricing category you&apos;re looking for doesn&apos;t exist.</p>
             <Link href="/pricing">
               <Button className="bg-teal-500 hover:bg-teal-600">
                 <ArrowLeft className="h-4 w-4 mr-2" />
