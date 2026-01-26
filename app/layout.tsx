@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Suspense } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
-import { Analytics } from "@vercel/analytics/next";
+import VercelAnalytics from "@/components/VercelAnalytics";
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -128,9 +128,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <AuthProvider>{children}</AuthProvider>
-        <Suspense fallback={null}>
-          <Analytics />
-        </Suspense>
+        
+            <VercelAnalytics />
+       
       </body>
     </html>
   );
