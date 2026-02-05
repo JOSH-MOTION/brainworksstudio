@@ -6,6 +6,20 @@ import { Query, CollectionReference, DocumentData } from 'firebase-admin/firesto
 
 export const dynamic = 'force-dynamic';
 
+// Helper to extract YouTube video ID
+function extractYouTubeId(url: string): string | null {
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+    /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+    /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const pattern of patterns) {
+    const match = url.match(pattern);
+    if (match && match[1]) return match[1];
+  }
+  return null;
+}
+
 export async function GET(request: NextRequest) {
   console.log('GET /api/portfolio: Starting request');
 
@@ -136,19 +150,21 @@ export async function POST(request: NextRequest) {
     if (type === 'photography' && (!files || files.length === 0)) {
       return NextResponse.json({ error: 'At least one image is required for photography' }, { status: 400 });
     }
-    if (type === 'videography' && !videoUrl && (!files || files.length === 0)) {
-      return NextResponse.json({ error: 'Video URL or file is required for videography' }, { status: 400 });
+    
+    // NEW: Validate YouTube URL for videography
+    if (type === 'videography' && !videoUrl) {
+      return NextResponse.json({ error: 'YouTube URL is required for videography' }, { status: 400 });
     }
-    if (type === 'videography' && !videoUrl && !thumbnail) {
-      return NextResponse.json({ error: 'Thumbnail is required for local video uploads' }, { status: 400 });
+    
+    if (type === 'videography' && videoUrl && !extractYouTubeId(videoUrl)) {
+      return NextResponse.json({ error: 'Invalid YouTube URL' }, { status: 400 });
     }
 
     const imageUrls: string[] = [];
-    let uploadedVideoUrl: string | null = null;
+    let finalVideoUrl: string | null = null;
 
-    // FIXED: Process files based on type
-    if (type === 'photography') {
-      // Process image files for photography
+    // Process images for photography
+    if (type === 'photography' && files && files.length > 0) {
       console.log(`POST /api/portfolio: Processing ${files.length} image files for photography`);
       for (const file of files) {
         if (file.size === 0) {
@@ -156,7 +172,7 @@ export async function POST(request: NextRequest) {
           continue;
         }
         if (!file.type.startsWith('image/')) {
-          console.warn(`POST /api/portfolio: Skipping non-image file for photography: ${file.name}`);
+          console.warn(`POST /api/portfolio: Skipping non-image file: ${file.name}`);
           continue;
         }
         console.log(`POST /api/portfolio: Uploading image - Name: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
@@ -164,48 +180,34 @@ export async function POST(request: NextRequest) {
         imageUrls.push(result.url);
         console.log(`POST /api/portfolio: Stored image in imageUrls: ${result.url}`);
       }
-    } else if (type === 'videography') {
-      // Process video files for videography
-      if (files && files.length > 0) {
-        console.log(`POST /api/portfolio: Processing ${files.length} video files for videography`);
-        for (const file of files) {
-          if (file.size === 0) {
-            console.warn('POST /api/portfolio: Skipping empty file');
-            continue;
-          }
-          if (!file.type.startsWith('video/')) {
-            console.warn(`POST /api/portfolio: Skipping non-video file for videography: ${file.name}`);
-            continue;
-          }
-          console.log(`POST /api/portfolio: Uploading video file - Name: ${file.name}, Type: ${file.type}, Size: ${file.size}`);
-          const result = await uploadToImageKit(file, `${title || 'video'}-${Date.now()}.mp4`, '/brain-works-studio');
-          uploadedVideoUrl = result.url;
-          console.log(`POST /api/portfolio: Stored video in videoUrl: ${result.url}`);
-        }
-      }
-
-      // Process thumbnail for videography
-      if (thumbnail) {
-        console.log(`POST /api/portfolio: Uploading thumbnail - Name: ${thumbnail.name}, Type: ${thumbnail.type}, Size: ${thumbnail.size}`);
-        const thumbnailResult = await uploadToImageKit(thumbnail, `${title || 'thumbnail'}-${Date.now()}.jpg`, '/brain-works-studio/thumbnails');
-        imageUrls.push(thumbnailResult.url);
-        console.log(`POST /api/portfolio: Stored thumbnail in imageUrls: ${thumbnailResult.url}`);
-      } else if (thumbnailUrl) {
-        imageUrls.push(thumbnailUrl);
-        console.log(`POST /api/portfolio: Using provided thumbnail: ${thumbnailUrl}`);
-      } else {
-        imageUrls.push('/video-placeholder.jpg');
-        console.log('POST /api/portfolio: No thumbnail provided, using placeholder');
-      }
     }
 
-    // Priority: YouTube/Vimeo URL > Uploaded video file
-    const finalVideoUrl = videoUrl?.trim() || uploadedVideoUrl || null;
-
-    if (type === 'videography' && !finalVideoUrl) {
-      return NextResponse.json({
-        error: 'No valid video found. Please provide a video URL or upload a video file.',
-      }, { status: 400 });
+    // Process YouTube video for videography
+    if (type === 'videography' && videoUrl) {
+      const videoId = extractYouTubeId(videoUrl);
+      if (videoId) {
+        // Convert to embed URL
+        finalVideoUrl = `https://www.youtube.com/embed/${videoId}`;
+        console.log(`POST /api/portfolio: Using YouTube embed URL: ${finalVideoUrl}`);
+        
+        // Handle thumbnail
+        if (thumbnail && thumbnail.size > 0) {
+          // Custom thumbnail uploaded
+          console.log(`POST /api/portfolio: Uploading custom thumbnail`);
+          const thumbnailResult = await uploadToImageKit(thumbnail, `${title || 'thumbnail'}-${Date.now()}.jpg`, '/brain-works-studio/thumbnails');
+          imageUrls.push(thumbnailResult.url);
+          console.log(`POST /api/portfolio: Stored custom thumbnail: ${thumbnailResult.url}`);
+        } else if (thumbnailUrl) {
+          // Use provided YouTube thumbnail
+          imageUrls.push(thumbnailUrl);
+          console.log(`POST /api/portfolio: Using provided YouTube thumbnail: ${thumbnailUrl}`);
+        } else {
+          // Use YouTube auto-thumbnail
+          const autoThumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+          imageUrls.push(autoThumbnail);
+          console.log(`POST /api/portfolio: Using YouTube auto-thumbnail: ${autoThumbnail}`);
+        }
+      }
     }
 
     const portfolioItem = {

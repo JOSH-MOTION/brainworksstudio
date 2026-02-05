@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft, Upload, Lock, Eye, EyeOff, Image as ImageIcon, X, Film } from 'lucide-react';
+import { ArrowLeft, Upload, Lock, Eye, EyeOff, Image as ImageIcon, X, Film, AlertCircle } from 'lucide-react';
 import { getAuth } from 'firebase/auth';
 import { app } from '@/lib/firebase';
 import Layout from '@/components/Layout';
@@ -40,7 +40,7 @@ const videographyCategories = [
 interface PreviewFile {
   file: File;
   preview: string;
-  type: 'image' | 'video';
+  type: 'image';
 }
 
 export default function UploadPortfolio() {
@@ -62,6 +62,21 @@ export default function UploadPortfolio() {
   const [showPin, setShowPin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [youtubeError, setYoutubeError] = useState('');
+
+  // Helper to extract YouTube video ID
+  const extractYouTubeId = (url: string): string | null => {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})/,
+      /(?:youtu\.be\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) return match[1];
+    }
+    return null;
+  };
 
   const generateRandomPin = () => {
     const pin = Math.floor(1000 + Math.random() * 9000).toString();
@@ -74,18 +89,36 @@ export default function UploadPortfolio() {
 
     setFiles(selectedFiles);
 
-    // Create preview URLs
+    // Create preview URLs (only for images)
     const previews: PreviewFile[] = [];
     Array.from(selectedFiles).forEach((file) => {
-      const isVideo = file.type.startsWith('video/');
-      const preview = URL.createObjectURL(file);
-      previews.push({
-        file,
-        preview,
-        type: isVideo ? 'video' : 'image',
-      });
+      if (file.type.startsWith('image/')) {
+        const preview = URL.createObjectURL(file);
+        previews.push({
+          file,
+          preview,
+          type: 'image',
+        });
+      }
     });
     setPreviewFiles(previews);
+  };
+
+  const handleVideoUrlChange = (url: string) => {
+    setVideoUrl(url);
+    setYoutubeError('');
+    
+    if (url && !extractYouTubeId(url)) {
+      setYoutubeError('Invalid YouTube URL. Please use a valid YouTube video link.');
+    } else if (url) {
+      // Auto-generate embed URL preview
+      const videoId = extractYouTubeId(url);
+      if (videoId) {
+        // Optionally auto-set thumbnail from YouTube
+        const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+        // You can set this as default thumbnail if user hasn't uploaded one
+      }
+    }
   };
 
   const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -120,12 +153,12 @@ export default function UploadPortfolio() {
       setError('Please upload at least one image for photography.');
       return;
     }
-    if (type === 'videography' && !files && !videoUrl) {
-      setError('Please upload a video file or provide a YouTube URL.');
+    if (type === 'videography' && !videoUrl) {
+      setError('Please provide a YouTube URL for the video.');
       return;
     }
-    if (type === 'videography' && files && !thumbnailFile) {
-      setError('Please upload a thumbnail image for the local video.');
+    if (type === 'videography' && videoUrl && !extractYouTubeId(videoUrl)) {
+      setError('Invalid YouTube URL. Please check the link and try again.');
       return;
     }
     if (pin && pin.length < 4) {
@@ -158,23 +191,19 @@ export default function UploadPortfolio() {
         }
       }
 
-      // Handle videography uploads
-      if (type === 'videography') {
-        if (videoUrl) {
-          formData.append('videoUrl', videoUrl);
-          if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-            const videoId = videoUrl.match(/(?:v=|\/)([0-9A-Za-z_-]{11})/)?.[1];
-            const thumbnailUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '/video-placeholder.jpg';
-            formData.append('imageUrls', thumbnailUrl);
-          } else {
-            formData.append('imageUrls', '/video-placeholder.jpg');
-          }
-        }
-        if (files && files[0]) {
-          formData.append('files', files[0]);
-        }
+      // Handle videography - YouTube URL only
+      if (type === 'videography' && videoUrl) {
+        const videoId = extractYouTubeId(videoUrl);
+        const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        formData.append('videoUrl', embedUrl);
+        
+        // Use custom thumbnail or YouTube auto-thumbnail
         if (thumbnailFile) {
           formData.append('thumbnail', thumbnailFile);
+        } else {
+          // Use YouTube thumbnail
+          const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+          formData.append('imageUrls', thumbnailUrl);
         }
       }
 
@@ -350,16 +379,77 @@ export default function UploadPortfolio() {
                 </motion.div>
 
                 {type === 'videography' && (
+                  <motion.div custom={7} variants={formElementVariants} initial="hidden" animate="visible">
+                    <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Film className="w-5 h-5 text-blue-600" />
+                        <Label className="text-[#001F44] font-semibold text-sm">YouTube Video *</Label>
+                      </div>
+                      <p className="text-xs text-gray-600 mb-3">
+                        Paste your YouTube video link (works with watch, share, or embed URLs)
+                      </p>
+                      <Input
+                        id="videoUrl"
+                        type="text"
+                        value={videoUrl}
+                        onChange={(e) => handleVideoUrlChange(e.target.value)}
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        className={`border-blue-100 focus:ring-blue-500 text-sm rounded-lg ${youtubeError ? 'border-red-500' : ''}`}
+                      />
+                      {youtubeError && (
+                        <div className="flex items-center gap-2 mt-2 text-red-600 text-xs">
+                          <AlertCircle className="w-4 h-4" />
+                          <span>{youtubeError}</span>
+                        </div>
+                      )}
+                      {videoUrl && !youtubeError && extractYouTubeId(videoUrl) && (
+                        <div className="mt-3">
+                          <p className="text-xs text-green-600 font-medium mb-2">✓ Valid YouTube URL</p>
+                          <div className="aspect-video rounded-lg overflow-hidden">
+                            <iframe
+                              src={`https://www.youtube.com/embed/${extractYouTubeId(videoUrl)}`}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                {type === 'videography' && videoUrl && (
                   <motion.div custom={8} variants={formElementVariants} initial="hidden" animate="visible">
-                    <Label htmlFor="videoUrl" className="text-[#001F44] text-sm">YouTube Video URL (optional)</Label>
-                    <Input
-                      id="videoUrl"
-                      type="text"
-                      value={videoUrl}
-                      onChange={(e) => setVideoUrl(e.target.value)}
-                      placeholder="e.g., https://www.youtube.com/embed/your-video-id"
-                      className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
-                    />
+                    <Label className="text-[#001F44] text-sm block mb-2">
+                      Custom Thumbnail (Optional)
+                    </Label>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Upload a custom thumbnail or we&apos;ll use YouTube&apos;s default
+                    </p>
+                    <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-4 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleThumbnailChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      />
+                      {thumbnailPreview ? (
+                        <div className="relative w-32 h-32 mx-auto">
+                          <Image
+                            src={thumbnailPreview}
+                            alt="Thumbnail"
+                            fill
+                            className="object-cover rounded-lg"
+                          />
+                        </div>
+                      ) : (
+                        <div className="text-center">
+                          <ImageIcon className="w-8 h-8 mx-auto mb-2 text-coral-500" />
+                          <p className="text-sm text-[#001F44]">Click to upload custom thumbnail</p>
+                        </div>
+                      )}
+                    </div>
                   </motion.div>
                 )}
 
@@ -367,9 +457,10 @@ export default function UploadPortfolio() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    className="text-red-600 text-sm bg-red-50 p-3 rounded-lg"
+                    className="text-red-600 text-sm bg-red-50 p-3 rounded-lg flex items-start gap-2"
                   >
-                    {error}
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <span>{error}</span>
                   </motion.div>
                 )}
 
@@ -379,8 +470,8 @@ export default function UploadPortfolio() {
                     whileHover="hover"
                     whileTap="tap"
                     onClick={handleUpload}
-                    disabled={loading}
-                    className="w-full bg-coral-500 text-teal-600 hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
+                    disabled={loading || (type === 'videography' && !videoUrl)}
+                    className="w-full bg-coral-500 text-teal-700 hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
                   >
                     {loading ? (
                       'Uploading...'
@@ -402,65 +493,30 @@ export default function UploadPortfolio() {
                   {title || 'Untitled Portfolio'}
                 </h3>
 
-                {/* Upload Area */}
-                <div className="mb-6">
-                  <Label htmlFor={type === 'photography' ? 'images' : 'videoFiles'} className="text-[#001F44] text-sm block mb-2">
-                    {type === 'photography' ? 'Upload Images *' : 'Upload Video *'}
-                  </Label>
-                  <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-8 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
-                    <input
-                      id={type === 'photography' ? 'images' : 'videoFiles'}
-                      type="file"
-                      multiple={type === 'photography'}
-                      accept={type === 'photography' ? 'image/*' : 'video/*'}
-                      onChange={handleFileChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                    />
-                    <div className="text-center">
-                      {type === 'photography' ? (
-                        <ImageIcon className="w-12 h-12 mx-auto mb-4 text-coral-500" />
-                      ) : (
-                        <Film className="w-12 h-12 mx-auto mb-4 text-coral-500" />
-                      )}
-                      <p className="text-[#001F44] font-medium mb-1">
-                        Click to upload or drag and drop
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        {type === 'photography' ? 'PNG, JPG, GIF up to 10MB each' : 'MP4, MOV, AVI up to 100MB'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Thumbnail Upload for Video */}
-                {type === 'videography' && previewFiles.length > 0 && (
+                {/* Upload Area for Photography */}
+                {type === 'photography' && (
                   <div className="mb-6">
-                    <Label htmlFor="thumbnail" className="text-[#001F44] text-sm block mb-2">
-                      Video Thumbnail * (required for local video)
+                    <Label htmlFor="images" className="text-[#001F44] text-sm block mb-2">
+                      Upload Images *
                     </Label>
-                    <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-4 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
+                    <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-8 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
                       <input
-                        id="thumbnail"
+                        id="images"
                         type="file"
+                        multiple
                         accept="image/*"
-                        onChange={handleThumbnailChange}
+                        onChange={handleFileChange}
                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       />
-                      {thumbnailPreview ? (
-                        <div className="relative w-32 h-32 mx-auto">
-                          <Image
-                            src={thumbnailPreview}
-                            alt="Thumbnail"
-                            fill
-                            className="object-cover rounded-lg"
-                          />
-                        </div>
-                      ) : (
-                        <div className="text-center">
-                          <ImageIcon className="w-8 h-8 mx-auto mb-2 text-coral-500" />
-                          <p className="text-sm text-[#001F44]">Click to upload thumbnail</p>
-                        </div>
-                      )}
+                      <div className="text-center">
+                        <ImageIcon className="w-12 h-12 mx-auto mb-4 text-coral-500" />
+                        <p className="text-[#001F44] font-medium mb-1">
+                          Click to upload or drag and drop
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          PNG, JPG, GIF up to 25MB each
+                        </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -482,20 +538,12 @@ export default function UploadPortfolio() {
                           animate={{ opacity: 1, scale: 1 }}
                           className="relative aspect-square rounded-lg overflow-hidden bg-gray-100 group"
                         >
-                          {preview.type === 'image' ? (
-                            <Image
-                              src={preview.preview}
-                              alt={`Preview ${index + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <video
-                              src={preview.preview}
-                              className="w-full h-full object-cover"
-                              muted
-                            />
-                          )}
+                          <Image
+                            src={preview.preview}
+                            alt={`Preview ${index + 1}`}
+                            fill
+                            className="object-cover"
+                          />
                           <button
                             onClick={() => removeFile(index)}
                             className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
@@ -511,11 +559,11 @@ export default function UploadPortfolio() {
                   </div>
                 )}
 
-                {previewFiles.length === 0 && (
+                {previewFiles.length === 0 && type === 'photography' && (
                   <div className="text-center py-12 text-gray-400">
                     <ImageIcon className="w-16 h-16 mx-auto mb-4 opacity-50" />
                     <p>No files uploaded yet</p>
-                    <p className="text-sm">Upload files to see them here</p>
+                    <p className="text-sm">Upload images to see them here</p>
                   </div>
                 )}
               </div>
