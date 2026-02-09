@@ -21,7 +21,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { 
   Plus, Edit, Trash2, Star, X, ChevronDown, ChevronUp, Image as ImageIcon, 
-  Package, Check, ArrowUp, ArrowDown 
+  Package, Check, AlertCircle
 } from 'lucide-react';
 
 interface PricingPackage {
@@ -72,6 +72,8 @@ export default function AdminPricingCategoriesPage() {
   const [editingPackage, setEditingPackage] = useState<{ categoryId: string; packageIndex: number; package: PricingPackage } | null>(null);
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [includesInputs, setIncludesInputs] = useState<string[]>(['']);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
 
   const [categoryForm, setCategoryForm] = useState({
     name: '',
@@ -86,10 +88,6 @@ export default function AdminPricingCategoriesPage() {
   const [uploadingImage, setUploadingImage] = useState(false);
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
-
- 
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-
 
   const [packageForm, setPackageForm] = useState({
     name: '',
@@ -141,8 +139,7 @@ export default function AdminPricingCategoriesPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file
-    const MAX_SIZE = 25 * 1024 * 1024; // 25MB
+    const MAX_SIZE = 25 * 1024 * 1024;
     if (file.size > MAX_SIZE) {
       alert(`File size ${(file.size / 1024 / 1024).toFixed(2)}MB exceeds 25MB limit`);
       return;
@@ -156,7 +153,6 @@ export default function AdminPricingCategoriesPage() {
 
     setSelectedImageFile(file);
     
-    // Create preview
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result as string);
@@ -205,13 +201,16 @@ export default function AdminPricingCategoriesPage() {
       return;
     }
 
+    setSaving(true);
+    setError('');
+
     try {
-      // Upload image first if file is selected
       let imageUrl = categoryForm.imageUrl;
       if (selectedImageFile) {
         const uploadedUrl = await uploadImageToImageKit(selectedImageFile);
         if (!uploadedUrl) {
           alert('Image upload failed. Please try again.');
+          setSaving(false);
           return;
         }
         imageUrl = uploadedUrl;
@@ -238,24 +237,29 @@ export default function AdminPricingCategoriesPage() {
         fetchCategories();
       } else {
         const error = await response.json();
-        alert(error.error || 'Failed to create category');
+        setError(error.error || 'Failed to create category');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating category:', error);
-      alert('An error occurred');
+      setError('An error occurred while creating the category');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleUpdateCategory = async () => {
     if (!firebaseUser || !editingCategory?.id) return;
 
+    setSaving(true);
+    setError('');
+
     try {
-      // Upload new image if file is selected
       let imageUrl = categoryForm.imageUrl;
       if (selectedImageFile) {
         const uploadedUrl = await uploadImageToImageKit(selectedImageFile);
         if (!uploadedUrl) {
           alert('Image upload failed. Please try again.');
+          setSaving(false);
           return;
         }
         imageUrl = uploadedUrl;
@@ -271,7 +275,7 @@ export default function AdminPricingCategoriesPage() {
         body: JSON.stringify({
           ...categoryForm,
           imageUrl,
-          packages: editingCategory.packages, // Keep existing packages
+          packages: editingCategory.packages,
         }),
       });
 
@@ -282,11 +286,14 @@ export default function AdminPricingCategoriesPage() {
         setEditingCategory(null);
         fetchCategories();
       } else {
-        alert('Failed to update category');
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to update category');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating category:', error);
-      alert('An error occurred');
+      setError('An error occurred while updating the category');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -313,15 +320,28 @@ export default function AdminPricingCategoriesPage() {
   };
 
   const handleAddPackage = async () => {
-    if (!firebaseUser || !selectedCategoryId || !packageForm.name) return;
+    if (!firebaseUser || !selectedCategoryId || !packageForm.name || !packageForm.price) {
+      setError('Please fill in package name and price');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
 
     const category = categories.find(c => c.id === selectedCategoryId);
-    if (!category) return;
+    if (!category) {
+      setError('Category not found');
+      setSaving(false);
+      return;
+    }
 
     const newPackage: PricingPackage = {
-      ...packageForm,
+      name: packageForm.name.trim(),
       price: formatGHS(packageForm.price),
+      duration: packageForm.duration?.trim() || '',
+      description: packageForm.description.trim(),
       includes: includesInputs.filter(item => item.trim()),
+      featured: packageForm.featured,
       order: packageForm.order || (category.packages?.length || 0),
     };
 
@@ -344,27 +364,54 @@ export default function AdminPricingCategoriesPage() {
         resetPackageForm();
         fetchCategories();
       } else {
-        alert('Failed to add package');
+        const errorData = await response.json();
+        setError(errorData.error || 'Failed to add package');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding package:', error);
-      alert('An error occurred');
+      setError('An error occurred while adding the package');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleUpdatePackage = async () => {
-    if (!firebaseUser || !editingPackage) return;
+    if (!firebaseUser || !editingPackage) {
+      setError('Invalid package data');
+      return;
+    }
+
+    if (!packageForm.name || !packageForm.price) {
+      setError('Please fill in package name and price');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
 
     const category = categories.find(c => c.id === editingPackage.categoryId);
-    if (!category) return;
+    if (!category) {
+      setError('Category not found');
+      setSaving(false);
+      return;
+    }
 
     const updatedPackages = [...(category.packages || [])];
     updatedPackages[editingPackage.packageIndex] = {
-      ...packageForm,
+      name: packageForm.name.trim(),
       price: formatGHS(packageForm.price),
+      duration: packageForm.duration?.trim() || '',
+      description: packageForm.description.trim(),
       includes: includesInputs.filter(item => item.trim()),
+      featured: packageForm.featured,
       order: packageForm.order,
     };
+
+    console.log('Updating package:', {
+      categoryId: editingPackage.categoryId,
+      packageIndex: editingPackage.packageIndex,
+      updatedPackage: updatedPackages[editingPackage.packageIndex]
+    });
 
     try {
       const token = await firebaseUser.getIdToken();
@@ -386,11 +433,15 @@ export default function AdminPricingCategoriesPage() {
         setEditingPackage(null);
         fetchCategories();
       } else {
-        alert('Failed to update package');
+        const errorData = await response.json();
+        console.error('Update failed:', errorData);
+        setError(errorData.error || 'Failed to update package');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error updating package:', error);
-      alert('An error occurred');
+      setError('An error occurred while updating the package');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -438,15 +489,18 @@ export default function AdminPricingCategoriesPage() {
       published: category.published,
       order: category.order,
     });
-    // Set existing image as preview
     if (category.imageUrl) {
       setImagePreview(category.imageUrl);
     }
+    setError('');
     setCategoryDialogOpen(true);
   };
 
   const handleEditPackage = (categoryId: string, packageIndex: number, pkg: PricingPackage) => {
+    console.log('Editing package:', { categoryId, packageIndex, pkg });
+    
     setEditingPackage({ categoryId, packageIndex, package: pkg });
+    setSelectedCategoryId(categoryId);
     setPackageForm({
       name: pkg.name,
       price: parseGHS(pkg.price),
@@ -456,6 +510,7 @@ export default function AdminPricingCategoriesPage() {
       order: pkg.order,
     });
     setIncludesInputs(pkg.includes.length > 0 ? pkg.includes : ['']);
+    setError('');
     setPackageDialogOpen(true);
   };
 
@@ -472,6 +527,7 @@ export default function AdminPricingCategoriesPage() {
     setEditingCategory(null);
     setSelectedImageFile(null);
     setImagePreview('');
+    setError('');
   };
 
   const resetPackageForm = () => {
@@ -486,6 +542,7 @@ export default function AdminPricingCategoriesPage() {
     setIncludesInputs(['']);
     setEditingPackage(null);
     setSelectedCategoryId('');
+    setError('');
   };
 
   const handleAddInclude = () => {
@@ -551,9 +608,17 @@ export default function AdminPricingCategoriesPage() {
                 {editingCategory ? 'Update category details' : 'Add a new service category'}
               </DialogDescription>
             </DialogHeader>
+            
+            {error && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-800">{error}</p>
+              </div>
+            )}
+
             <div className="space-y-4">
               <div>
-                <Label>Category Name</Label>
+                <Label>Category Name *</Label>
                 <Input
                   value={categoryForm.name}
                   onChange={(e) => {
@@ -670,13 +735,18 @@ export default function AdminPricingCategoriesPage() {
 
               <Button
                 onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}
-                disabled={uploadingImage}
+                disabled={uploadingImage || saving}
                 className="w-full bg-teal-500 hover:bg-teal-600"
               >
                 {uploadingImage ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                     Uploading Image...
+                  </>
+                ) : saving ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                    Saving...
                   </>
                 ) : (
                   editingCategory ? 'Update Category' : 'Create Category'
@@ -767,10 +837,11 @@ export default function AdminPricingCategoriesPage() {
                       <DialogTrigger asChild>
                         <Button 
                           size="sm"
-                          className="bg-teal-500 hover:bg-coral-600"
+                          className="bg-teal-500 hover:bg-teal-600"
                           onClick={() => {
                             setSelectedCategoryId(category.id!);
                             setEditingPackage(null);
+                            resetPackageForm();
                           }}
                         >
                           <Plus className="h-4 w-4 mr-1" />
@@ -784,9 +855,17 @@ export default function AdminPricingCategoriesPage() {
                             {editingPackage ? 'Update package details' : `Add a pricing package to ${category.name}`}
                           </DialogDescription>
                         </DialogHeader>
+                        
+                        {error && (
+                          <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-start gap-2">
+                            <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                            <p className="text-sm text-red-800">{error}</p>
+                          </div>
+                        )}
+
                         <div className="space-y-4">
                           <div>
-                            <Label>Package Name</Label>
+                            <Label>Package Name *</Label>
                             <Input
                               value={packageForm.name}
                               onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
@@ -797,7 +876,7 @@ export default function AdminPricingCategoriesPage() {
 
                           <div className="grid grid-cols-2 gap-4">
                             <div>
-                              <Label>Price (GHS)</Label>
+                              <Label>Price (GHS) *</Label>
                               <div className="relative">
                                 <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">₵</span>
                                 <Input
@@ -886,9 +965,17 @@ export default function AdminPricingCategoriesPage() {
 
                           <Button
                             onClick={editingPackage ? handleUpdatePackage : handleAddPackage}
+                            disabled={saving}
                             className="w-full bg-teal-500 hover:bg-teal-600"
                           >
-                            {editingPackage ? 'Update Package' : 'Add Package'}
+                            {saving ? (
+                              <>
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                Saving...
+                              </>
+                            ) : (
+                              editingPackage ? 'Update Package' : 'Add Package'
+                            )}
                           </Button>
                         </div>
                       </DialogContent>
@@ -898,12 +985,12 @@ export default function AdminPricingCategoriesPage() {
                   {category.packages && category.packages.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {category.packages.map((pkg, index) => (
-                        <Card key={index} className={pkg.featured ? 'border-2 border-coral-500' : 'border-gray-200'}>
+                        <Card key={index} className={pkg.featured ? 'border-2 border-teal-500' : 'border-gray-200'}>
                           <CardHeader>
                             <div className="flex justify-between items-start mb-2">
                               <CardTitle className="text-lg text-gray-900">{pkg.name}</CardTitle>
                               {pkg.featured && (
-                                <Badge className="bg-coral-100 text-coral-700 flex items-center gap-1">
+                                <Badge className="bg-teal-100 text-teal-700 flex items-center gap-1">
                                   <Star className="h-3 w-3" />
                                   Featured
                                 </Badge>
@@ -911,7 +998,7 @@ export default function AdminPricingCategoriesPage() {
                             </div>
                             <CardDescription>{pkg.description}</CardDescription>
                             <div className="mt-3 flex items-baseline gap-2">
-                              <span className="text-2xl font-bold text-coral-600">{pkg.price}</span>
+                              <span className="text-2xl font-bold text-teal-600">{pkg.price}</span>
                             </div>
                             {pkg.duration && (
                               <p className="text-sm text-gray-500 mt-1">{pkg.duration}</p>
@@ -959,10 +1046,11 @@ export default function AdminPricingCategoriesPage() {
                       <p className="text-sm text-gray-500 mb-4">Add your first pricing package to this category</p>
                       <Button
                         size="sm"
-                        className="bg-coral-500 hover:bg-coral-600"
+                        className="bg-teal-500 hover:bg-teal-600"
                         onClick={() => {
                           setSelectedCategoryId(category.id!);
                           setEditingPackage(null);
+                          resetPackageForm();
                           setPackageDialogOpen(true);
                         }}
                       >
