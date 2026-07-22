@@ -6,9 +6,10 @@ import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Camera, Video, Star, Sparkles, Zap, Award, FileText } from 'lucide-react';
+import { ArrowRight, Camera, Video, Star, Sparkles, Zap, Award, FileText, Play } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import VideoPlayer from '@/components/VideoPlayer';
 
 // Animation variants
 const fadeInUp: Variants = {
@@ -64,6 +65,21 @@ export default function Home() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
+  const youtubeUrl = 'https://youtu.be/Tvzynkzv_y4';
+  const getYouTubeId = (url: string) => {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+  };
+  
+  const videoId = getYouTubeId(youtubeUrl);
+  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : youtubeUrl;
+  
+  const [videoThumbnail, setVideoThumbnail] = useState(
+    videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '/hero1.jpg'
+  );
 
   useEffect(() => {
     fetchReviews();
@@ -142,14 +158,7 @@ export default function Home() {
           className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-20 text-center"
         >
           <div className="max-w-5xl mx-auto">
-            {/* Premium Badge */}
-            <motion.div
-              variants={fadeInUp}
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/5 backdrop-blur-md border border-white/10 rounded-full mb-8"
-            >
-              <Sparkles className="w-4 h-4 text-teal-400" />
-              <span className="text-sm text-white/90 font-medium tracking-wide">Premium Visual Storytelling</span>
-            </motion.div>
+            
 
             {/* Main Heading - Large and Bold */}
             <motion.h1
@@ -255,106 +264,114 @@ export default function Home() {
         </motion.div>
       </section>
 
-      {/* Services Section - Modern Grid */}
-      <section className="py-32 bg-slate-50">
+      {/* Services & Philosophy Section */}
+      <section className="py-24 sm:py-32 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="text-center mb-20"
-          >
-            <motion.div variants={fadeInUp} className="inline-block mb-6">
-              <span className="px-5 py-2.5 bg-teal-50 text-teal-600 rounded-full text-sm font-bold uppercase tracking-wider">
-                Our Services
-              </span>
-            </motion.div>
-            <motion.h2
-              variants={fadeInUp}
-              className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
+            {/* Left Column: Visual Media (Image & Video) */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="lg:col-span-7 relative flex items-center gap-6 md:gap-8"
             >
-              What We Offer
-            </motion.h2>
-            <motion.p
-              variants={fadeInUp}
-              className="text-xl text-gray-600 max-w-2xl mx-auto font-light"
-            >
-              Professional services tailored to capture your vision with creativity and precision
-            </motion.p>
-          </motion.div>
+              {/* Left Offset Item: Playable Video Thumbnail */}
+              <motion.div
+                variants={scaleIn}
+                onClick={() => setSelectedVideo(embedUrl)}
+                className="w-[43%] aspect-[3/4.5] relative overflow-hidden bg-stone-100 shadow-lg mt-16 group cursor-pointer"
+              >
+                <Image
+                  src={videoThumbnail}
+                  alt="Floral and luxury details"
+                  fill
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 768px) 30vw, 20vw"
+                  onError={() => {
+                    if (videoId && videoThumbnail.includes('maxresdefault')) {
+                      setVideoThumbnail(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
+                    } else {
+                      setVideoThumbnail('/hero1.jpg');
+                    }
+                  }}
+                />
+                {/* Semi-transparent dark overlay */}
+                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center" />
+                
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md transition-all duration-300 group-hover:bg-white group-hover:shadow-lg"
+                  >
+                    <Play className="w-5 h-5 text-neutral-900 fill-neutral-900 ml-0.5" />
+                  </motion.div>
+                </div>
+              </motion.div>
 
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto"
-          >
-            {[
-              {
-                icon: Camera,
-                title: 'Photography',
-                description: 'Stunning images that freeze your most precious moments in time with artistic precision.',
-                features: ['Portrait Sessions', 'Event Coverage', 'Commercial Shoots'],
-                link: '/photography',
-                image: '/Pic1.jpeg',
-                gradient: 'from-blue-500 to-cyan-500',
-              },
-              {
-                icon: Video,
-                title: 'Videography',
-                description: 'Cinematic videos that bring your story to life with emotion and professional quality.',
-                features: ['Wedding Films', 'Corporate Videos', 'Documentary Style'],
-                link: '/videography',
-                image: '/Pic3.jpeg',
-                gradient: 'from-purple-500 to-pink-500',
-              },
-            ].map((service, index) => (
-              <motion.div key={index} variants={scaleIn}>
-                <Link href={service.link}>
-                  <Card className="group relative overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-500 bg-white rounded-2xl">
-                    <div className="relative h-80 overflow-hidden">
-                      <Image
-                        src={service.image}
-                        alt={service.title}
-                        fill
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover transition-transform duration-700 group-hover:scale-110"
-                        onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
-                      />
-                      <div className={`absolute inset-0 bg-gradient-to-t ${service.gradient} opacity-60 group-hover:opacity-70 transition-opacity`} />
-                      <div className="absolute top-8 left-8">
-                        <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-2xl">
-                          <service.icon className="w-8 h-8 text-slate-900" />
-                        </div>
-                      </div>
-                    </div>
-                    <CardContent className="p-10">
-                      <h3 className="text-3xl font-bold text-slate-900 mb-4 group-hover:text-teal-600 transition-colors">
-                        {service.title}
-                      </h3>
-                      <p className="text-gray-600 mb-6 leading-relaxed text-lg">
-                        {service.description}
-                      </p>
-                      <ul className="space-y-3 mb-8">
-                        {service.features.map((feature, idx) => (
-                          <li key={idx} className="flex items-center gap-3 text-base text-gray-700">
-                            <Zap className="w-5 h-5 text-[#CB9D06] flex-shrink-0" />
-                            {feature}
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="flex items-center text-teal-600 font-bold group-hover:gap-3 gap-2 transition-all text-lg">
-                        Learn More
-                        <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                      </div>
-                    </CardContent>
-                  </Card>
+              {/* Right Item: Static Premium Image */}
+              <motion.div
+                variants={scaleIn}
+                className="w-[57%] aspect-[3/4.5] relative overflow-hidden bg-stone-100 shadow-lg"
+              >
+                <Image
+                  src="/charles.jpg"
+                  alt="Bride wearing sheer pearl gloves"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 50vw, 30vw"
+                  priority
+                />
+              </motion.div>
+            </motion.div>
+
+            {/* Right Column: Copywriting & CTA */}
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-100px" }}
+              variants={staggerContainer}
+              className="lg:col-span-5 flex flex-col justify-center text-left"
+            >
+              <motion.span
+                variants={fadeInUp}
+                className="text-xs uppercase tracking-[0.25em] text-neutral-500 font-medium mb-6 block"
+              >
+                Our Services & Philosophy
+              </motion.span>
+              
+              <motion.h2
+                variants={fadeInUp}
+                className="text-3xl sm:text-4xl lg:text-5xl font-light text-neutral-900 tracking-wide leading-tight mb-8 font-serif uppercase"
+              >
+                Lasting Memories Through Photography, Videography & Live Streaming
+              </motion.h2>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-gray-600 text-lg leading-relaxed mb-6 font-light"
+              >
+                At Brain Works Studio Africa, we believe every special moment deserves to be captured with artistic precision and emotional depth. From intimate portraits and cinematic wedding films to high-definition live streaming for corporate events, we bring your stories to life.
+              </motion.p>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-gray-600 text-lg leading-relaxed mb-10 font-light"
+              >
+                Whether it is the quiet joy of a playful glance or the dynamic energy of a live broadcast, our team is equipped to deliver world-class visuals. We don't just record events; we craft enduring memories that you can relive forever.
+              </motion.p>
+
+              <motion.div variants={fadeInUp}>
+                <Link href="/about">
+                  <Button className="px-8 py-6 bg-neutral-900 hover:bg-neutral-800 text-white font-medium uppercase tracking-wider text-sm rounded-none border-0 transition-colors shadow-sm self-start">
+                    Learn More
+                  </Button>
                 </Link>
               </motion.div>
-            ))}
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -702,6 +719,10 @@ export default function Home() {
           </motion.div>
         </motion.div>
       </section>
+      
+      {selectedVideo && (
+        <VideoPlayer videoSrc={selectedVideo} onClose={() => setSelectedVideo(null)} />
+      )}
     </Layout>
   );
 }
