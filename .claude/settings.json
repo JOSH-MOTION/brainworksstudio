@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" remote -v)"
+    ]
+  }
+}
