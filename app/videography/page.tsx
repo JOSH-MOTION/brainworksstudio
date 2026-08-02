@@ -210,7 +210,7 @@ export default function VideographyPortfolio({ params }: { params: { category?: 
                   >
                     <Image
                       src={item.imageUrls[0] || item.videoUrl || '/video-placeholder.jpg'}
-                      alt={item.title}
+                      alt={`${item.title} — ${item.category} videography by Brain Works Studio Africa, Accra, Ghana`}
                       width={400}
                       height={300}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"

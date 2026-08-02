@@ -1,19 +1,25 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import { Suspense } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import VercelAnalytics from "@/components/VercelAnalytics";
+import { getApprovedReviews } from '@/lib/reviews-server';
 
 const inter = Inter({ subsets: ['latin'] });
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-playfair',
+  display: 'swap',
+});
 
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: 'Brain Works Studio Africa – Professional Photography & Videography',
+  title: 'Brain Works Studio Africa | Wedding & Event Photographer, Videographer in Accra, Ghana',
   description:
-    'Brain Works Studio Africa offers professional photography and videography services for events, portraits, products, and commercial projects across Ghana and Africa.',
+    'Brain Works Studio Africa offers professional wedding photography, corporate event coverage, portraits, live streaming, and cinematic videography in Accra, Ghana and across Africa.',
   keywords: [
     'Brain Works Studio Africa',
     'BWSA',
@@ -125,9 +131,9 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   openGraph: {
-    title: 'Brain Works Studio Africa – Professional Photography & Videography',
+    title: 'Brain Works Studio Africa | Wedding & Event Photographer, Videographer in Accra, Ghana',
     description:
-      'Professional photography, videography, and storytelling across Ghana and Africa.',
+      'Professional wedding photography, event coverage, and cinematic videography in Accra, Ghana and across Africa.',
     url: BASE_URL,
     siteName: 'Brain Works Studio Africa',
     images: [
@@ -154,11 +160,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const reviews = await getApprovedReviews();
+  const ratedReviews = reviews.filter((r) => typeof r.rating === 'number' && r.rating > 0);
+  const aggregateRating =
+    ratedReviews.length > 0
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: (
+            ratedReviews.reduce((sum, r) => sum + r.rating, 0) / ratedReviews.length
+          ).toFixed(1),
+          reviewCount: ratedReviews.length,
+          bestRating: 5,
+          worstRating: 1,
+        }
+      : undefined;
+
   return (
     <html lang="en">
       <head>
@@ -201,6 +222,7 @@ export default function RootLayout({
               telephone: "+233242403450",
               email: "brainworksstudio2@gmail.com",
               priceRange: "₵₵",
+              ...(aggregateRating ? { aggregateRating } : {}),
               address: {
                 "@type": "PostalAddress",
                 streetAddress: "Lapaz",
@@ -317,7 +339,7 @@ export default function RootLayout({
           content="ca-pub-3845871149646341"
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${playfair.variable}`}>
         <AuthProvider>{children}</AuthProvider>
         
             <VercelAnalytics />

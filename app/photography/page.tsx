@@ -161,7 +161,7 @@ export default function PhotographyPortfolio({ params }: { params: { category?: 
                   <div className="relative overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-all duration-300">
                     <Image
                       src={item.imageUrls[0] || '/placeholder-image.jpg'}
-                      alt={item.title}
+                      alt={`${item.title} — ${item.category} photography by Brain Works Studio Africa, Accra, Ghana`}
                       width={400}
                       height={300}
                       className="object-cover w-full h-64 group-hover:scale-105 transition-transform duration-300"
