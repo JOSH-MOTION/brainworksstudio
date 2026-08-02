@@ -119,11 +119,11 @@ export default function Home() {
         {/* Hero Background Image with Dramatic Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/hero1.jpg"
+            src="/hero/249A9973.jpg"
             alt="Hero Background"
             fill
             sizes="100vw"
-            className="object-cover"
+            className="object-cover object-[center_20%]"
             priority
             quality={100}
             onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}

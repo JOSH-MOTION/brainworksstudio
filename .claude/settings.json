@@ -1,7 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" remote -v)"
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" remote -v)",
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" log -1 --format=\"%H %ci\")",
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" branch -vv)",
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" add public/zohoverify/verifyforzoho.html)",
+      "Bash(git -C 'c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio' commit -m ' *)",
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" push origin main)",
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" log -1 --stat -- public/zohoverify/verifyforzoho.html)",
+      "Bash(git -C \"c:\\\\Users\\\\Khodz\\\\Desktop\\\\brainworksstudio\" status --short)",
+      "Bash(npm run *)",
+      "Read(//tmp/**)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3001/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(curl -s http://localhost:3001/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3000/hero/249A9973.jpg)"
     ]
   }
 }
