@@ -1,0 +1,9 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "next-env.d.ts",
+    "lib/portfolio-server.ts",
+    "lib/blog-server.ts",
+    "lib/pricing-server.ts"
+  ]
+}

@@ -358,9 +358,16 @@ export default function Home() {
 
               <motion.p
                 variants={fadeInUp}
-                className="text-gray-600 text-lg leading-relaxed mb-10 font-light"
+                className="text-gray-600 text-lg leading-relaxed mb-6 font-light"
               >
                 Whether it is the quiet joy of a playful glance or the dynamic energy of a live broadcast, our team is equipped to deliver world-class visuals. We don't just record events; we craft enduring memories that you can relive forever.
+              </motion.p>
+
+              <motion.p
+                variants={fadeInUp}
+                className="text-gray-600 text-lg leading-relaxed mb-10 font-light"
+              >
+                Beyond the camera, we're a full creative studio: corporate shoots, dinners, and corporate events, documentary and music video production, graphic design and branding, motion graphics, social media content, and photo and video editing — all under one roof in Accra.
               </motion.p>
 
               <motion.div variants={fadeInUp}>

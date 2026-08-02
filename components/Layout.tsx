@@ -130,8 +130,7 @@ export default function RootLayout({ children }: LayoutProps) {
   };
 
   return (
-    <html lang="en">
-      <body className="min-h-screen font-sans">
+    <div className="min-h-screen font-sans">
         {/* Header - Conditional Background Based on Route and Screen Size */}
         <motion.header
           initial="hidden"
@@ -411,12 +410,22 @@ export default function RootLayout({ children }: LayoutProps) {
                 <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Services</h3>
                 <ul className="space-y-2 text-sm">
                   {[
-                    'Event Photography',
-                    'Portrait Sessions',
-                    'Product Photography',
-                    'Commercial Work',
+                    'Event & Corporate Photography',
                     'Wedding Photography',
-                    'Video Production',
+                    'Portrait Sessions',
+                    'Product & Commercial Photography',
+                    'Real Estate & Fashion Photography',
+                    'Aerial & Drone Photography',
+                    'Video Production & Wedding Films',
+                    'Documentary & Music Videos',
+                    'Corporate & Training Videos',
+                    'Live Streaming',
+                    'Voiceover Services',
+                    'Ad Production',
+                    'Graphic Design & Branding',
+                    'Motion Graphics & Animation',
+                    'Social Media Content Creation',
+                    'Photo & Video Editing',
                   ].map((service, index) => (
                     <motion.li
                       key={index}
@@ -496,7 +505,6 @@ export default function RootLayout({ children }: LayoutProps) {
             </motion.div>
           </div>
         </motion.footer>
-      </body>
-    </html>
+    </div>
   );
 }
