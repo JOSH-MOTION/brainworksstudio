@@ -81,7 +81,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                 </span>
               </motion.div>
 
-              <h1 className="text-5xl sm:text-6xl font-bold text-white mb-4">
+              <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white mb-4">
                 {category.name}
               </h1>
               <p className="text-xl text-gray-200 max-w-2xl">
@@ -119,7 +119,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
             transition={{ duration: 0.5 }}
             className="text-center mb-12"
           >
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            <h2 className="font-serif text-4xl font-bold text-slate-900 mb-4">
               Choose Your Package
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -222,7 +222,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
           transition={{ duration: 0.6 }}
           className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-white mb-4">
             Have Questions?
           </h2>
           <p className="text-lg text-gray-300 mb-8">

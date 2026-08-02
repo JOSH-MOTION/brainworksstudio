@@ -105,7 +105,7 @@ export default function PhotographyPortfolio({ params }: { params: { category: s
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <motion.h1
-            className="text-3xl md:text-5xl font-bold mb-4 tracking-tight capitalize"
+            className="font-serif text-3xl md:text-5xl font-bold mb-4 tracking-tight capitalize"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}

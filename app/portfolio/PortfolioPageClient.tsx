@@ -89,7 +89,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         {/* Header */}
         <div className="text-center mb-12">
           <motion.h1
-            className="text-4xl md:text-5xl font-bold text-[#001F44] mb-4 tracking-tight"
+            className="font-serif text-4xl md:text-5xl font-bold text-[#001F44] mb-4 tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}

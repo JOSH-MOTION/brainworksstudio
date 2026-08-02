@@ -50,7 +50,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
             <span className="text-sm text-white font-medium">Transparent & Flexible Pricing</span>
           </motion.div>
 
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Choose Your
             <span className="block mt-2 bg-gradient-to-r from-white via-teal-200 to-teal-400 bg-clip-text text-transparent">
               Perfect Package
@@ -121,7 +121,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
 
                         {/* Content Section */}
                         <CardContent className="flex-1 p-8 flex flex-col justify-center">
-                          <h2 className="text-3xl font-bold text-slate-900 mb-3 group-hover:text-teal-600 transition-colors">
+                          <h2 className="font-serif text-3xl font-bold text-slate-900 mb-3 group-hover:text-teal-600 transition-colors">
                             {category.name}
                           </h2>
                           <p className="text-gray-600 mb-6 leading-relaxed">
@@ -151,7 +151,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
           transition={{ duration: 0.6 }}
           className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
+          <h2 className="font-serif text-4xl sm:text-5xl font-bold text-white mb-6">
             Need a Custom Package?
           </h2>
           <p className="text-xl text-gray-300 mb-8">

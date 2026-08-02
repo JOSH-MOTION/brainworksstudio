@@ -366,7 +366,7 @@ export default function HomePageClient({ initialReviews }: { initialReviews: Rev
             </motion.div>
             <motion.h2
               variants={fadeInUp}
-              className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
+              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
             >
               Featured Work
             </motion.h2>
@@ -462,7 +462,7 @@ export default function HomePageClient({ initialReviews }: { initialReviews: Rev
             </motion.div>
             <motion.h2
               variants={fadeInUp}
-              className="text-5xl sm:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
+              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
             >
               What Clients Say
             </motion.h2>

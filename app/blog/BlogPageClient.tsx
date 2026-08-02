@@ -62,7 +62,7 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
               <Badge className="mb-4 bg-white/10 text-white border-white/20 px-4 py-1.5 rounded-full font-medium">
                 Blog
               </Badge>
-              <h1 className="text-5xl sm:text-6xl font-bold mb-6 tracking-tight">
+              <h1 className="font-serif text-5xl sm:text-6xl font-bold mb-6 tracking-tight">
                 Stories & Insights
               </h1>
               <p className="text-xl text-gray-300 leading-relaxed">
@@ -153,7 +153,7 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
                               {featuredPost.category}
                             </Badge>
                           </div>
-                          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 group-hover:text-gray-700 transition-colors line-clamp-3">
+                          <h2 className="font-serif text-3xl lg:text-4xl font-bold text-gray-900 mb-4 group-hover:text-gray-700 transition-colors line-clamp-3">
                             {featuredPost.title}
                           </h2>
                           <p className="text-gray-600 text-lg mb-6 line-clamp-3 leading-relaxed">
@@ -187,7 +187,7 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
               {regularPosts.length > 0 && (
                 <>
                   <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900">Recent Posts</h2>
+                    <h2 className="font-serif text-2xl font-bold text-gray-900">Recent Posts</h2>
                     <p className="text-gray-600 mt-1">Explore our latest articles and stories</p>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-16">
@@ -253,7 +253,7 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
               transition={{ duration: 0.6 }}
               viewport={{ once: true }}
             >
-              <h2 className="text-4xl font-bold mb-4">Stay Updated</h2>
+              <h2 className="font-serif text-4xl font-bold mb-4">Stay Updated</h2>
               <p className="text-xl text-gray-300 mb-8">
                 Get the latest stories and insights delivered to your inbox
               </p>

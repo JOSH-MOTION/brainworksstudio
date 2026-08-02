@@ -383,7 +383,7 @@ export default function PortfolioDetailPage({ params }: { params: { id: string }
                 </Badge>
               </div>
 
-              <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight">
+              <h1 className="font-serif text-5xl md:text-7xl font-bold mb-6 tracking-tight">
                 {item.title.toUpperCase()}
               </h1>
               <p className="text-lg md:text-xl mb-2 tracking-widest">

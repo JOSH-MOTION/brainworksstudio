@@ -93,7 +93,7 @@ export default function SubmitReview() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-2xl font-bold text-[#001F44] mb-6"
+          className="font-serif text-2xl font-bold text-[#001F44] mb-6"
         >
           Submit Your Review
         </motion.h2>

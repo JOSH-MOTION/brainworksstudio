@@ -308,7 +308,7 @@ export default function BookingPage() {
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="text-2xl md:text-3xl font-bold text-[#001F44] mb-3">
+          <motion.h1 className="font-serif text-2xl md:text-3xl font-bold text-[#001F44] mb-3">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}

@@ -216,7 +216,7 @@ export default function AboutPageClient() {
             animate="visible"
             className="space-y-6"
           >
-            <h1 className="text-4xl md:text-5xl font-bold text-[#001F44]">
+            <h1 className="font-serif text-4xl md:text-5xl font-bold text-[#001F44]">
               {headingText.map((word, index) => (
                 <motion.span
                   key={index}
@@ -256,7 +256,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Story</h2>
+            <h2 className="font-serif text-3xl font-bold text-[#001F44] mb-4">Our Story</h2>
             <p className="text-gray-600 max-w-3xl mx-auto">
               Founded in 2019, Brain Works Studio Africa began as a small team of passionate photographers dedicated to capturing life's most meaningful moments. Over the years, we've grown into a full-service studio, blending creativity with technical expertise to deliver stunning visuals for clients worldwide.
             </p>
@@ -302,7 +302,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Core Values</h2>
+            <h2 className="font-serif text-3xl font-bold text-[#001F44] mb-4">Our Core Values</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               The principles that guide every shot we take and every client we serve.
             </p>
@@ -341,7 +341,7 @@ export default function AboutPageClient() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Meet Our Team</h2>
+            <h2 className="font-serif text-3xl font-bold text-[#001F44] mb-4">Meet Our Team</h2>
             <p className="text-gray-600 max-w-lg mx-auto">
               Our dedicated creatives bring years of expertise to every project.
             </p>
@@ -443,7 +443,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Trusted By</h2>
+            <h2 className="font-serif text-3xl font-bold text-[#001F44] mb-4">Trusted By</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We're proud to have worked with amazing brands and businesses across various industries.
             </p>
@@ -507,7 +507,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Our Impact</h2>
+            <h2 className="font-serif text-3xl font-bold text-[#001F44] mb-4">Our Impact</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               Numbers that showcase our dedication to excellence.
             </p>
@@ -545,7 +545,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold text-[#001F44] mb-4">Where We Create</h2>
+            <h2 className="font-serif text-3xl font-bold text-[#001F44] mb-4">Where We Create</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
               We serve clients across multiple locations, bringing our expertise to you.
             </p>
@@ -600,7 +600,7 @@ export default function AboutPageClient() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <h2 className="text-3xl font-bold mb-4">Ready to Capture Your Moments?</h2>
+            <h2 className="font-serif text-3xl font-bold mb-4">Ready to Capture Your Moments?</h2>
             <p className="text-lg mb-6 max-w-2xl mx-auto">
               Let's create something extraordinary together. Book your session today!
             </p>

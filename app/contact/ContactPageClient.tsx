@@ -144,7 +144,7 @@ export default function ContactPageClient() {
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="text-3xl md:text-4xl font-bold text-[#001F44] mb-4">
+          <motion.h1 className="font-serif text-3xl md:text-4xl font-bold text-[#001F44] mb-4">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}
@@ -400,7 +400,7 @@ export default function ContactPageClient() {
         className="py-12 bg-teal-50 border-t border-coral-100"
       >
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold text-[#001F44] mb-4">
+          <h2 className="font-serif text-2xl md:text-3xl font-bold text-[#001F44] mb-4">
             Areas We Serve
           </h2>
           <p className="text-gray-600 max-w-3xl mx-auto mb-6">

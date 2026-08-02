@@ -86,7 +86,7 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
                   ))}
                 </div>
 
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
                   {post.title || 'Untitled'}
                 </h1>
 
