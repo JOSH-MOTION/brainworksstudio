@@ -1,9 +1,0 @@
-# *
-User-agent: *
-Allow: /
-
-# Host
-Host: https://brainworksstudioafrica.com
-
-# Sitemaps
-Sitemap: https://brainworksstudioafrica.com/sitemap.xml
