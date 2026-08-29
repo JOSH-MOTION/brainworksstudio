@@ -170,6 +170,7 @@ export default function RootLayout({ children }: LayoutProps) {
                 {[
                   { href: '/', label: 'Home' },
                   { href: '/portfolio', label: 'Portfolio' },
+                  { href: '/services', label: 'Services' },
                   { href: '/pricing', label: 'Pricing' },
                   { href: '/blog', label: 'Blog' },
                   { href: '/about', label: 'About' },
@@ -272,6 +273,7 @@ export default function RootLayout({ children }: LayoutProps) {
                     {[
                       { href: '/', label: 'Home' },
                       { href: '/portfolio', label: 'Portfolio' },
+                      { href: '/services', label: 'Services' },
                       { href: '/pricing', label: 'Pricing' },
                       { href: '/blog', label: 'Blog' },
                       { href: '/about', label: 'About' },
@@ -446,6 +448,7 @@ export default function RootLayout({ children }: LayoutProps) {
                   {[
                     { href: '/about', label: 'About Us' },
                     { href: '/portfolio', label: 'Portfolio' },
+                    { href: '/services', label: 'Services' },
                     { href: '/pricing', label: 'Pricing' },
                     { href: '/blog', label: 'Blog' },
                     { href: '/booking', label: 'Book a Session' },

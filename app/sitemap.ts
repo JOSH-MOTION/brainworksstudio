@@ -5,6 +5,7 @@ import { getPublishedBlogPosts } from '@/lib/blog-server';
 import { getPublishedPricingCategories } from '@/lib/pricing-server';
 import { PHOTOGRAPHY_CATEGORY_LABELS } from '@/lib/photography-categories';
 import { VIDEOGRAPHY_CATEGORY_LABELS } from '@/lib/videography-categories';
+import { SERVICES } from '@/lib/services-config';
 
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
@@ -14,6 +15,7 @@ const staticRoutes: { path: string; changeFrequency: MetadataRoute.Sitemap[numbe
   { path: '/contact', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/portfolio', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/photography', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/services', changeFrequency: 'monthly', priority: 0.9 },
   { path: '/pricing', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/reviews/submit', changeFrequency: 'yearly', priority: 0.3 },
@@ -73,6 +75,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const serviceUrls = SERVICES.map((service) => ({
+    url: `${BASE_URL}/services/${service.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.85,
+  }));
+
   return [
     ...staticUrls,
     ...portfolioUrls,
@@ -80,5 +89,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...pricingUrls,
     ...photographyCategoryUrls,
     ...videographyCategoryUrls,
+    ...serviceUrls,
   ];
 }
