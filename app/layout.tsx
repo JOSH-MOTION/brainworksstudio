@@ -190,13 +190,6 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/site.webmanifest" />
 
-        {/* Open Graph & Social Media Meta Tags */}
-        <meta property="og:image" content={`${BASE_URL}/android-chrome-512x512.png`} />
-        <meta property="og:image:width" content="512" />
-        <meta property="og:image:height" content="512" />
-        <meta property="og:image:type" content="image/png" />
-        <meta name="twitter:image" content={`${BASE_URL}/android-chrome-512x512.png`} />
-
         {/* ✅ Google AdSense Script */}
         <script
           async
