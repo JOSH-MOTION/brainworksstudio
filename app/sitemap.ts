@@ -3,6 +3,8 @@ import { MetadataRoute } from 'next';
 import { getPortfolioItems } from '@/lib/portfolio-server';
 import { getPublishedBlogPosts } from '@/lib/blog-server';
 import { getPublishedPricingCategories } from '@/lib/pricing-server';
+import { PHOTOGRAPHY_CATEGORY_LABELS } from '@/lib/photography-categories';
+import { VIDEOGRAPHY_CATEGORY_LABELS } from '@/lib/videography-categories';
 
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
@@ -12,7 +14,6 @@ const staticRoutes: { path: string; changeFrequency: MetadataRoute.Sitemap[numbe
   { path: '/contact', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/portfolio', changeFrequency: 'weekly', priority: 0.9 },
   { path: '/photography', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/videography', changeFrequency: 'weekly', priority: 0.8 },
   { path: '/pricing', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
   { path: '/reviews/submit', changeFrequency: 'yearly', priority: 0.3 },
@@ -58,5 +59,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.6,
     }));
 
-  return [...staticUrls, ...portfolioUrls, ...blogUrls, ...pricingUrls];
+  const photographyCategoryUrls = Object.keys(PHOTOGRAPHY_CATEGORY_LABELS).map((slug) => ({
+    url: `${BASE_URL}/photography/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  const videographyCategoryUrls = Object.keys(VIDEOGRAPHY_CATEGORY_LABELS).map((slug) => ({
+    url: `${BASE_URL}/videography/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.7,
+  }));
+
+  return [
+    ...staticUrls,
+    ...portfolioUrls,
+    ...blogUrls,
+    ...pricingUrls,
+    ...photographyCategoryUrls,
+    ...videographyCategoryUrls,
+  ];
 }
