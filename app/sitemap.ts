@@ -1,63 +1,62 @@
 // app/sitemap.ts
 import { MetadataRoute } from 'next';
+import { getPortfolioItems } from '@/lib/portfolio-server';
+import { getPublishedBlogPosts } from '@/lib/blog-server';
+import { getPublishedPricingCategories } from '@/lib/pricing-server';
 
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
-// 1. Define the paths you want to exclude from the sitemap.
-// This is crucial for keeping admin or private pages out of Google's index.
-const EXCLUDED_PATHS = [
-    // Pages you don't want indexed
-    '/login',
-    '/admin',
-    '/dashboard',
-    
-    // Any dynamic route that should be excluded (e.g., /user/[id])
-    // Note: Use a more sophisticated method for dynamic exclusions if needed.
+const staticRoutes: { path: string; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency']; priority: number }[] = [
+  { path: '', changeFrequency: 'daily', priority: 1.0 },
+  { path: '/about', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/contact', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/portfolio', changeFrequency: 'weekly', priority: 0.9 },
+  { path: '/photography', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/videography', changeFrequency: 'weekly', priority: 0.8 },
+  { path: '/pricing', changeFrequency: 'monthly', priority: 0.7 },
+  { path: '/blog', changeFrequency: 'weekly', priority: 0.7 },
+  { path: '/reviews/submit', changeFrequency: 'yearly', priority: 0.3 },
+  { path: '/booking', changeFrequency: 'monthly', priority: 0.6 },
 ];
-
-// 2. Define your static routes
-const staticRoutes = [
-    '', // Represents the home page: /
-    '/about',
-    '/contact',
-    '/portfolio',
-    '/services', // Example service overview page
-];
-
-
-// Function to get dynamic content (like individual project pages)
-async function getDynamicUrls() {
-    // 💡 Replace this with your actual data fetching from your database or CMS
-    // Example: Fetching all project IDs to generate project pages
-    const projects = [
-        { slug: 'wedding-photography', date: '2025-10-08' },
-        { slug: 'product-videography', date: '2025-10-01' },
-    ];
-
-    return projects.map((project) => ({
-        url: `${BASE_URL}/portfolio/${project.slug}`,
-        lastModified: new Date(project.date).toISOString().split('T')[0],
-        changeFrequency: 'weekly' as const,
-        priority: 0.9,
-    }));
-}
-
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const dynamicUrls = await getDynamicUrls();
+  const [portfolioItems, blogPosts, pricingCategories] = await Promise.all([
+    getPortfolioItems(),
+    getPublishedBlogPosts(),
+    getPublishedPricingCategories(),
+  ]);
 
-    const staticUrls = staticRoutes
-        .filter(path => !EXCLUDED_PATHS.includes(path)) // Filter out excluded pages
-        .map((route) => ({
-            url: `${BASE_URL}${route}`,
-            lastModified: new Date().toISOString().split('T')[0],
-            // Set priority and frequency based on the page's importance
-            changeFrequency: route === '' ? 'daily' as const : 'monthly' as const,
-            priority: route === '' ? 1.0 : 0.8,
-        }));
-    
-    // Combine the static and dynamic URLs
-    return [...staticUrls, ...dynamicUrls];
+  const staticUrls = staticRoutes.map((route) => ({
+    url: `${BASE_URL}${route.path}`,
+    lastModified: new Date(),
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
+
+  const portfolioUrls = portfolioItems.map((item) => ({
+    url: `${BASE_URL}/portfolio/${item.id}`,
+    lastModified: new Date(item.updatedAt || item.createdAt),
+    changeFrequency: 'monthly' as const,
+    priority: item.featured ? 0.8 : 0.6,
+  }));
+
+  const blogUrls = blogPosts
+    .filter((post) => post.slug)
+    .map((post) => ({
+      url: `${BASE_URL}/blog/${post.slug}`,
+      lastModified: new Date(post.updatedAt || post.createdAt),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+
+  const pricingUrls = pricingCategories
+    .filter((category) => category.slug)
+    .map((category) => ({
+      url: `${BASE_URL}/pricing/${category.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    }));
+
+  return [...staticUrls, ...portfolioUrls, ...blogUrls, ...pricingUrls];
 }
-
-// 💡 IMPORTANT: Ensure your build script runs the Next.js build: npm run build
