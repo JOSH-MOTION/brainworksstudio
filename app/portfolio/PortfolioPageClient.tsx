@@ -4,11 +4,9 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PortfolioItem } from '@/types';
-import { Filter, Play, Camera, Video } from 'lucide-react';
+import { Filter, Play, Camera, Video, Star, ArrowUpRight } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -25,6 +23,26 @@ const cardVariants: Variants = {
 const buttonVariants: Variants = {
   hover: { scale: 1.05, transition: { duration: 0.2 } },
   tap: { scale: 0.95 },
+};
+
+const cardShadowVariants: Variants = {
+  rest: { boxShadow: '0 8px 30px -14px rgba(0,31,68,0.35)' },
+  hover: { boxShadow: '0 24px 48px -16px rgba(0,31,68,0.45)', transition: { duration: 0.4, ease: 'easeOut' } },
+};
+
+const cardImageVariants: Variants = {
+  rest: { scale: 1 },
+  hover: { scale: 1.06, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] } },
+};
+
+const cardRevealVariants: Variants = {
+  rest: { opacity: 0, y: 6 },
+  hover: { opacity: 1, y: 0, transition: { duration: 0.25, ease: 'easeOut' } },
+};
+
+const cardPlayVariants: Variants = {
+  rest: { scale: 1 },
+  hover: { scale: 1.1, transition: { duration: 0.3, ease: 'easeOut' } },
 };
 
 interface PortfolioPageClientProps {
@@ -111,52 +129,52 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="flex justify-center mb-8"
+          className="mb-8 flex justify-center overflow-x-auto px-4"
         >
-          <div className="inline-flex bg-white rounded-full p-1 shadow-md">
+          <div className="inline-flex flex-nowrap items-center gap-1 rounded-full bg-white p-1 shadow-md">
             <button
               onClick={() => {
                 setSelectedType('all');
                 setSelectedCategory('all');
               }}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                 selectedType === 'all'
                   ? 'bg-teal-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-teal-600'
               }`}
             >
               All
-              <span className="text-xs opacity-75">({portfolioItems.length})</span>
+              <span className="hidden text-xs opacity-75 sm:inline">({portfolioItems.length})</span>
             </button>
             <button
               onClick={() => {
                 setSelectedType('photography');
                 setSelectedCategory('all');
               }}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                 selectedType === 'photography'
                   ? 'bg-teal-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-teal-600'
               }`}
             >
-              <Camera className="h-4 w-4" />
+              <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Photography
-              <span className="text-xs opacity-75">({photographyCount})</span>
+              <span className="hidden text-xs opacity-75 sm:inline">({photographyCount})</span>
             </button>
             <button
               onClick={() => {
                 setSelectedType('videography');
                 setSelectedCategory('all');
               }}
-              className={`px-6 py-3 rounded-full font-medium transition-all duration-300 flex items-center gap-2 ${
+              className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                 selectedType === 'videography'
                   ? 'bg-teal-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-teal-600'
               }`}
             >
-              <Video className="h-4 w-4" />
+              <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               Videography
-              <span className="text-xs opacity-75">({videographyCount})</span>
+              <span className="hidden text-xs opacity-75 sm:inline">({videographyCount})</span>
             </button>
           </div>
         </motion.div>
@@ -227,8 +245,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
 
         {/* Portfolio Grid */}
         <motion.div
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-[minmax(200px,auto)]"
-          style={{ gridTemplateRows: 'masonry' }}
+          className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 lg:gap-8"
           variants={sectionVariants}
         >
           <AnimatePresence mode="wait">
@@ -239,12 +256,18 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
-                exit={{ opacity: 0, scale: 0.9 }}
+                exit={{ opacity: 0, scale: 0.96 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Link href={`/portfolio/${item.id}`}>
-                  <Card className="group cursor-pointer overflow-hidden border-none shadow-lg hover:shadow-2xl transition-all duration-300 bg-white rounded-xl">
-                    <div className="relative w-full max-h-96 overflow-hidden">
+                <Link href={`/portfolio/${item.id}`} className="block">
+                  <motion.div
+                    initial="rest"
+                    animate="rest"
+                    whileHover="hover"
+                    variants={cardShadowVariants}
+                    className="relative aspect-[4/5] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100"
+                  >
+                    <motion.div variants={cardImageVariants} className="absolute inset-0">
                       <Image
                         src={
                           item.imageUrls && item.imageUrls.length > 0
@@ -254,52 +277,59 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
                               : '/placeholder-image.jpg'
                         }
                         alt={`${item.title} — ${item.category} ${item.type === 'photography' ? 'photography' : 'videography'} by Brain Works Studio Africa, Accra, Ghana`}
-                        width={400}
-                        height={300}
-                        className="w-full h-auto object-contain transition-transform duration-300 group-hover:scale-105"
+                        fill
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover"
                         onError={(e) => {
                           e.currentTarget.src = '/placeholder-image.jpg';
                         }}
                       />
-                      {item.videoUrl && (
-                        <div className="absolute inset-0 flex items-center justify-center bg-[#001F44]/40">
-                          <Play className="h-12 w-12 text-white" />
-                        </div>
-                      )}
-                      {item.featured && (
-                        <div className="absolute top-3 left-3">
-                          <Badge className="bg-amber-400 text-black">Featured</Badge>
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg text-[#001F44] mb-2">{item.title}</h3>
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        <Badge className="bg-coral-500 text-white hover:bg-coral-600 transition-colors">
-                          {item.category}
-                        </Badge>
-                        <Badge className="bg-teal-100 text-[#001F44] hover:bg-teal-200 transition-colors">
-                          {item.type === 'photography' ? '📷 Photo' : '🎥 Video'}
-                        </Badge>
-                        {item.tags.slice(0, 2).map((tag) => (
-                          <Badge
-                            key={tag}
-                            variant="outline"
-                            className="border-coral-500 text-coral-500 hover:bg-coral-100 transition-colors"
-                          >
-                            {tag}
-                          </Badge>
-                        ))}
+                    </motion.div>
+
+                    {/* Top-left: featured marker */}
+                    {item.featured && (
+                      <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#001F44] shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
+                        <Star className="h-2.5 w-2.5 fill-[#CB9D06] text-[#CB9D06] sm:h-3 sm:w-3" />
+                        Featured
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full"
-                      >
-                        View Details
-                      </Button>
+                    )}
+
+                    {/* Top-right: media type indicator */}
+                    <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-[#001F44] shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
+                      {item.type === 'photography' ? (
+                        <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+                      ) : (
+                        <Video className="h-3 w-3 sm:h-4 sm:w-4" />
+                      )}
                     </div>
-                  </Card>
+
+                    {/* Video play affordance */}
+                    {item.videoUrl && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <motion.div
+                          variants={cardPlayVariants}
+                          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg sm:h-16 sm:w-16"
+                        >
+                          <Play className="ml-0.5 h-4 w-4 fill-[#001F44] text-[#001F44] sm:h-6 sm:w-6" />
+                        </motion.div>
+                      </div>
+                    )}
+
+                    {/* Bottom scrim + metadata */}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#001F44]/95 via-[#001F44]/50 to-transparent px-2.5 pb-2.5 pt-8 sm:px-5 sm:pb-5 sm:pt-16">
+                      <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/75 sm:mb-1 sm:text-xs sm:tracking-[0.12em]">
+                        {item.category}
+                      </p>
+                      <h3 className="font-serif text-xs leading-snug text-white sm:text-xl">{item.title}</h3>
+                      <motion.div
+                        variants={cardRevealVariants}
+                        className="mt-1.5 hidden items-center gap-1.5 text-sm font-medium text-white sm:mt-3 sm:flex"
+                      >
+                        View project
+                        <ArrowUpRight className="h-4 w-4" />
+                      </motion.div>
+                    </div>
+                  </motion.div>
                 </Link>
               </motion.div>
             ))}
