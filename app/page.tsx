@@ -18,12 +18,14 @@ export const metadata: Metadata = {
     url: BASE_URL,
     siteName: 'Brain Works Studio Africa',
     type: 'website',
+    images: [{ url: `${BASE_URL}/newlogo2.jpg`, width: 1200, height: 630, alt: 'Brain Works Studio Africa' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Brain Works Studio Africa | Wedding & Event Photographer in Accra, Ghana',
     description:
       'Professional wedding photography, corporate event coverage, portraits, live streaming, and cinematic videography in Accra, Ghana and across Africa.',
+    images: [`${BASE_URL}/newlogo2.jpg`],
   },
 };
 

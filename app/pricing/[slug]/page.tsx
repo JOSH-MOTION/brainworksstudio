@@ -41,13 +41,13 @@ export async function generateMetadata({ params }: PricingCategoryPageProps): Pr
       url,
       siteName: 'Brain Works Studio Africa',
       type: 'website',
-      images: category.imageUrl ? [{ url: category.imageUrl }] : undefined,
+      images: [{ url: category.imageUrl || `${BASE_URL}/newlogo2.jpg` }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${category.name} Pricing | Brain Works Studio Africa`,
       description,
-      images: category.imageUrl ? [category.imageUrl] : undefined,
+      images: [category.imageUrl || `${BASE_URL}/newlogo2.jpg`],
     },
   };
 }

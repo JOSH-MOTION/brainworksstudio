@@ -44,13 +44,13 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       url,
       siteName: 'Brain Works Studio Africa',
       type: 'article',
-      images: post.featuredImage ? [{ url: post.featuredImage }] : undefined,
+      images: [{ url: post.featuredImage || `${BASE_URL}/newlogo2.jpg` }],
     },
     twitter: {
       card: 'summary_large_image',
       title: post.title,
       description,
-      images: post.featuredImage ? [post.featuredImage] : undefined,
+      images: [post.featuredImage || `${BASE_URL}/newlogo2.jpg`],
     },
   };
 }
