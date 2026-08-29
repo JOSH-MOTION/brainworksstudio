@@ -520,7 +520,7 @@ export default function HomePageClient({ initialReviews }: { initialReviews: Rev
                               alt={review.clientName}
                               width={64}
                               height={64}
-                              className="rounded-full object-cover"
+                              className="w-16 h-16 rounded-full object-cover flex-shrink-0"
                               onError={(e) => {
                                 e.currentTarget.src = '/images/profile-placeholder.jpg';
                               }}
