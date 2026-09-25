@@ -4,9 +4,9 @@ import ContactPageClient from './ContactPageClient';
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
-  title: 'Contact Us | Brain Works Studio Africa — Accra, Ghana',
+  title: 'Start a Project | Brain Works Studio Africa — Accra, Ghana',
   description:
-    'Get in touch with Brain Works Studio Africa in Accra, Lapaz. Book photography, videography, live streaming, or ad production — response within 24 hours.',
+    'Start a project with Brain Works Studio Africa in Accra — commercials, corporate films, live streaming, social content, events and photography. We reply within one business day.',
   keywords: [
     'contact photographer Accra',
     'book videographer Ghana',
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/contact` },
   openGraph: {
-    title: 'Contact Brain Works Studio Africa',
+    title: 'Start a Project with Brain Works Studio Africa',
     description:
-      'Get in touch to book photography, videography, live streaming, or ad production in Accra, Ghana and across Africa.',
+      'Tell us about your commercial, corporate, live, social or event production in Accra, Ghana and across Africa.',
     url: `${BASE_URL}/contact`,
     siteName: 'Brain Works Studio Africa',
     type: 'website',
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Contact Brain Works Studio Africa',
+    title: 'Start a Project with Brain Works Studio Africa',
     description:
-      'Get in touch to book photography, videography, live streaming, or ad production in Accra, Ghana and across Africa.',
+      'Tell us about your commercial, corporate, live, social or event production in Accra, Ghana and across Africa.',
     images: [`${BASE_URL}/newlogo2.jpg`],
   },
 };

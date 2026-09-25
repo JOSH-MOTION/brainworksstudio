@@ -1,5 +1,14 @@
 import nodemailer from 'nodemailer';
 
+// Escape user-supplied values before interpolating them into email HTML.
+export const escapeHtml = (value: unknown): string =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
 export const createTransporter = () => {
   return nodemailer.createTransport({
     service: 'gmail',
@@ -20,15 +29,15 @@ export const sendBookingConfirmation = async (userEmail: string, bookingDetails:
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #8B4513;">Booking Confirmation</h2>
-        <p>Dear ${bookingDetails.userName},</p>
+        <p>Dear ${escapeHtml(bookingDetails.userName)},</p>
         <p>Thank you for booking with Brain Works Studio Africa. Your booking has been received and is pending review.</p>
         
         <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3>Booking Details:</h3>
-          <p><strong>Service:</strong> ${bookingDetails.serviceCategory}</p>
-          <p><strong>Date:</strong> ${bookingDetails.date}</p>
-          <p><strong>Time:</strong> ${bookingDetails.startTime} - ${bookingDetails.endTime}</p>
-          <p><strong>Location:</strong> ${bookingDetails.location}</p>
+          <p><strong>Service:</strong> ${escapeHtml(bookingDetails.serviceCategory)}</p>
+          <p><strong>Date:</strong> ${escapeHtml(bookingDetails.date)}</p>
+          <p><strong>Time:</strong> ${escapeHtml(bookingDetails.startTime)} - ${escapeHtml(bookingDetails.endTime)}</p>
+          <p><strong>Location:</strong> ${escapeHtml(bookingDetails.location)}</p>
         </div>
         
         <p>We will review your booking and get back to you within 24 hours.</p>
@@ -53,18 +62,18 @@ export const sendBookingStatusUpdate = async (userEmail: string, status: string,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: ${statusColor};">Booking ${statusText}</h2>
-        <p>Dear ${bookingDetails.userName},</p>
+        <p>Dear ${escapeHtml(bookingDetails.userName)},</p>
         <p>Your booking has been <strong style="color: ${statusColor};">${status}</strong>.</p>
         
         <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
           <h3>Booking Details:</h3>
-          <p><strong>Service:</strong> ${bookingDetails.serviceCategory}</p>
-          <p><strong>Date:</strong> ${bookingDetails.date}</p>
-          <p><strong>Time:</strong> ${bookingDetails.startTime} - ${bookingDetails.endTime}</p>
-          <p><strong>Location:</strong> ${bookingDetails.location}</p>
+          <p><strong>Service:</strong> ${escapeHtml(bookingDetails.serviceCategory)}</p>
+          <p><strong>Date:</strong> ${escapeHtml(bookingDetails.date)}</p>
+          <p><strong>Time:</strong> ${escapeHtml(bookingDetails.startTime)} - ${escapeHtml(bookingDetails.endTime)}</p>
+          <p><strong>Location:</strong> ${escapeHtml(bookingDetails.location)}</p>
         </div>
         
-        ${bookingDetails.adminNotes ? `<p><strong>Notes:</strong> ${bookingDetails.adminNotes}</p>` : ''}
+        ${bookingDetails.adminNotes ? `<p><strong>Notes:</strong> ${escapeHtml(bookingDetails.adminNotes)}</p>` : ''}
         
         <p>Thank you for choosing Brain Works Studio Africa!</p>
         <p>Best regards,<br>Brain Works Studio Africa Team</p>

@@ -148,7 +148,7 @@ export default function AdminReviewsPage() {
       <AdminLayout>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500 mx-auto"></div>
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gold-500 mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading reviews...</p>
           </div>
         </div>
@@ -169,7 +169,7 @@ export default function AdminReviewsPage() {
             </div>
             <Button
               variant="outline"
-              className="border-teal-300 text-teal-500 hover:bg-teal-50"
+              className="border-gold-300 text-gold-500 hover:bg-gold-50"
               onClick={copyReviewLink}
             >
               <Copy className="h-4 w-4 mr-2" />
@@ -184,8 +184,8 @@ export default function AdminReviewsPage() {
                 variant={filter === f ? 'default' : 'outline'}
                 className={`cursor-pointer px-4 py-2 ${
                   filter === f
-                    ? 'bg-teal-500 text-white'
-                    : 'border-teal-300 text-teal-500 hover:bg-teal-50'
+                    ? 'bg-gold-500 text-white'
+                    : 'border-gold-300 text-gold-500 hover:bg-gold-50'
                 }`}
                 onClick={() => setFilter(f as typeof filter)}
               >
@@ -206,7 +206,7 @@ export default function AdminReviewsPage() {
             filteredReviews.map((review) => (
               <Card
                 key={review.id}
-                className={review.featured ? 'border-2 border-teal-500' : 'border-gray-200'}
+                className={review.featured ? 'border-2 border-gold-500' : 'border-gray-200'}
               >
                 <CardHeader>
                   <div className="flex justify-between items-start">
@@ -221,8 +221,8 @@ export default function AdminReviewsPage() {
                           onError={(e) => (e.currentTarget.src = '/images/profile-placeholder.jpg')}
                         />
                       ) : (
-                        <div className="w-15 h-15 rounded-full bg-teal-100 flex items-center justify-center">
-                          <span className="text-teal-500 font-semibold text-xl">
+                        <div className="w-15 h-15 rounded-full bg-gold-100 flex items-center justify-center">
+                          <span className="text-gold-500 font-semibold text-xl">
                             {review.clientName.charAt(0)}
                           </span>
                         </div>
@@ -254,7 +254,7 @@ export default function AdminReviewsPage() {
                             {review.approved ? 'Approved' : 'Pending'}
                           </Badge>
                           {review.featured && (
-                            <Badge className="bg-teal-100 text-teal-700">Featured</Badge>
+                            <Badge className="bg-gold-100 text-gold-700">Featured</Badge>
                           )}
                         </div>
                       </div>
@@ -272,14 +272,14 @@ export default function AdminReviewsPage() {
                 <CardContent>
                   <p className="text-gray-700 mb-4">{review.reviewText}</p>
                   {review.adminResponse && (
-                    <div className="mb-4 p-3 bg-teal-50 border border-teal-200 rounded-md">
-                      <p className="text-sm font-semibold text-teal-500">Our Response:</p>
+                    <div className="mb-4 p-3 bg-gold-50 border border-gold-200 rounded-md">
+                      <p className="text-sm font-semibold text-gold-500">Our Response:</p>
                       <p className="text-sm text-gray-700">{review.adminResponse}</p>
                     </div>
                   )}
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor={`response-${review.id}`} className="text-[#001F44] text-sm">
+                      <Label htmlFor={`response-${review.id}`} className="text-navy-900 text-sm">
                         Admin Response
                       </Label>
                       <Textarea
@@ -290,14 +290,14 @@ export default function AdminReviewsPage() {
                         }
                         placeholder="Enter your response..."
                         rows={3}
-                        className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg"
+                        className="border-gray-300 focus:ring-gold-500 text-sm rounded-lg"
                       />
                     </div>
                     <div className="flex gap-2">
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-teal-300 text-teal-500 hover:bg-teal-50"
+                        className="border-gold-300 text-gold-500 hover:bg-gold-50"
                         onClick={() =>
                           updateReview(review.id, { adminResponse: responseInputs[review.id] || '' })
                         }
@@ -308,7 +308,7 @@ export default function AdminReviewsPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-teal-300 text-teal-500 hover:bg-teal-50"
+                        className="border-gold-300 text-gold-500 hover:bg-gold-50"
                         onClick={() => sendReviewEmail(review.clientEmail)}
                       >
                         <Mail className="h-4 w-4 mr-1" />
@@ -319,14 +319,14 @@ export default function AdminReviewsPage() {
                           checked={review.approved}
                           onCheckedChange={(checked) => updateReview(review.id, { approved: checked })}
                         />
-                        <Label className="text-[#001F44] text-sm">Approve</Label>
+                        <Label className="text-navy-900 text-sm">Approve</Label>
                       </div>
                       <div className="flex items-center gap-2">
                         <Switch
                           checked={review.featured}
                           onCheckedChange={(checked) => updateReview(review.id, { featured: checked })}
                         />
-                        <Label className="text-[#001F44] text-sm">Feature</Label>
+                        <Label className="text-navy-900 text-sm">Feature</Label>
                       </div>
                     </div>
                   </div>

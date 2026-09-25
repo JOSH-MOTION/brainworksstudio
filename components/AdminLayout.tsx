@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           initial="hidden"
           animate="visible"
           variants={headerVariants}
-          className="fixed top-0 left-0 w-full bg-white text-[#001F44] shadow-sm z-50"
+          className="fixed top-0 left-0 w-full bg-white text-navy-900 shadow-sm z-50"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
@@ -85,7 +85,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                     height={60}
                   />
                 </motion.div>
-                <span className="text-base font-bold text-[#001F44]">
+                <span className="text-base font-bold text-navy-900">
                   Brain Works Studio Africa
                 </span>
               </Link>
@@ -114,8 +114,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   >
                     <Link
                       href={item.href}
-                      className={`text[#001F44] hover:text-[#001F44] text-sm ${
-                        pathname === item.href ? 'text-[#001F44] font-semibold' : ''
+                      className={`textnavy-900 hover:text-navy-900 text-sm ${
+                        pathname === item.href ? 'text-navy-900 font-semibold' : ''
                       }`}
                     >
                       {item.label}
@@ -126,7 +126,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-coral-100 text-[#001F44] hover:bg-coral-50 hover:text-coral-600 text-sm"
+                    className="border-coral-100 text-navy-900 hover:bg-coral-50 hover:text-coral-600 text-sm"
                     onClick={signOut}
                   >
                     <LogOut className="h-4 w-4 mr-1" />
@@ -155,7 +155,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="md:hidden bg-[#001F44] absolute top-16 left-0 w-full shadow-sm"
+                  className="md:hidden bg-navy-900 absolute top-16 left-0 w-full shadow-sm"
                 >
                   <div className="flex flex-col space-y-2 py-3 px-4">
                     {[
@@ -217,7 +217,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={headerVariants}
-          className="bg-[#001F44] text-white"
+          className="bg-navy-900 text-white"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center">
             <p className="text-sm">&copy; 2025 Brain Works Studio Africa Africa - Admin Portal. All rights reserved.</p>

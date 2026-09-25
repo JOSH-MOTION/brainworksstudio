@@ -4,8 +4,8 @@
   "description": "Professional Photography & Videography Services",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#14b8a6",
+  "background_color": "#1A3050",
+  "theme_color": "#B68B35",
   "icons": [
     {
       "src": "/newlogo2.jpg",

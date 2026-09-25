@@ -575,7 +575,7 @@ export default function AdminPricingCategoriesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gold-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading pricing categories...</p>
         </div>
       </div>
@@ -596,7 +596,7 @@ export default function AdminPricingCategoriesPage() {
           if (!open) resetCategoryForm();
         }}>
           <DialogTrigger asChild>
-            <Button className="bg-teal-500 hover:bg-teal-600">
+            <Button className="bg-gold-500 hover:bg-gold-600">
               <Plus className="h-4 w-4 mr-2" />
               New Category
             </Button>
@@ -628,7 +628,7 @@ export default function AdminPricingCategoriesPage() {
                     }
                   }}
                   placeholder="e.g., Wedding, Engagement, Corporate Events"
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
               </div>
 
@@ -638,7 +638,7 @@ export default function AdminPricingCategoriesPage() {
                   value={categoryForm.slug}
                   onChange={(e) => setCategoryForm({ ...categoryForm, slug: generateSlug(e.target.value) })}
                   placeholder="wedding-photography"
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">Will appear in URL: /pricing/{categoryForm.slug || 'category-slug'}</p>
               </div>
@@ -650,7 +650,7 @@ export default function AdminPricingCategoriesPage() {
                   onChange={(e) => setCategoryForm({ ...categoryForm, description: e.target.value })}
                   placeholder="Brief tagline for the category"
                   rows={2}
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
               </div>
 
@@ -661,7 +661,7 @@ export default function AdminPricingCategoriesPage() {
                   onChange={(e) => setCategoryForm({ ...categoryForm, longDescription: e.target.value })}
                   placeholder="Detailed description of what this category offers"
                   rows={4}
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
               </div>
 
@@ -670,7 +670,7 @@ export default function AdminPricingCategoriesPage() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">
                     <label className="flex-1">
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-teal-500 cursor-pointer transition-colors">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-gold-500 cursor-pointer transition-colors">
                         <input
                           type="file"
                           accept="image/jpeg,image/jpg,image/png,image/webp"
@@ -720,7 +720,7 @@ export default function AdminPricingCategoriesPage() {
                   value={categoryForm.order}
                   onChange={(e) => setCategoryForm({ ...categoryForm, order: parseInt(e.target.value) || 0 })}
                   placeholder="0"
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
                 <p className="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
               </div>
@@ -736,7 +736,7 @@ export default function AdminPricingCategoriesPage() {
               <Button
                 onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}
                 disabled={uploadingImage || saving}
-                className="w-full bg-teal-500 hover:bg-teal-600"
+                className="w-full bg-gold-500 hover:bg-gold-600"
               >
                 {uploadingImage ? (
                   <>
@@ -781,7 +781,7 @@ export default function AdminPricingCategoriesPage() {
                         <Badge variant="outline" className="text-xs">Draft</Badge>
                       )}
                       <Badge variant="outline" className="text-xs">Order: {category.order}</Badge>
-                      <Badge className="bg-teal-100 text-teal-700">
+                      <Badge className="bg-gold-100 text-gold-700">
                         {category.packages?.length || 0} packages
                       </Badge>
                     </div>
@@ -792,7 +792,7 @@ export default function AdminPricingCategoriesPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-teal-300 text-teal-500 hover:bg-teal-50"
+                    className="border-gold-300 text-gold-500 hover:bg-gold-50"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleEditCategory(category);
@@ -837,7 +837,7 @@ export default function AdminPricingCategoriesPage() {
                       <DialogTrigger asChild>
                         <Button 
                           size="sm"
-                          className="bg-teal-500 hover:bg-teal-600"
+                          className="bg-gold-500 hover:bg-gold-600"
                           onClick={() => {
                             setSelectedCategoryId(category.id!);
                             setEditingPackage(null);
@@ -870,7 +870,7 @@ export default function AdminPricingCategoriesPage() {
                               value={packageForm.name}
                               onChange={(e) => setPackageForm({ ...packageForm, name: e.target.value })}
                               placeholder="e.g., Silver Package, Gold Package"
-                              className="border-gray-300 focus:ring-teal-500"
+                              className="border-gray-300 focus:ring-gold-500"
                             />
                           </div>
 
@@ -883,7 +883,7 @@ export default function AdminPricingCategoriesPage() {
                                   value={packageForm.price}
                                   onChange={(e) => setPackageForm({ ...packageForm, price: parseGHS(e.target.value) })}
                                   placeholder="1500"
-                                  className="border-gray-300 focus:ring-teal-500 pl-8"
+                                  className="border-gray-300 focus:ring-gold-500 pl-8"
                                 />
                               </div>
                             </div>
@@ -893,7 +893,7 @@ export default function AdminPricingCategoriesPage() {
                                 value={packageForm.duration}
                                 onChange={(e) => setPackageForm({ ...packageForm, duration: e.target.value })}
                                 placeholder="e.g., 3 hours, Full day"
-                                className="border-gray-300 focus:ring-teal-500"
+                                className="border-gray-300 focus:ring-gold-500"
                               />
                             </div>
                           </div>
@@ -905,7 +905,7 @@ export default function AdminPricingCategoriesPage() {
                               onChange={(e) => setPackageForm({ ...packageForm, description: e.target.value })}
                               placeholder="Brief description of the package"
                               rows={2}
-                              className="border-gray-300 focus:ring-teal-500"
+                              className="border-gray-300 focus:ring-gold-500"
                             />
                           </div>
 
@@ -917,7 +917,7 @@ export default function AdminPricingCategoriesPage() {
                                   value={include}
                                   onChange={(e) => handleIncludeChange(index, e.target.value)}
                                   placeholder={`Feature ${index + 1}`}
-                                  className="border-gray-300 focus:ring-teal-500"
+                                  className="border-gray-300 focus:ring-gold-500"
                                 />
                                 {includesInputs.length > 1 && (
                                   <Button
@@ -935,7 +935,7 @@ export default function AdminPricingCategoriesPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="border-teal-300 text-teal-500 hover:bg-teal-50 mt-2"
+                                className="border-gold-300 text-gold-500 hover:bg-gold-50 mt-2"
                                 onClick={handleAddInclude}
                               >
                                 <Plus className="h-4 w-4 mr-1" />
@@ -951,7 +951,7 @@ export default function AdminPricingCategoriesPage() {
                               value={packageForm.order}
                               onChange={(e) => setPackageForm({ ...packageForm, order: parseInt(e.target.value) || 0 })}
                               placeholder="0"
-                              className="border-gray-300 focus:ring-teal-500"
+                              className="border-gray-300 focus:ring-gold-500"
                             />
                           </div>
 
@@ -966,7 +966,7 @@ export default function AdminPricingCategoriesPage() {
                           <Button
                             onClick={editingPackage ? handleUpdatePackage : handleAddPackage}
                             disabled={saving}
-                            className="w-full bg-teal-500 hover:bg-teal-600"
+                            className="w-full bg-gold-500 hover:bg-gold-600"
                           >
                             {saving ? (
                               <>
@@ -985,12 +985,12 @@ export default function AdminPricingCategoriesPage() {
                   {category.packages && category.packages.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {category.packages.map((pkg, index) => (
-                        <Card key={index} className={pkg.featured ? 'border-2 border-teal-500' : 'border-gray-200'}>
+                        <Card key={index} className={pkg.featured ? 'border-2 border-gold-500' : 'border-gray-200'}>
                           <CardHeader>
                             <div className="flex justify-between items-start mb-2">
                               <CardTitle className="text-lg text-gray-900">{pkg.name}</CardTitle>
                               {pkg.featured && (
-                                <Badge className="bg-teal-100 text-teal-700 flex items-center gap-1">
+                                <Badge className="bg-gold-100 text-gold-700 flex items-center gap-1">
                                   <Star className="h-3 w-3" />
                                   Featured
                                 </Badge>
@@ -998,7 +998,7 @@ export default function AdminPricingCategoriesPage() {
                             </div>
                             <CardDescription>{pkg.description}</CardDescription>
                             <div className="mt-3 flex items-baseline gap-2">
-                              <span className="text-2xl font-bold text-teal-600">{pkg.price}</span>
+                              <span className="text-2xl font-bold text-gold-600">{pkg.price}</span>
                             </div>
                             {pkg.duration && (
                               <p className="text-sm text-gray-500 mt-1">{pkg.duration}</p>
@@ -1020,7 +1020,7 @@ export default function AdminPricingCategoriesPage() {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="flex-1 border-teal-300 text-teal-500 hover:bg-teal-50"
+                                className="flex-1 border-gold-300 text-gold-500 hover:bg-gold-50"
                                 onClick={() => handleEditPackage(category.id!, index, pkg)}
                               >
                                 <Edit className="h-4 w-4 mr-1" />
@@ -1046,7 +1046,7 @@ export default function AdminPricingCategoriesPage() {
                       <p className="text-sm text-gray-500 mb-4">Add your first pricing package to this category</p>
                       <Button
                         size="sm"
-                        className="bg-teal-500 hover:bg-teal-600"
+                        className="bg-gold-500 hover:bg-gold-600"
                         onClick={() => {
                           setSelectedCategoryId(category.id!);
                           setEditingPackage(null);
@@ -1072,7 +1072,7 @@ export default function AdminPricingCategoriesPage() {
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No categories yet</h3>
               <p className="text-gray-600 mb-4">Create your first pricing category to get started</p>
               <Button
-                className="bg-teal-500 hover:bg-teal-600"
+                className="bg-gold-500 hover:bg-gold-600"
                 onClick={() => setCategoryDialogOpen(true)}
               >
                 <Plus className="h-4 w-4 mr-2" />

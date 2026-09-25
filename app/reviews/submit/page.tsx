@@ -87,55 +87,55 @@ export default function SubmitReview() {
   };
 
   return (
-    <div className="min-h-screen bg-teal-50 p-6">
+    <div className="min-h-screen bg-gold-50 p-6">
       <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-md p-6">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="font-serif text-2xl font-bold text-[#001F44] mb-6"
+          className="font-serif text-2xl font-bold text-navy-900 mb-6"
         >
           Submit Your Review
         </motion.h2>
 
         <div className="space-y-6">
           <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientName" className="text-[#001F44] text-sm">Name *</Label>
+            <Label htmlFor="clientName" className="text-navy-900 text-sm">Name *</Label>
             <Input
               id="clientName"
               type="text"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
               placeholder="Your name"
-              className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg"
+              className="border-gray-300 focus:ring-gold-500 text-sm rounded-lg"
             />
           </motion.div>
 
           <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientEmail" className="text-[#001F44] text-sm">Email *</Label>
+            <Label htmlFor="clientEmail" className="text-navy-900 text-sm">Email *</Label>
             <Input
               id="clientEmail"
               type="email"
               value={clientEmail}
               onChange={(e) => setClientEmail(e.target.value)}
               placeholder="Your email"
-              className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg"
+              className="border-gray-300 focus:ring-gold-500 text-sm rounded-lg"
             />
           </motion.div>
 
           <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="clientImage" className="text-[#001F44] text-sm">Profile Image (optional)</Label>
+            <Label htmlFor="clientImage" className="text-navy-900 text-sm">Profile Image (optional)</Label>
             <Input
               id="clientImage"
               type="file"
               accept="image/*"
               onChange={(e) => setClientImage(e.target.files?.[0] || null)}
-              className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg"
+              className="border-gray-300 focus:ring-gold-500 text-sm rounded-lg"
             />
           </motion.div>
 
           <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label className="text-[#001F44] text-sm">Rating *</Label>
+            <Label className="text-navy-900 text-sm">Rating *</Label>
             <div className="flex gap-1">
               {[1, 2, 3, 4, 5].map((star) => (
                 <Star
@@ -150,9 +150,9 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="serviceType" className="text-[#001F44] text-sm">Service Type *</Label>
+            <Label htmlFor="serviceType" className="text-navy-900 text-sm">Service Type *</Label>
             <Select value={serviceType} onValueChange={setServiceType}>
-              <SelectTrigger className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg">
+              <SelectTrigger className="border-gray-300 focus:ring-gold-500 text-sm rounded-lg">
                 <SelectValue placeholder="Select service type" />
               </SelectTrigger>
               <SelectContent>
@@ -166,14 +166,14 @@ export default function SubmitReview() {
           </motion.div>
 
           <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
-            <Label htmlFor="reviewText" className="text-[#001F44] text-sm">Review *</Label>
+            <Label htmlFor="reviewText" className="text-navy-900 text-sm">Review *</Label>
             <Textarea
               id="reviewText"
               value={reviewText}
               onChange={(e) => setReviewText(e.target.value)}
               placeholder="Share your experience..."
               rows={4}
-              className="border-gray-300 focus:ring-teal-500 text-sm rounded-lg"
+              className="border-gray-300 focus:ring-gold-500 text-sm rounded-lg"
             />
           </motion.div>
 
@@ -194,7 +194,7 @@ export default function SubmitReview() {
               whileTap="tap"
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-teal-500 text-white hover:bg-teal-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
+              className="w-full bg-gold-500 text-white hover:bg-gold-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
             >
               {loading ? (
                 'Submitting...'

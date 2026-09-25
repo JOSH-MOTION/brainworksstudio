@@ -63,11 +63,11 @@ export default function LoginPage() {
   // Show loading screen during auth state check or redirect
   if (authLoading || (user && !isResetMode)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-white">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gold-50 to-white">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-teal-600 text-lg"
+          className="text-gold-600 text-lg"
         >
           Loading...
         </motion.div>
@@ -125,14 +125,14 @@ export default function LoginPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-teal-50 to-white">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gold-50 to-white">
         <motion.div
           variants={formVariants}
           initial="hidden"
           animate="visible"
           className="w-full max-w-md"
         >
-          <Card className="rounded-2xl bg-white shadow-lg border border-teal-200">
+          <Card className="rounded-2xl bg-white shadow-lg border border-gold-200">
             <CardHeader className="text-center">
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
@@ -143,7 +143,7 @@ export default function LoginPage() {
                   className="object-contain"
                 />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-[#001F44]">
+              <CardTitle className="text-3xl font-bold text-navy-900">
                 {isResetMode ? 'Reset Password' : 'Welcome Back'}
               </CardTitle>
               <CardDescription className="text-gray-600">
@@ -156,7 +156,7 @@ export default function LoginPage() {
               {!isResetMode ? (
                 <form onSubmit={handleLoginSubmit} className="space-y-5">
                   <motion.div variants={inputVariants} className="space-y-2">
-                    <Label htmlFor="email" className="text-[#001F44] font-semibold">
+                    <Label htmlFor="email" className="text-navy-900 font-semibold">
                       Email
                     </Label>
                     <Input
@@ -166,12 +166,12 @@ export default function LoginPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       placeholder="your@email.com"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                     />
                   </motion.div>
 
                   <motion.div variants={inputVariants} className="space-y-2">
-                    <Label htmlFor="password" className="text-[#001F44] font-semibold">
+                    <Label htmlFor="password" className="text-navy-900 font-semibold">
                       Password
                     </Label>
                     <div className="relative">
@@ -182,12 +182,12 @@ export default function LoginPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         required
                         placeholder="••••••••"
-                        className="border-teal-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
+                        className="border-gold-300 focus:border-gold-500 focus:ring-gold-500 pr-10"
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-700"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gold-600 hover:text-gold-700"
                       >
                         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                       </button>
@@ -199,7 +199,7 @@ export default function LoginPage() {
                         setError('');
                         setSuccess('');
                       }}
-                      className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                      className="text-sm text-gold-600 hover:text-gold-700 font-medium"
                     >
                       Forgot Password?
                     </button>
@@ -218,7 +218,7 @@ export default function LoginPage() {
                   <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                     <Button
                       type="submit"
-                      className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                      className="w-full bg-gold-600 hover:bg-gold-700 text-white"
                       disabled={loading}
                     >
                       {loading ? 'Signing In...' : 'Sign In'}
@@ -228,7 +228,7 @@ export default function LoginPage() {
               ) : (
                 <form onSubmit={handleResetSubmit} className="space-y-5">
                   <motion.div variants={inputVariants} className="space-y-2">
-                    <Label htmlFor="resetEmail" className="text-[#001F44] font-semibold">
+                    <Label htmlFor="resetEmail" className="text-navy-900 font-semibold">
                       Email
                     </Label>
                     <Input
@@ -238,7 +238,7 @@ export default function LoginPage() {
                       onChange={(e) => setResetEmail(e.target.value)}
                       required
                       placeholder="your@email.com"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                     />
                   </motion.div>
 
@@ -256,7 +256,7 @@ export default function LoginPage() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      className="text-teal-600 text-sm bg-teal-50 p-3 rounded-md"
+                      className="text-gold-600 text-sm bg-gold-50 p-3 rounded-md"
                     >
                       {success}
                     </motion.div>
@@ -265,7 +265,7 @@ export default function LoginPage() {
                   <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                     <Button
                       type="submit"
-                      className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                      className="w-full bg-gold-600 hover:bg-gold-700 text-white"
                       disabled={loading}
                     >
                       {loading ? 'Sending Reset Email...' : 'Send Reset Email'}
@@ -281,7 +281,7 @@ export default function LoginPage() {
                         setSuccess('');
                         setResetEmail('');
                       }}
-                      className="text-sm text-teal-600 hover:text-teal-700 font-medium"
+                      className="text-sm text-gold-600 hover:text-gold-700 font-medium"
                     >
                       Back to Sign In
                     </button>
@@ -293,7 +293,7 @@ export default function LoginPage() {
                 <div className="mt-6 text-center">
                   <p className="text-sm text-gray-600">
                     Don&apos;t have an account?{' '}
-                    <Link href="/auth/signup" className="text-teal-600 hover:text-teal-700 font-medium">
+                    <Link href="/auth/signup" className="text-gold-600 hover:text-gold-700 font-medium">
                       Sign up
                     </Link>
                   </p>

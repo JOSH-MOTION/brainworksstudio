@@ -249,10 +249,10 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-teal-50">
+        <div className="min-h-screen flex items-center justify-center bg-gold-50">
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-coral-500 mx-auto"></div>
-            <p className="mt-4 text-sm text-[#001F44]">Loading...</p>
+            <p className="mt-4 text-sm text-navy-900">Loading...</p>
           </div>
         </div>
       </Layout>
@@ -262,7 +262,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
   if (error && !item) {
     return (
       <Layout>
-        <div className="min-h-screen flex items-center justify-center bg-teal-50">
+        <div className="min-h-screen flex items-center justify-center bg-gold-50">
           <div className="text-center">
             <p className="text-red-600 text-sm">{error}</p>
             <Button
@@ -285,7 +285,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
         initial="hidden"
         animate="visible"
         variants={formVariants}
-        className="py-8 bg-teal-50 min-h-screen"
+        className="py-8 bg-gold-50 min-h-screen"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -296,21 +296,21 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
             <Button
               onClick={() => router.push('/admin/portfolio')}
               variant="outline"
-              className="flex items-center text-[#001F44] hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
+              className="flex items-center text-navy-900 hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Portfolio
             </Button>
           </motion.div>
 
-          <h1 className="text-3xl font-bold text-[#001F44] mb-8">Edit Portfolio Item</h1>
+          <h1 className="text-3xl font-bold text-navy-900 mb-8">Edit Portfolio Item</h1>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Form */}
             <div className="lg:col-span-1 space-y-6">
               <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 space-y-6">
                 <div>
-                  <Label htmlFor="title" className="text-[#001F44] text-sm">Title</Label>
+                  <Label htmlFor="title" className="text-navy-900 text-sm">Title</Label>
                   <Input
                     id="title"
                     value={formData.title}
@@ -321,7 +321,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="type" className="text-[#001F44] text-sm">Type</Label>
+                  <Label htmlFor="type" className="text-navy-900 text-sm">Type</Label>
                   <Select
                     value={formData.type}
                     onValueChange={(value: 'photography' | 'videography') =>
@@ -339,7 +339,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="category" className="text-[#001F44] text-sm">Category</Label>
+                  <Label htmlFor="category" className="text-navy-900 text-sm">Category</Label>
                   <Select
                     value={formData.category}
                     onValueChange={(value) => setFormData({ ...formData, category: value })}
@@ -356,7 +356,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="tags" className="text-[#001F44] text-sm">Tags (comma-separated)</Label>
+                  <Label htmlFor="tags" className="text-navy-900 text-sm">Tags (comma-separated)</Label>
                   <Input
                     id="tags"
                     value={formData.tags}
@@ -366,7 +366,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="caption" className="text-[#001F44] text-sm">Caption</Label>
+                  <Label htmlFor="caption" className="text-navy-900 text-sm">Caption</Label>
                   <Textarea
                     id="caption"
                     value={formData.caption}
@@ -377,7 +377,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="clientName" className="text-[#001F44] text-sm">Client Name</Label>
+                  <Label htmlFor="clientName" className="text-navy-900 text-sm">Client Name</Label>
                   <Input
                     id="clientName"
                     value={formData.clientName}
@@ -387,7 +387,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 </div>
 
                 <div>
-                  <Label htmlFor="clientId" className="text-[#001F44] text-sm">Client ID</Label>
+                  <Label htmlFor="clientId" className="text-navy-900 text-sm">Client ID</Label>
                   <Input
                     id="clientId"
                     value={formData.clientId}
@@ -399,7 +399,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 <div className="bg-coral-50 border border-coral-100 rounded-lg p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <Lock className="w-5 h-5 text-coral-500" />
-                    <Label className="text-[#001F44] font-semibold text-sm">PIN (Client Access)</Label>
+                    <Label className="text-navy-900 font-semibold text-sm">PIN (Client Access)</Label>
                   </div>
                   <div className="relative">
                     <Input
@@ -413,7 +413,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                     <button
                       type="button"
                       onClick={() => setShowPin(!showPin)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[#001F44] hover:text-coral-500"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-900 hover:text-coral-500"
                     >
                       {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -427,14 +427,14 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                     checked={formData.featured}
                     onCheckedChange={(checked) => setFormData({ ...formData, featured: !!checked })}
                   />
-                  <Label htmlFor="featured" className="text-[#001F44] text-sm cursor-pointer">
+                  <Label htmlFor="featured" className="text-navy-900 text-sm cursor-pointer">
                     Featured Item
                   </Label>
                 </div>
 
                 {formData.type === 'videography' && (
                   <div>
-                    <Label htmlFor="videoUrl" className="text-[#001F44] text-sm">Video URL</Label>
+                    <Label htmlFor="videoUrl" className="text-navy-900 text-sm">Video URL</Label>
                     <Input
                       id="videoUrl"
                       value={formData.videoUrl}
@@ -454,7 +454,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 <Button
                   type="submit"
                   disabled={loading || !token}
-                  className="w-full bg-coral-500 text-teal-700 hover:bg-coral-600 rounded-lg text-sm font-semibold py-3"
+                  className="w-full bg-coral-500 text-gold-700 hover:bg-coral-600 rounded-lg text-sm font-semibold py-3"
                 >
                   {loading ? 'Updating...' : 'Update Portfolio Item'}
                 </Button>
@@ -464,13 +464,13 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
             {/* Right Column - Gallery Preview */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold text-[#001F44] mb-4">
+                <h3 className="text-xl font-bold text-navy-900 mb-4">
                   {formData.title || 'Untitled Portfolio'}
                 </h3>
 
                 {/* Upload New Files */}
                 <div className="mb-6">
-                  <Label className="text-[#001F44] text-sm block mb-2">
+                  <Label className="text-navy-900 text-sm block mb-2">
                     Add More {formData.type === 'photography' ? 'Images' : 'Videos'}
                   </Label>
                   <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-6 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
@@ -487,7 +487,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                       ) : (
                         <Film className="w-10 h-10 mx-auto mb-3 text-coral-500" />
                       )}
-                      <p className="text-[#001F44] font-medium mb-1">
+                      <p className="text-navy-900 font-medium mb-1">
                         Click to upload or drag and drop
                       </p>
                       <p className="text-sm text-gray-500">
@@ -500,7 +500,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 {/* Thumbnail for Video */}
                 {formData.type === 'videography' && formData.files.length > 0 && (
                   <div className="mb-6">
-                    <Label className="text-[#001F44] text-sm block mb-2">
+                    <Label className="text-navy-900 text-sm block mb-2">
                       Video Thumbnail
                     </Label>
                     <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-4 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
@@ -522,7 +522,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                       ) : (
                         <div className="text-center">
                           <ImageIcon className="w-8 h-8 mx-auto mb-2 text-coral-500" />
-                          <p className="text-sm text-[#001F44]">Click to upload thumbnail</p>
+                          <p className="text-sm text-navy-900">Click to upload thumbnail</p>
                         </div>
                       )}
                     </div>
@@ -532,7 +532,7 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                 {/* Gallery */}
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h4 className="text-lg font-semibold text-[#001F44]">
+                    <h4 className="text-lg font-semibold text-navy-900">
                       Media Gallery ({totalImages} {totalImages === 1 ? 'item' : 'items'})
                     </h4>
                   </div>

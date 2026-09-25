@@ -5,18 +5,22 @@ import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Camera, Video, Star, Sparkles, Zap, Award, FileText, Play } from 'lucide-react';
+import { ArrowRight, Star, Award, Play, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import VideoPlayer from '@/components/VideoPlayer';
+import { SERVICE_PILLARS, VERIFIED_STATS } from '@/lib/site-config';
+import { PortfolioItem } from '@/types';
+import MotionCard from '@/components/MotionCard';
+import ImageCard from '@/components/ImageCard';
 
 // Animation variants
 const fadeInUp: Variants = {
-  hidden: { opacity: 0, y: 60 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
@@ -25,29 +29,20 @@ const staggerContainer: Variants = {
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
-      delayChildren: 0.3,
+      staggerChildren: 0.12,
+      delayChildren: 0.2,
     },
   },
 };
 
-const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
-const slideIn: Variants = {
-  hidden: { opacity: 0, x: -40 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-  },
-};
+const WHY_BWSA = [
+  { title: 'Creative direction', description: 'Concept and story first — every shoot starts with what the work needs to achieve.' },
+  { title: 'Production capability', description: 'From a lean social crew to multi-camera commercial and live productions.' },
+  { title: 'Reliable crew', description: 'An experienced team that turns up prepared, on time and briefed.' },
+  { title: 'Technical expertise', description: 'Cinema cameras, lighting, drone, sound and live switching handled in-house.' },
+  { title: 'Storytelling', description: 'Visuals built around people and message, not just pretty frames.' },
+  { title: 'Post-production', description: 'Edit, colour, motion graphics and sound delivered for every platform.' },
+];
 
 interface Review {
   id: string;
@@ -60,625 +55,411 @@ interface Review {
   adminResponse?: string;
 }
 
-export default function HomePageClient({ initialReviews }: { initialReviews: Review[] }) {
+export default function HomePageClient({
+  initialReviews,
+  selectedWork,
+}: {
+  initialReviews: Review[];
+  selectedWork: PortfolioItem[];
+}) {
   const [reviews] = useState<Review[]>(initialReviews);
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
-  const youtubeUrl = 'https://youtu.be/Tvzynkzv_y4';
-  const getYouTubeId = (url: string) => {
-    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-    const match = url.match(regExp);
-    return (match && match[2].length === 11) ? match[2] : null;
-  };
+  const showreelId = 'Tvzynkzv_y4';
+  const embedUrl = `https://www.youtube.com/embed/${showreelId}`;
+  const [videoThumbnail, setVideoThumbnail] = useState(`https://img.youtube.com/vi/${showreelId}/maxresdefault.jpg`);
 
-  const videoId = getYouTubeId(youtubeUrl);
-  const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}` : youtubeUrl;
-
-  const [videoThumbnail, setVideoThumbnail] = useState(
-    videoId ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : '/hero1.jpg'
-  );
+  const businessPillars = SERVICE_PILLARS.filter((p) => p.forBusiness);
 
   return (
     <Layout>
-      {/* Hero Section - Inspired by KRAFT Design */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900">
-        {/* Hero Background Image with Dramatic Overlay */}
+      {/* 1. Hero */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-navy-900">
         <div className="absolute inset-0 z-0">
           <Image
             src="/hero/249A9973.jpg"
-            alt="Hero Background"
+            alt="Brain Works Studio Africa production"
             fill
             sizes="100vw"
             className="object-cover object-[center_20%]"
             priority
-            quality={100}
-            onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
+            quality={85}
           />
-          {/* Dramatic gradient overlays for depth */}
-          <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/60 to-transparent" />
-<div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/40" />
-
+          <div className="absolute inset-0 bg-gradient-to-r from-stone-900 via-stone-900/70 to-stone-900/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-stone-900 via-transparent to-stone-900/40" />
         </div>
 
-        {/* Subtle animated background orbs */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
-          <motion.div
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.2, 0.3, 0.2],
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className="absolute -top-1/4 -left-1/4 w-[600px] h-[600px] bg-teal-400/20 rounded-full blur-[120px]"
-          />
-        </div>
-
-        {/* Hero Content */}
         <motion.div
           initial="hidden"
           animate="visible"
           variants={staggerContainer}
-          className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-20 text-center"
+          className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-28 text-center"
         >
           <div className="max-w-5xl mx-auto">
-            
-
-            {/* Main Heading - Large and Bold */}
-            <motion.h1
-              variants={fadeInUp}
-              className="font-serif text-4xl sm:text-6xl lg:text-8xl font-bold text-white mb-6 sm:mb-8 leading-[1.15] sm:leading-[1.1] tracking-tight"
-            >
-              Every Frame Tells
-              <span className="block mt-1 sm:mt-2">
-                <span className="bg-gradient-to-r from-white via-teal-200 to-teal-400 bg-clip-text text-transparent">
-                  a Story
-                </span>
-              </span>
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              variants={fadeInUp}
-              className="text-base sm:text-xl md:text-2xl text-gray-300 mb-10 sm:mb-12 max-w-3xl mx-auto leading-relaxed font-light"
-            >
-              Professional photography, videography, and live streaming services
-              in Accra, Ghana — for weddings, corporate events, and brands
-              across Africa.
+            <motion.p variants={fadeInUp} className="mb-6 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-gold-300">
+              African Creative Production Company · Accra, Ghana
             </motion.p>
 
-            {/* CTA Buttons */}
+            <motion.h1
+              variants={fadeInUp}
+              className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-10 sm:mb-12 leading-[1.1] tracking-tight"
+            >
+              We Create Visual Stories
+              <span className="block mt-1 sm:mt-2 text-gold-300">That Move People.</span>
+            </motion.h1>
+
             <motion.div
               variants={fadeInUp}
               className="flex flex-col sm:flex-row items-center justify-center gap-4"
             >
-              <Link href="/portfolio">
-                <motion.div
-                  whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(20,184,166,0.3)" }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.2 }}
+              <Link href="/contact" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  className="group w-full sm:w-auto bg-gold-500 text-white hover:bg-gold-400 border-0 text-base font-bold py-7 px-10 rounded-full shadow-2xl shadow-gold-500/30"
                 >
-                  <Button
-                    size="lg"
-                    className="group w-full sm:w-auto bg-white text-slate-900 hover:bg-gray-100 border-0 text-base font-bold py-7 px-10 rounded-full shadow-2xl shadow-white/20 transition-all duration-300"
-                  >
-                    SEE ALL MODELS
-                    <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </motion.div>
+                  START A PROJECT
+                  <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </Link>
-              <Link href="/pricing">
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                  transition={{ duration: 0.2 }}
+              <Link href="/portfolio" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:text-white hover:bg-white/10 hover:border-white/50 text-base font-bold py-7 px-10 rounded-full"
                 >
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto bg-transparent backdrop-blur-sm border-2 border-white/30 text-white hover:text-teal-400 hover:bg-white/10 hover:border-white/50 text-base font-bold py-7 px-10 rounded-full transition-all duration-300"
-                  >
-                    <FileText className="mr-3 h-5 w-5" />
-                    VIEW RATE CARD
-                  </Button>
-                </motion.div>
+                  VIEW OUR WORK
+                </Button>
               </Link>
             </motion.div>
 
-            {/* Stats Section */}
-            <motion.div
-              variants={fadeInUp}
-              className="grid grid-cols-3 gap-8 mt-20 max-w-3xl mx-auto border-t border-white/10 pt-12"
-            >
-              {[
-                { number: '500+', label: 'Happy Clients' },
-                { number: '1000+', label: 'Projects Done' },
-                { number: '15+', label: 'Awards Won' },
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ y: -5 }}
-                  transition={{ duration: 0.3 }}
-                  className="text-center"
-                >
-                  <div className="text-4xl sm:text-5xl font-bold text-white mb-2 tracking-tight">
-                    {stat.number}
+            {/* 2. Credibility strip — only verified figures (see lib/site-config.ts) */}
+            {VERIFIED_STATS.length > 0 && (
+              <motion.div
+                variants={fadeInUp}
+                className="grid gap-8 mt-20 max-w-3xl mx-auto border-t border-white/10 pt-12"
+                style={{ gridTemplateColumns: `repeat(${VERIFIED_STATS.length}, minmax(0, 1fr))` }}
+              >
+                {VERIFIED_STATS.map((stat) => (
+                  <div key={stat.label} className="text-center">
+                    <div className="text-3xl sm:text-5xl font-bold text-white mb-2 tracking-tight">{stat.value}</div>
+                    <div className="text-xs sm:text-sm text-gray-400 uppercase tracking-wider font-medium">{stat.label}</div>
                   </div>
-                  <div className="text-sm text-gray-400 uppercase tracking-wider font-medium">
-                    {stat.label}
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </motion.div>
-
-        {/* Scroll Indicator */}
-        <motion.div
-          animate={{ y: [0, 12, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 z-10"
-        >
-          <div className="w-8 h-12 border-2 border-white/30 rounded-full flex items-start justify-center p-2">
-            <motion.div
-              animate={{ y: [0, 16, 0] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              className="w-1.5 h-1.5 bg-white rounded-full"
-            />
+                ))}
+              </motion.div>
+            )}
           </div>
         </motion.div>
       </section>
 
-      {/* Services & Philosophy Section */}
-      <section className="py-24 sm:py-32 bg-white overflow-hidden">
+      {/* 3. What We Do */}
+      <section className="py-24 sm:py-28 bg-white">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
-            {/* Left Column: Visual Media (Image & Video) */}
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-              className="lg:col-span-7 relative flex items-center gap-6 md:gap-8"
-            >
-              {/* Left Offset Item: Playable Video Thumbnail */}
-              <motion.div
-                variants={scaleIn}
-                onClick={() => setSelectedVideo(embedUrl)}
-                className="w-[43%] aspect-[3/4.5] relative overflow-hidden bg-stone-100 shadow-lg mt-16 group cursor-pointer"
-              >
-                <Image
-                  src={videoThumbnail}
-                  alt="Floral and luxury details"
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 768px) 30vw, 20vw"
-                  onError={() => {
-                    if (videoId && videoThumbnail.includes('maxresdefault')) {
-                      setVideoThumbnail(`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`);
-                    } else {
-                      setVideoThumbnail('/hero1.jpg');
-                    }
-                  }}
-                />
-                {/* Semi-transparent dark overlay */}
-                <div className="absolute inset-0 bg-black/25 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center" />
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-md transition-all duration-300 group-hover:bg-white group-hover:shadow-lg"
-                  >
-                    <Play className="w-5 h-5 text-neutral-900 fill-neutral-900 ml-0.5" />
-                  </motion.div>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-100px' }}
+            variants={staggerContainer}
+            className="max-w-3xl mb-14"
+          >
+            <motion.span variants={fadeInUp} className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">
+              What We Do
+            </motion.span>
+            <motion.h2 variants={fadeInUp} className="font-serif text-3xl sm:text-5xl font-bold text-navy-900 tracking-tight">
+              The right creative and technical team for every project.
+            </motion.h2>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {SERVICE_PILLARS.map((pillar, index) => (
+              <ImageCard
+                key={pillar.slug}
+                index={index}
+                href={pillar.href}
+                image={pillar.image}
+                imageAlt={`${pillar.name} by Brain Works Studio Africa`}
+                title={pillar.name}
+                summary={pillar.summary}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Selected Work */}
+      {selectedWork.length > 0 && (
+        <section className="py-24 sm:py-28 bg-navy-950 text-white">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14">
+              <div>
+                <span className="text-xs uppercase tracking-[0.25em] text-gold-300 font-semibold block mb-4">Selected Work</span>
+                <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight">Proof, not promises.</h2>
+              </div>
+              <Link href="/portfolio" className="inline-flex items-center text-sm font-semibold text-gold-300 hover:text-gold-200">
+                View all work <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {selectedWork.map((work, index) => (
+                <MotionCard key={work.id} index={index} lift={8} className="rounded-xl bg-navy-800">
+                  <Link href={`/portfolio/${work.id}`} className="block">
+                    <div className="relative aspect-[4/3] overflow-hidden">
+                      <Image
+                        src={work.imageUrls[0]}
+                        alt={`${work.title} — ${work.category} by Brain Works Studio Africa`}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-navy-950/95" />
+                      <div className="absolute inset-x-0 bottom-0 p-6 transition-transform duration-500 group-hover:-translate-y-2">
+                        <p className="text-xs uppercase tracking-wider text-gold-300 mb-1">{work.category || work.type}</p>
+                        <h3 className="text-xl font-bold">{work.title}</h3>
+                        <span className="mt-2 inline-flex translate-y-2 items-center text-sm font-semibold text-gold-300 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
+                          View project <ArrowRight className="ml-2 h-4 w-4" />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </MotionCard>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 6. Why BWSA */}
+      <section className="py-24 sm:py-28 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-14">
+          <div className="lg:col-span-4">
+            <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">Why BWSA</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight">
+              Built to deliver, from brief to final cut.
+            </h2>
+          </div>
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
+            {WHY_BWSA.map((item, index) => (
+              <MotionCard key={item.title} index={index} lift={4} className="rounded-xl border border-gray-100 bg-slate-50 p-6 hover:bg-white">
+                <div className="flex gap-4">
+                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-gold-100 text-gold-600 transition-all duration-500 group-hover:rotate-[360deg] group-hover:bg-gold-500 group-hover:text-white">
+                    <Check className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <h3 className="font-semibold text-navy-900">{item.title}</h3>
+                    <p className="mt-1 text-sm leading-relaxed text-gray-600">{item.description}</p>
+                  </div>
                 </div>
-              </motion.div>
+              </MotionCard>
+            ))}
+          </div>
+        </div>
+      </section>
 
-              {/* Right Item: Static Premium Image */}
-              <motion.div
-                variants={scaleIn}
-                className="w-[57%] aspect-[3/4.5] relative overflow-hidden bg-stone-100 shadow-lg"
-              >
-                <Image
-                  src="/charles.jpg"
-                  alt="Bride wearing sheer pearl gloves"
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 50vw, 30vw"
-                  priority
-                />
-              </motion.div>
-            </motion.div>
+      {/* 7. Services for Business (with showreel) */}
+      <section className="py-24 sm:py-28 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <button
+            type="button"
+            onClick={() => setSelectedVideo(embedUrl)}
+            className="group relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-200 shadow-xl"
+            aria-label="Play the BWSA showreel"
+          >
+            <Image
+              src={videoThumbnail}
+              alt="BWSA showreel"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={() => {
+                if (videoThumbnail.includes('maxresdefault')) {
+                  setVideoThumbnail(`https://img.youtube.com/vi/${showreelId}/hqdefault.jpg`);
+                } else {
+                  setVideoThumbnail('/hero1.jpg');
+                }
+              }}
+            />
+            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                <Play className="ml-1 h-6 w-6 fill-navy-900 text-navy-900" />
+              </span>
+            </div>
+          </button>
 
-            {/* Right Column: Copywriting & CTA */}
+          <div>
+            <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">For Business</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-6">
+              Production for brands and organisations.
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-8">
+              Corporate films, commercials, branded content, social media content, live streaming and photography —
+              planned around your audience and delivered for every platform you publish on.
+            </p>
+            <ul className="space-y-3 mb-10">
+              {businessPillars.map((pillar) => (
+                <li key={pillar.slug}>
+                  <Link href={pillar.href} className="group flex items-center justify-between border-b border-gray-200 pb-3 text-navy-900 hover:text-gold-700">
+                    <span className="font-medium">{pillar.name}</span>
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link href="/contact">
+              <Button className="rounded-full bg-navy-900 hover:bg-navy-800 px-8 py-6 font-semibold">
+                Get a Quote
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 9. Testimonials */}
+      {reviews.length > 0 && (
+        <section className="py-24 sm:py-28 bg-white">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8">
             <motion.div
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
+              viewport={{ once: true, margin: '-100px' }}
               variants={staggerContainer}
-              className="lg:col-span-5 flex flex-col justify-center text-left"
+              className="text-center mb-16"
             >
               <motion.span
                 variants={fadeInUp}
-                className="text-xs uppercase tracking-[0.25em] text-neutral-500 font-medium mb-6 block"
+                className="px-5 py-2.5 bg-gold-50 text-gold-600 rounded-full text-sm font-bold inline-flex items-center gap-2 uppercase tracking-wider mb-6"
               >
-                Our Services & Philosophy
+                <Award className="w-4 h-4" />
+                Client Reviews
               </motion.span>
-              
-              <motion.h2
-                variants={fadeInUp}
-                className="text-3xl sm:text-4xl lg:text-5xl font-light text-neutral-900 tracking-wide leading-tight mb-8 font-serif uppercase"
-              >
-                Lasting Memories Through Photography, Videography & Live Streaming
+              <motion.h2 variants={fadeInUp} className="font-serif text-3xl sm:text-5xl font-bold text-navy-900 tracking-tight">
+                What Clients Say
               </motion.h2>
-
-              <motion.p
-                variants={fadeInUp}
-                className="text-gray-600 text-lg leading-relaxed mb-6 font-light"
-              >
-                At Brain Works Studio Africa, we believe every special moment deserves to be captured with artistic precision and emotional depth. From intimate portraits and cinematic wedding films to high-definition live streaming for corporate events, we bring your stories to life.
-              </motion.p>
-
-              <motion.p
-                variants={fadeInUp}
-                className="text-gray-600 text-lg leading-relaxed mb-6 font-light"
-              >
-                Whether it is the quiet joy of a playful glance or the dynamic energy of a live broadcast, our team is equipped to deliver world-class visuals. We don't just record events; we craft enduring memories that you can relive forever.
-              </motion.p>
-
-              <motion.p
-                variants={fadeInUp}
-                className="text-gray-600 text-lg leading-relaxed mb-10 font-light"
-              >
-                Beyond the camera, we're a full creative studio: corporate shoots, dinners, and corporate events, documentary and music video production, graphic design and branding, motion graphics, social media content, and photo and video editing — all under one roof in Accra.
-              </motion.p>
-
-              <motion.div variants={fadeInUp}>
-                <Link href="/about">
-                  <Button className="px-8 py-6 bg-neutral-900 hover:bg-neutral-800 text-white font-medium uppercase tracking-wider text-sm rounded-none border-0 transition-colors shadow-sm self-start">
-                    Learn More
-                  </Button>
-                </Link>
-              </motion.div>
             </motion.div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {reviews.slice(0, 6).map((review, index) => (
+                <MotionCard key={review.id} index={index} className="rounded-2xl">
+                  <Card className="relative h-full border border-gray-100 shadow-sm bg-white rounded-2xl">
+                    <span aria-hidden="true" className="pointer-events-none absolute right-5 top-2 font-serif text-7xl leading-none text-gold-100 transition-all duration-500 group-hover:-translate-y-1 group-hover:text-gold-200">
+                      &rdquo;
+                    </span>
+                    <CardHeader className="pb-4">
+                      <div className="flex items-center gap-4">
+                        {review.clientImage ? (
+                          <Image
+                            src={review.clientImage}
+                            alt={review.clientName}
+                            width={56}
+                            height={56}
+                            className="w-14 h-14 rounded-full object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-gold-600 flex items-center justify-center flex-shrink-0">
+                            <span className="text-white font-bold text-xl">{review.clientName.charAt(0).toUpperCase()}</span>
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-lg font-bold text-navy-900 truncate">{review.clientName}</CardTitle>
+                          <p className="text-sm text-gray-500 truncate">{review.serviceType}</p>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-1 mb-4" aria-label={`${review.rating} out of 5 stars`}>
+                        {[...Array(5)].map((_, i) => (
+                          <motion.span
+                            key={i}
+                            initial={{ opacity: 0, scale: 0, rotate: -90 }}
+                            whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 + (index % 3) * 0.09 + i * 0.08, type: 'spring', stiffness: 260, damping: 14 }}
+                          >
+                            <Star className={`h-4 w-4 ${i < review.rating ? 'fill-gold-500 text-gold-500' : 'text-gray-300'}`} />
+                          </motion.span>
+                        ))}
+                      </div>
+                      <p className="text-gray-700 leading-relaxed">&ldquo;{review.reviewText}&rdquo;</p>
+                      {review.adminResponse && (
+                        <div className="mt-5 p-4 bg-slate-50 rounded-xl border-l-4 border-gold-500">
+                          <p className="text-xs font-bold text-gold-600 mb-1 uppercase tracking-wider">Our Response</p>
+                          <p className="text-sm text-gray-700">{review.adminResponse}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                </MotionCard>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 10. About BWSA */}
+      <section className="py-24 sm:py-28 bg-white border-t border-gray-100">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-stone-100">
+            <Image src="/charles.jpg" alt="The Brain Works Studio Africa team at work" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+          </div>
+          <div>
+            <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">About BWSA</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-6">
+              From photography studio to creative production company.
+            </h2>
+            <p className="text-gray-600 leading-relaxed mb-5">
+              Brain Works Studio Africa started with a camera and a love for people&rsquo;s stories. Today we&rsquo;re a
+              production company based in Accra, bringing together directors, cinematographers, photographers, editors and
+              live-production crew.
+            </p>
+            <p className="text-gray-600 leading-relaxed mb-8">
+              We believe visual storytelling should solve a communication problem — not simply look good.
+            </p>
+            <Link href="/about">
+              <Button variant="outline" className="rounded-full border-navy-900 px-8 py-6 font-semibold text-navy-900 hover:bg-navy-900 hover:text-white">
+                Our Story
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Featured Work Section */}
-      <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="text-center mb-20"
-          >
-            <motion.div variants={fadeInUp} className="inline-block mb-6">
-              <span className="px-5 py-2.5 bg-[#CB9D06]/10 text-[#CB9D06] rounded-full text-sm font-bold uppercase tracking-wider">
-                Portfolio
-              </span>
-            </motion.div>
-            <motion.h2
-              variants={fadeInUp}
-              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
-            >
-              Featured Work
-            </motion.h2>
-            <motion.p
-              variants={fadeInUp}
-              className="text-xl text-gray-600 max-w-2xl mx-auto font-light"
-            >
-              A glimpse into our portfolio of unforgettable moments
-            </motion.p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="grid md:grid-cols-2 gap-8"
-          >
-            {[
-              { image: '/image.jpg', title: 'Timeless Wedding', category: 'Wedding', link: '/portfolio/wedding' },
-              { image: '/brand.jpg', title: 'Brand Campaign', category: 'Corporate', link: '/portfolio/corporate' },
-            ].map((work, index) => (
-              <motion.div key={index} variants={scaleIn}>
-                <Link href={work.link}>
-                  <div className="group relative overflow-hidden rounded-3xl aspect-[4/3] shadow-xl hover:shadow-2xl transition-all duration-500">
-                    <Image
-                      src={work.image}
-                      alt={work.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 50vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-110"
-                      onError={(e) => (e.currentTarget.src = '/placeholder-image.jpg')}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent opacity-70 group-hover:opacity-90 transition-opacity" />
-                    <div className="absolute inset-0 flex flex-col justify-end p-10">
-                      <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-md text-white text-xs font-bold rounded-full mb-4 w-fit uppercase tracking-wider">
-                        {work.category}
-                      </span>
-                      <h3 className="text-3xl font-bold text-white mb-3 group-hover:translate-y-0 translate-y-2 transition-transform">
-                        {work.title}
-                      </h3>
-                      <div className="flex items-center text-white opacity-0 group-hover:opacity-100 transition-opacity font-semibold">
-                        View Project
-                        <ArrowRight className="ml-3 w-5 h-5" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-            className="text-center mt-16"
-          >
-            <Link href="/portfolio">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  size="lg"
-                  className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 py-7 text-base font-bold shadow-xl"
-                >
-                  Explore Full Portfolio
-                  <ArrowRight className="ml-3 h-5 w-5" />
-                </Button>
-              </motion.div>
-            </Link>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-32 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
-            variants={staggerContainer}
-            className="text-center mb-20"
-          >
-            <motion.div variants={fadeInUp} className="inline-block mb-6">
-              <span className="px-5 py-2.5 bg-teal-50 text-teal-600 rounded-full text-sm font-bold flex items-center gap-2 w-fit mx-auto uppercase tracking-wider">
-                <Award className="w-4 h-4" />
-                Client Reviews
-              </span>
-            </motion.div>
-            <motion.h2
-              variants={fadeInUp}
-              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 tracking-tight"
-            >
-              What Clients Say
-            </motion.h2>
-            <motion.p
-              variants={fadeInUp}
-              className="text-xl text-gray-600 max-w-2xl mx-auto font-light"
-            >
-              Hear from those who trusted us with their special moments
-            </motion.p>
-          </motion.div>
-
-          {reviews.length === 0 ? (
-            <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-              variants={scaleIn}
-            >
-              <Card className="max-w-2xl mx-auto shadow-xl border-0 rounded-2xl">
-                <CardContent className="p-16 text-center">
-                  <div className="w-20 h-20 bg-teal-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                    <Star className="w-10 h-10 text-teal-500" />
-                  </div>
-                  <h3 className="text-3xl font-bold text-slate-900 mb-4">
-                    Be the First to Review
-                  </h3>
-                  <p className="text-gray-600 mb-8 text-lg">
-                    Share your experience with Brain Works Studio Africa!
-                  </p>
-                  <Link href="/reviews/submit">
-                    <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full px-10 py-6 text-base font-semibold">
-                      Submit a Review
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ) : (
-            <>
-              <motion.div
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: "-100px" }}
-                variants={staggerContainer}
-                className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
-              >
-                {reviews.slice(0, 6).map((review, index) => (
-                  <motion.div key={review.id} variants={scaleIn}>
-                    <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-shadow duration-300 bg-white rounded-2xl">
-                      <CardHeader className="pb-4">
-                        <div className="flex items-center gap-4">
-                          {review.clientImage ? (
-                            <Image
-                              src={review.clientImage}
-                              alt={review.clientName}
-                              width={64}
-                              height={64}
-                              className="w-16 h-16 rounded-full object-cover flex-shrink-0"
-                              onError={(e) => {
-                                e.currentTarget.src = '/images/profile-placeholder.jpg';
-                              }}
-                            />
-                          ) : (
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-teal-400 to-teal-600 flex items-center justify-center flex-shrink-0">
-                              <span className="text-white font-bold text-2xl">
-                                {review.clientName.charAt(0).toUpperCase()}
-                              </span>
-                            </div>
-                          )}
-                          <div className="flex-1 min-w-0">
-                            <CardTitle className="text-xl font-bold text-slate-900 truncate">
-                              {review.clientName}
-                            </CardTitle>
-                            <p className="text-sm text-gray-500 truncate">{review.serviceType}</p>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center gap-1 mb-6">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-5 w-5 ${
-                                i < review.rating 
-                                  ? 'fill-[#CB9D06] text-[#CB9D06]' 
-                                  : 'text-gray-300'
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <p className="text-gray-700 leading-relaxed mb-6">
-                          &ldquo;{review.reviewText}&rdquo;
-                        </p>
-                        {review.adminResponse && (
-                          <div className="p-5 bg-slate-50 rounded-xl border-l-4 border-teal-500">
-                            <p className="text-xs font-bold text-teal-600 mb-2 uppercase tracking-wider">
-                              Our Response:
-                            </p>
-                            <p className="text-sm text-gray-700">
-                              {review.adminResponse}
-                            </p>
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </motion.div>
-
-              {reviews.length > 6 && (
-                <motion.div
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeInUp}
-                  className="text-center mt-16"
-                >
-                  <p className="text-gray-600 mb-6 text-lg">
-                    Showing 6 of {reviews.length} testimonials
-                  </p>
-                  <Link href="/reviews">
-                    <Button className="bg-slate-900 hover:bg-slate-800 text-white rounded-full px-10 py-7 text-base font-bold">
-                      View All Testimonials
-                    </Button>
-                  </Link>
-                </motion.div>
-              )}
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* Modern CTA Section */}
-      <section className="relative py-32 bg-gradient-to-br from-slate-950 via-slate-900 to-teal-950 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-            backgroundSize: '48px 48px'
-          }} />
-        </div>
-
-        {/* Gradient Orbs */}
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-teal-500/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-0 right-1/4 w-[600px] h-[600px] bg-[#CB9D06]/10 rounded-full blur-[150px]" />
-
+      {/* 11. Final CTA */}
+      <section className="relative py-28 bg-gradient-to-br from-navy-950 via-navy-900 to-navy-950 overflow-hidden">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
-          className="relative max-w-5xl mx-auto text-center px-6 lg:px-8"
+          className="relative max-w-4xl mx-auto text-center px-6 lg:px-8"
         >
-          <motion.div variants={fadeInUp} className="inline-block mb-8">
-            <span className="px-5 py-2.5 bg-white/5 backdrop-blur-md text-white rounded-full text-sm font-bold uppercase tracking-wider">
-              Ready to Get Started?
-            </span>
-          </motion.div>
-
-          <motion.h2
-            variants={fadeInUp}
-            className="font-serif text-4xl sm:text-6xl md:text-7xl font-bold text-white mb-8 tracking-tight"
-          >
-            Let&rsquo;s Create Something
-            <span className="block mt-3 bg-gradient-to-r from-white via-teal-300 to-teal-400 bg-clip-text text-transparent">
-              Extraordinary
-            </span>
+          <motion.h2 variants={fadeInUp} className="font-serif text-4xl sm:text-6xl font-bold text-white mb-6 tracking-tight">
+            Have a project in mind?
+            <span className="block mt-2 text-gold-300">Let&rsquo;s build it.</span>
           </motion.h2>
-
-          <motion.p
-            variants={fadeInUp}
-            className="text-xl text-gray-300 mb-16 max-w-2xl mx-auto font-light leading-relaxed"
-          >
-            Book your session today and let us turn your vision into stunning visual stories
+          <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+            Tell us what you need and we&rsquo;ll come back with ideas, availability and a quote within one business day.
           </motion.p>
-
-          <motion.div
-            variants={fadeInUp}
-            className="flex flex-col sm:flex-row items-center justify-center gap-5"
-          >
-            <Link href="/booking">
-              <motion.div
-                whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(255,255,255,0.2)" }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <Button
-                  size="lg"
-                  className="group w-full sm:w-auto bg-white text-slate-900 hover:bg-gray-100 text-base font-bold py-7 px-10 rounded-full shadow-2xl"
-                >
-                  Book a Session
-                  <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </motion.div>
+          <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link href="/contact" className="w-full sm:w-auto">
+              <Button size="lg" className="group w-full sm:w-auto bg-white text-navy-900 hover:bg-gray-100 text-base font-bold py-7 px-10 rounded-full">
+                Start a Project
+                <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </Link>
-            <Link href="/contact">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.98 }}
+            <Link href="/booking" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:text-white hover:bg-white/10 text-base font-bold py-7 px-10 rounded-full"
               >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 text-base font-bold py-7 px-10 rounded-full backdrop-blur-sm"
-                >
-                  Get in Touch
-                </Button>
-              </motion.div>
+                Book a Session
+              </Button>
             </Link>
           </motion.div>
         </motion.div>
       </section>
-      
-      {selectedVideo && (
-        <VideoPlayer videoSrc={selectedVideo} onClose={() => setSelectedVideo(null)} />
-      )}
+
+      {selectedVideo && <VideoPlayer videoSrc={selectedVideo} onClose={() => setSelectedVideo(null)} />}
     </Layout>
   );
 }
-       

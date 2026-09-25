@@ -231,7 +231,7 @@ export default function UploadPortfolio() {
 
   return (
     <Layout>
-      <div className="min-h-screen bg-teal-50 p-6">
+      <div className="min-h-screen bg-gold-50 p-6">
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
@@ -242,7 +242,7 @@ export default function UploadPortfolio() {
             <Button
               onClick={() => router.push('/admin/portfolio')}
               variant="outline"
-              className="flex items-center text-[#001F44] hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
+              className="flex items-center text-navy-900 hover:text-coral-500 transition-colors text-sm border-coral-100 rounded-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Back to Portfolio
@@ -253,7 +253,7 @@ export default function UploadPortfolio() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-2xl font-bold text-[#001F44] mb-6"
+            className="text-2xl font-bold text-navy-900 mb-6"
           >
             Upload Portfolio
           </motion.h2>
@@ -263,7 +263,7 @@ export default function UploadPortfolio() {
             <div className="lg:col-span-1 space-y-6">
               <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
                 <motion.div custom={0} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="title" className="text-[#001F44] text-sm">Title *</Label>
+                  <Label htmlFor="title" className="text-navy-900 text-sm">Title *</Label>
                   <Input
                     id="title"
                     type="text"
@@ -275,7 +275,7 @@ export default function UploadPortfolio() {
                 </motion.div>
 
                 <motion.div custom={1} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="type" className="text-[#001F44] text-sm">Type *</Label>
+                  <Label htmlFor="type" className="text-navy-900 text-sm">Type *</Label>
                   <Select value={type} onValueChange={(value: 'photography' | 'videography') => setType(value)}>
                     <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                       <SelectValue placeholder="Select type" />
@@ -288,7 +288,7 @@ export default function UploadPortfolio() {
                 </motion.div>
 
                 <motion.div custom={2} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="category" className="text-[#001F44] text-sm">Category *</Label>
+                  <Label htmlFor="category" className="text-navy-900 text-sm">Category *</Label>
                   <Select value={category} onValueChange={(value: string) => setCategory(value)}>
                     <SelectTrigger className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg">
                       <SelectValue placeholder="Select category" />
@@ -302,7 +302,7 @@ export default function UploadPortfolio() {
                 </motion.div>
 
                 <motion.div custom={3} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="tags" className="text-[#001F44] text-sm">Tags (comma separated)</Label>
+                  <Label htmlFor="tags" className="text-navy-900 text-sm">Tags (comma separated)</Label>
                   <Input
                     id="tags"
                     type="text"
@@ -314,7 +314,7 @@ export default function UploadPortfolio() {
                 </motion.div>
 
                 <motion.div custom={4} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="caption" className="text-[#001F44] text-sm">Caption</Label>
+                  <Label htmlFor="caption" className="text-navy-900 text-sm">Caption</Label>
                   <Textarea
                     id="caption"
                     value={caption}
@@ -326,7 +326,7 @@ export default function UploadPortfolio() {
                 </motion.div>
 
                 <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
-                  <Label htmlFor="clientName" className="text-[#001F44] text-sm">Client Name *</Label>
+                  <Label htmlFor="clientName" className="text-navy-900 text-sm">Client Name *</Label>
                   <Input
                     id="clientName"
                     type="text"
@@ -341,9 +341,9 @@ export default function UploadPortfolio() {
                   <div className="bg-coral-50 border border-coral-100 rounded-lg p-4">
                     <div className="flex items-center gap-2 mb-3">
                       <Lock className="w-5 h-5 text-coral-500" />
-                      <Label className="text-[#001F44] font-semibold text-sm">PIN *</Label>
+                      <Label className="text-navy-900 font-semibold text-sm">PIN *</Label>
                     </div>
-                    <p className="text-xs text-[#001F44] mb-3">
+                    <p className="text-xs text-navy-900 mb-3">
                       Set a unique PIN that clients will use to access their portfolio
                     </p>
                     <div className="flex gap-2">
@@ -359,7 +359,7 @@ export default function UploadPortfolio() {
                         <button
                           type="button"
                           onClick={() => setShowPin(!showPin)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[#001F44] hover:text-coral-500"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-900 hover:text-coral-500"
                         >
                           {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -383,7 +383,7 @@ export default function UploadPortfolio() {
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-3">
                         <Film className="w-5 h-5 text-blue-600" />
-                        <Label className="text-[#001F44] font-semibold text-sm">YouTube Video *</Label>
+                        <Label className="text-navy-900 font-semibold text-sm">YouTube Video *</Label>
                       </div>
                       <p className="text-xs text-gray-600 mb-3">
                         Paste your YouTube video link (works with watch, share, or embed URLs)
@@ -421,7 +421,7 @@ export default function UploadPortfolio() {
 
                 {type === 'videography' && videoUrl && (
                   <motion.div custom={8} variants={formElementVariants} initial="hidden" animate="visible">
-                    <Label className="text-[#001F44] text-sm block mb-2">
+                    <Label className="text-navy-900 text-sm block mb-2">
                       Custom Thumbnail (Optional)
                     </Label>
                     <p className="text-xs text-gray-600 mb-2">
@@ -446,7 +446,7 @@ export default function UploadPortfolio() {
                       ) : (
                         <div className="text-center">
                           <ImageIcon className="w-8 h-8 mx-auto mb-2 text-coral-500" />
-                          <p className="text-sm text-[#001F44]">Click to upload custom thumbnail</p>
+                          <p className="text-sm text-navy-900">Click to upload custom thumbnail</p>
                         </div>
                       )}
                     </div>
@@ -471,7 +471,7 @@ export default function UploadPortfolio() {
                     whileTap="tap"
                     onClick={handleUpload}
                     disabled={loading || (type === 'videography' && !videoUrl)}
-                    className="w-full bg-coral-500 text-teal-700 hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
+                    className="w-full bg-coral-500 text-gold-700 hover:bg-coral-600 font-semibold py-3 flex items-center justify-center gap-2 text-sm rounded-lg disabled:opacity-50"
                   >
                     {loading ? (
                       'Uploading...'
@@ -489,14 +489,14 @@ export default function UploadPortfolio() {
             {/* Right Column - Preview Gallery */}
             <div className="lg:col-span-2">
               <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="text-xl font-bold text-[#001F44] mb-4">
+                <h3 className="text-xl font-bold text-navy-900 mb-4">
                   {title || 'Untitled Portfolio'}
                 </h3>
 
                 {/* Upload Area for Photography */}
                 {type === 'photography' && (
                   <div className="mb-6">
-                    <Label htmlFor="images" className="text-[#001F44] text-sm block mb-2">
+                    <Label htmlFor="images" className="text-navy-900 text-sm block mb-2">
                       Upload Images *
                     </Label>
                     <div className="relative border-2 border-dashed border-coral-200 rounded-lg p-8 hover:border-coral-400 transition-colors cursor-pointer bg-coral-50/50">
@@ -510,7 +510,7 @@ export default function UploadPortfolio() {
                       />
                       <div className="text-center">
                         <ImageIcon className="w-12 h-12 mx-auto mb-4 text-coral-500" />
-                        <p className="text-[#001F44] font-medium mb-1">
+                        <p className="text-navy-900 font-medium mb-1">
                           Click to upload or drag and drop
                         </p>
                         <p className="text-sm text-gray-500">
@@ -525,7 +525,7 @@ export default function UploadPortfolio() {
                 {previewFiles.length > 0 && (
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <h4 className="text-lg font-semibold text-[#001F44]">
+                      <h4 className="text-lg font-semibold text-navy-900">
                         Preview ({previewFiles.length} {previewFiles.length === 1 ? 'file' : 'files'})
                       </h4>
                     </div>

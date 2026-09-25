@@ -116,14 +116,14 @@ export default function SignupPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-teal-50 to-white">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gold-50 to-white">
         <motion.div
           variants={formVariants}
           initial="hidden"
           animate="visible"
           className="w-full max-w-md"
         >
-          <Card className="rounded-2xl bg-white shadow-lg border border-teal-200">
+          <Card className="rounded-2xl bg-white shadow-lg border border-gold-200">
             <CardHeader className="text-center">
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
@@ -134,7 +134,7 @@ export default function SignupPage() {
                   className="object-contain"
                 />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-[#001F44]">Create Your Account</CardTitle>
+              <CardTitle className="text-3xl font-bold text-navy-900">Create Your Account</CardTitle>
               <CardDescription className="text-gray-600">
                 Join Brain Works Studio Africa to start capturing your moments
               </CardDescription>
@@ -142,7 +142,7 @@ export default function SignupPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="displayName" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="displayName" className="text-navy-900 font-semibold">
                     Full Name
                   </Label>
                   <Input
@@ -153,12 +153,12 @@ export default function SignupPage() {
                     onChange={handleChange}
                     required
                     placeholder="Your full name"
-                    className="border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                    className="border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                   />
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="profileImage" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="profileImage" className="text-navy-900 font-semibold">
                     Profile Picture (Optional)
                   </Label>
                   <div className="flex items-center gap-4">
@@ -167,7 +167,7 @@ export default function SignupPage() {
                         <motion.img
                           src={imagePreview}
                           alt="Profile preview"
-                          className="w-24 h-24 rounded-full object-cover border-4 border-teal-200"
+                          className="w-24 h-24 rounded-full object-cover border-4 border-gold-200"
                           whileHover={{ scale: 1.1 }}
                           transition={{ type: 'spring', stiffness: 200 }}
                         />
@@ -183,8 +183,8 @@ export default function SignupPage() {
                         </button>
                       </div>
                     ) : (
-                      <div className="w-24 h-24 rounded-full bg-teal-50 flex items-center justify-center border-4 border-teal-200">
-                        <Camera className="h-8 w-8 text-teal-400" />
+                      <div className="w-24 h-24 rounded-full bg-gold-50 flex items-center justify-center border-4 border-gold-200">
+                        <Camera className="h-8 w-8 text-gold-400" />
                       </div>
                     )}
                     <Input
@@ -192,13 +192,13 @@ export default function SignupPage() {
                       type="file"
                       accept="image/*"
                       onChange={handleImageChange}
-                      className="flex-1 border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                      className="flex-1 border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                     />
                   </div>
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="email" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="email" className="text-navy-900 font-semibold">
                     Email
                   </Label>
                   <Input
@@ -209,12 +209,12 @@ export default function SignupPage() {
                     onChange={handleChange}
                     required
                     placeholder="your@email.com"
-                    className="border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                    className="border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                   />
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="password" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="password" className="text-navy-900 font-semibold">
                     Password
                   </Label>
                   <div className="relative">
@@ -226,12 +226,12 @@ export default function SignupPage() {
                       onChange={handleChange}
                       required
                       placeholder="••••••••"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gold-600 hover:text-gold-700"
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -239,7 +239,7 @@ export default function SignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="confirmPassword" className="text-navy-900 font-semibold">
                     Confirm Password
                   </Label>
                   <div className="relative">
@@ -251,12 +251,12 @@ export default function SignupPage() {
                       onChange={handleChange}
                       required
                       placeholder="••••••••"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gold-600 hover:text-gold-700"
                     >
                       {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -276,7 +276,7 @@ export default function SignupPage() {
                 <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                   <Button
                     type="submit"
-                    className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                    className="w-full bg-gold-600 hover:bg-gold-700 text-white"
                     disabled={loading}
                   >
                     {loading ? 'Creating Account...' : 'Create Account'}
@@ -287,7 +287,7 @@ export default function SignupPage() {
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
                   Already have an account?{' '}
-                  <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-medium">
+                  <Link href="/auth/login" className="text-gold-600 hover:text-gold-700 font-medium">
                     Sign in
                   </Link>
                 </p>
