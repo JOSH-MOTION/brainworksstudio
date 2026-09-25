@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatCategoryName } from '@/lib/pricing-format';
 
 interface PricingCategory {
   id: string;
@@ -92,7 +93,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
                           {category.imageUrl ? (
                             <Image
                               src={category.imageUrl}
-                              alt={category.name}
+                              alt={formatCategoryName(category.name)}
                               fill
                               sizes="(max-width: 768px) 100vw, 40vw"
                               className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -122,7 +123,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
                         {/* Content Section */}
                         <CardContent className="flex-1 p-8 flex flex-col justify-center">
                           <h2 className="font-serif text-3xl font-bold text-slate-900 mb-3 group-hover:text-gold-600 transition-colors">
-                            {category.name}
+                            {formatCategoryName(category.name)}
                           </h2>
                           <p className="text-gray-600 mb-6 leading-relaxed">
                             {category.description}

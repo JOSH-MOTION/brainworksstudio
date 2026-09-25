@@ -33,7 +33,8 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
         updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
         createdBy: data.createdBy || '',
         clientId: data.clientId || null,
-        pin: data.pin || data.downloadPin || null,
+        // Public pages only need to know a PIN exists — never the PIN itself.
+        hasPin: !!(data.pin || data.downloadPin),
       } as PortfolioItem;
     });
 
@@ -70,7 +71,8 @@ export async function getPortfolioItemById(id: string): Promise<PortfolioItem | 
       updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || new Date().toISOString(),
       createdBy: data.createdBy || '',
       clientId: data.clientId || null,
-      pin: data.pin || data.downloadPin || null,
+      // Public pages only need to know a PIN exists — never the PIN itself.
+      hasPin: !!(data.pin || data.downloadPin),
     } as PortfolioItem;
   } catch (error) {
     console.error('getPortfolioItemById: Error fetching portfolio item:', error);

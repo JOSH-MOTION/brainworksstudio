@@ -7,9 +7,9 @@ export const dynamic = 'force-dynamic';
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
-  title: 'Blog | Photography & Videography Tips, Ghana | Brain Works Studio Africa',
+  title: 'Insights | Production, Video & Photography Guides, Ghana | Brain Works Studio Africa',
   description:
-    'Stories, tips, and behind-the-scenes insights on photography, videography, live streaming, and visual storytelling from Brain Works Studio Africa in Accra, Ghana.',
+    'Guides, stories and behind-the-scenes insights on commercial and corporate production, live streaming, photography and visual storytelling from Brain Works Studio Africa in Accra, Ghana.',
   keywords: [
     'photography tips Ghana',
     'wedding photography cost Ghana',
@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   ],
   alternates: { canonical: `${BASE_URL}/blog` },
   openGraph: {
-    title: 'Blog | Brain Works Studio Africa',
+    title: 'Insights | Brain Works Studio Africa',
     description:
-      'Stories, tips, and behind-the-scenes insights on photography, videography, and live streaming from Brain Works Studio Africa.',
+      'Guides and behind-the-scenes insights on production, live streaming and photography from Brain Works Studio Africa.',
     url: `${BASE_URL}/blog`,
     siteName: 'Brain Works Studio Africa',
     type: 'website',
@@ -32,9 +32,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Blog | Brain Works Studio Africa',
+    title: 'Insights | Brain Works Studio Africa',
     description:
-      'Stories, tips, and behind-the-scenes insights on photography, videography, and live streaming from Brain Works Studio Africa.',
+      'Guides and behind-the-scenes insights on production, live streaming and photography from Brain Works Studio Africa.',
     images: [`${BASE_URL}/newlogo2.jpg`],
   },
 };

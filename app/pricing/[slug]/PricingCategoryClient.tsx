@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Check, Star, ArrowLeft, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatCategoryName, formatPrice } from '@/lib/pricing-format';
 
 interface PricingPackage {
   name: string;
@@ -40,7 +41,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
           <>
             <Image
               src={category.imageUrl}
-              alt={category.name}
+              alt={formatCategoryName(category.name)}
               fill
               sizes="100vw"
               className="object-cover"
@@ -82,7 +83,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
               </motion.div>
 
               <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white mb-4">
-                {category.name}
+                {formatCategoryName(category.name)}
               </h1>
               <p className="text-xl text-gray-200 max-w-2xl">
                 {category.description}
@@ -168,14 +169,14 @@ export default function PricingCategoryClient({ category }: { category: PricingC
 
                     <CardHeader className="text-center pb-4 pt-8">
                       <CardTitle className="text-2xl text-slate-900 mb-2">
-                        {pkg.name}
+                        {formatCategoryName(pkg.name)}
                       </CardTitle>
                       <CardDescription className="text-gray-600 mb-4">
                         {pkg.description}
                       </CardDescription>
                       <div className="mt-4">
                         <span className="text-4xl font-bold text-coral-600">
-                          {pkg.price}
+                          {formatPrice(pkg.price)}
                         </span>
                         {pkg.duration && (
                           <p className="text-sm text-gray-500 mt-2">{pkg.duration}</p>
@@ -188,7 +189,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                         {pkg.includes.map((item, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-gray-700">{item}</span>
+                            <span className="text-sm text-gray-700">{formatPrice(item)}</span>
                           </li>
                         ))}
                       </ul>
@@ -201,7 +202,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                               : 'bg-gold-600 hover:bg-gold-700 text-white'
                           }`}
                         >
-                          Book {pkg.name}
+                          Book {formatCategoryName(pkg.name)}
                         </Button>
                       </Link>
                     </CardContent>

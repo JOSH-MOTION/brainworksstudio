@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
+import { useAuth } from '@/hooks/useAuth';
 import Image from 'next/image';
 import { X, Play, ArrowDown, Edit, Trash2, Eye, Lock, Download, Share2 } from 'lucide-react';
 import Link from 'next/link';
@@ -44,12 +45,18 @@ export default function PortfolioDetailPage({ params }: { params: { id: string }
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const { firebaseUser } = useAuth();
 
   useEffect(() => {
     const fetchItem = async () => {
       try {
         console.log(`Fetching portfolio item: /api/portfolio/${id}`);
-        const response = await fetch(`/api/portfolio/${id}`, { cache: 'no-store' });
+        // Send the admin token so the API includes the download PIN.
+        const token = await firebaseUser?.getIdToken();
+        const response = await fetch(`/api/portfolio/${id}`, {
+          cache: 'no-store',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
         console.log(`Response status: ${response.status}, OK: ${response.ok}`);
         if (!response.ok) {
           const contentType = response.headers.get('content-type');
@@ -76,7 +83,7 @@ export default function PortfolioDetailPage({ params }: { params: { id: string }
       }
     };
     fetchItem();
-  }, [id]);
+  }, [id, firebaseUser]);
 
   const openLightbox = (mediaUrl: string, index: number) => {
     setSelectedMedia(mediaUrl);

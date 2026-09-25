@@ -118,9 +118,6 @@ const teamMembers: TeamMember[] = [
     description: 'With over 4 years of experience, Joshua Doe is a visionary leader dedicated to driving creative excellence and innovation. As the CEO of Brain Works Studio Africa , he leads with passion, turning ideas into impactful visual stories that inspire and connect audiences.',
     profileImageUrl: '/me.jpg',
     socials: [
-      { platform: 'Instagram', url: 'https://instagram.com/johndoe', icon: InstagramIcon },
-      { platform: 'Twitter', url: 'https://twitter.com/johndoe', icon: Twitter },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/johndoe', icon: Linkedin },
     ],
   },
   {
@@ -131,36 +128,31 @@ const teamMembers: TeamMember[] = [
     profileImageUrl: '/mic.jpg',
     socials: [
       { platform: 'Instagram', url: 'https://www.instagram.com/bekoe.films?igsh=MWVlZzdmOHJ5enR3OA%3D%3D&utm_source=qr', icon: InstagramIcon },
-      { platform: 'Twitter', url: 'https://twitter.com/janesmith', icon: Twitter },
-      { platform: 'LinkedIn', url: 'https://linkedin.com/in/janesmith', icon: Linkedin },
     ],
   },
   {
     name: 'Emmanuel Atta',
     position: 'Public Relation',
     years: '3+',
-    description: 'With over 3 years of experience, Emmanuel Atta brings strong teamwork, discipline, and strategic thinking to every role. As a midfielder with a background in client relations, he combines focus and communication to deliver both on and off the field.',
+    description: 'With over 3 years of experience, Emmanuel Atta brings strong teamwork, discipline, and strategic thinking to every role. With a background in client relations, he keeps communication clear and makes sure every client feels looked after from first enquiry to final delivery.',
     profileImageUrl: '/cor.jpg',
     socials: [
-      { platform: 'Instagram', url: 'https://instagram.com/alexbrown', icon: InstagramIcon },
-      { platform: 'Twitter', url: 'https://twitter.com/alexbrown', icon: Twitter },
       { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/emmanuel-atta-435705286?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app', icon: Linkedin },
     ],
   },
   {
-    name: 'JOHNSON COURAGE YAO',
+    name: 'Johnson Courage Yao',
     position: 'Photographer',
     years: '5+',
     description: 'Experienced in the art of photography for over 5 years, this professional specializes in creating captivating visuals that inspire and connect. Their unique approach combines technical skill with a creative vision, producing images that truly stand out.',
     profileImageUrl: '/jon.jpg',
     socials: [
       { platform: 'Instagram', url: 'https://www.instagram.com/mania.studios1?igsh=azc3cW93MmN1dWRy&utm_source=qr', icon: InstagramIcon },
-      { platform: 'Twitter', url: 'https://twitter.com/emilywhite', icon: Twitter },
       { platform: 'LinkedIn', url: 'https://www.linkedin.com/in/courage-johnson-359922364?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=ios_app', icon: Linkedin },
     ],
   },
   {
-    name: ' Albert Makafui Kakabiku',
+    name: 'Albert Makafui Kakabiku',
     position: 'Graphic Designer',
     years: '6+',
     description: 'A passionate graphic designer blending creativity and technology to craft impactful visual designs for brands and businesses.',
@@ -415,6 +407,7 @@ export default function AboutPageClient() {
                         <motion.a
                           key={socialIndex}
                           href={social.url}
+                          aria-label={` on ${social.platform}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           custom={socialIndex}
@@ -560,7 +553,7 @@ export default function AboutPageClient() {
             viewport={{ once: true }}
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {['Ghana, Accra', 'Kumasi, Ghana', 'Los Angeles, CA', 'Chicago, IL'].map((location, index) => (
+            {['Accra, Ghana', 'Kumasi, Ghana', 'Across West Africa'].map((location, index) => (
               <motion.div
                 key={location}
                 custom={index}

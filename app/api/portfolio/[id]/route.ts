@@ -2,6 +2,7 @@
 import { NextResponse, NextRequest } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import { uploadToImageKit } from '@/lib/imagekit';
+import { isAdminRequest, withPinAccess } from '@/lib/portfolio-access';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,8 +37,11 @@ export async function GET(
       pin: data?.pin || data?.downloadPin || null, // Map pin or downloadPin for consistency
     };
 
-    console.log(`GET /api/portfolio/${id}: Returning item`, item);
-    return NextResponse.json(item);
+    // PINs go to verified admins only (lib/portfolio-access.ts).
+    const isAdmin = await isAdminRequest(request);
+    return NextResponse.json(withPinAccess(item, isAdmin), {
+      headers: { 'Cache-Control': 'private, no-store' },
+    });
   } catch (error: any) {
     console.error(`GET /api/portfolio/[id]: Error fetching item:`, error);
     return NextResponse.json(

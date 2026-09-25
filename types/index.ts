@@ -68,7 +68,8 @@ export interface PortfolioItem {
   updatedAt: string;
   createdBy: string;
   clientId: string | null;
-  pin?: string;
+  pin?: string; // only present for admins — see lib/portfolio-access.ts
+  hasPin?: boolean;
 }
 
 export interface Client {

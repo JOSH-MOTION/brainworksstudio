@@ -44,17 +44,31 @@ interface MediaItem {
   filename: string;
 }
 
-export default function PortfolioDetailClient({ id }: { id: string }) {
+// Builds the downloadable media list (video first, then images) for an item.
+function buildMediaList(data: PortfolioItem): MediaItem[] {
+  const media: MediaItem[] = [];
+  if (data.videoUrl && data.type === 'videography') {
+    media.push({ type: 'video', url: data.videoUrl, filename: `${data.title}-video.mp4` });
+  }
+  data.imageUrls.forEach((url, i) => {
+    media.push({ type: 'image', url, filename: `${data.title}-image-${i + 1}.jpg` });
+  });
+  return media;
+}
+
+export default function PortfolioDetailClient({ id, initialItem }: { id: string; initialItem?: PortfolioItem | null }) {
   const router = useRouter();
-  const [item, setItem] = useState<PortfolioItem | null>(null);
-  const [loading, setLoading] = useState(true);
+  // The server page passes the item in so the project renders in the initial HTML
+  // (headline, images) instead of a loading spinner — important for SEO.
+  const [item, setItem] = useState<PortfolioItem | null>(initialItem ?? null);
+  const [loading, setLoading] = useState(!initialItem);
   const [error, setError] = useState('');
   const [pin, setPin] = useState('');
   const [pinError, setPinError] = useState('');
   const [isDownloadAuthorized, setIsDownloadAuthorized] = useState(false);
   const [showPinModal, setShowPinModal] = useState(false);
   const [pendingDownload, setPendingDownload] = useState<MediaItem | null>(null);
-  const [mediaList, setMediaList] = useState<MediaItem[]>([]);
+  const [mediaList, setMediaList] = useState<MediaItem[]>(initialItem ? buildMediaList(initialItem) : []);
   const [showPin, setShowPin] = useState(false);
 
   // ZIP state
@@ -70,11 +84,10 @@ export default function PortfolioDetailClient({ id }: { id: string }) {
   //  Fetch portfolio item
   // ---------------------------------------------------
   useEffect(() => {
+    if (initialItem) return;
     const fetchItem = async () => {
       try {
-        console.log(`Fetching portfolio item: /api/portfolio/${id}`);
         const response = await fetch(`/api/portfolio/${id}`, { cache: 'no-store' });
-        console.log(`Response status: ${response.status}, OK: ${response.ok}`);
         if (!response.ok) {
           const contentType = response.headers.get('content-type');
           console.log(`Content-Type: ${contentType}`);
@@ -90,25 +103,8 @@ export default function PortfolioDetailClient({ id }: { id: string }) {
           throw new Error(errorMessage);
         }
         const data: PortfolioItem = await response.json();
-        console.log('Fetched portfolio item:', data);
         setItem(data);
-
-        const media: MediaItem[] = [];
-        if (data.videoUrl && data.type === 'videography') {
-          media.push({
-            type: 'video',
-            url: data.videoUrl,
-            filename: `${data.title}-video.mp4`,
-          });
-        }
-        data.imageUrls.forEach((url, i) => {
-          media.push({
-            type: 'image',
-            url,
-            filename: `${data.title}-image-${i + 1}.jpg`,
-          });
-        });
-        setMediaList(media);
+        setMediaList(buildMediaList(data));
       } catch (err: any) {
         console.error('Fetch error:', err);
         setError(err.message);
@@ -117,7 +113,7 @@ export default function PortfolioDetailClient({ id }: { id: string }) {
       }
     };
     fetchItem();
-  }, [id]);
+  }, [id, initialItem]);
 
   // ---------------------------------------------------
   //  Single file download
@@ -143,7 +139,7 @@ export default function PortfolioDetailClient({ id }: { id: string }) {
   };
 
   const requestDownload = async (media: MediaItem) => {
-    if (isDownloadAuthorized || !item?.pin) {
+    if (isDownloadAuthorized || !item?.hasPin) {
       await triggerDownload(media.url, media.filename);
       return;
     }
@@ -157,7 +153,7 @@ export default function PortfolioDetailClient({ id }: { id: string }) {
   const downloadAllAsZip = async () => {
     if (!item || mediaList.length === 0) return;
 
-    if (isDownloadAuthorized || !item.pin) {
+    if (isDownloadAuthorized || !item.hasPin) {
       await createZip();
       return;
     }
@@ -368,7 +364,7 @@ export default function PortfolioDetailClient({ id }: { id: string }) {
                 {item.featured && (
                   <Badge className="bg-amber-400 text-black">Featured</Badge>
                 )}
-                {item.pin && (
+                {item.hasPin && (
                   <Badge className="bg-blue-500 text-white">
                     <Lock className="h-3 w-3 mr-1" />
                     PIN Protected

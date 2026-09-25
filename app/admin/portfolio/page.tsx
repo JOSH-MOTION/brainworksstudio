@@ -277,7 +277,12 @@ export default function AdminPortfolioPage() {
 
   const fetchPortfolioItems = async () => {
     try {
-      const response = await fetch('/api/portfolio');
+      // Send the admin token so the API includes download PINs.
+      const token = await firebaseUser?.getIdToken();
+      const response = await fetch('/api/portfolio', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        cache: 'no-store',
+      });
       if (response.ok) {
         const data = await response.json();
         setPortfolioItems(data);

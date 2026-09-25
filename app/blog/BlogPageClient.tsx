@@ -60,13 +60,13 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
               className="text-center max-w-3xl mx-auto"
             >
               <Badge className="mb-4 bg-white/10 text-white border-white/20 px-4 py-1.5 rounded-full font-medium">
-                Blog
+                Insights
               </Badge>
               <h1 className="font-serif text-5xl sm:text-6xl font-bold mb-6 tracking-tight">
                 Stories & Insights
               </h1>
               <p className="text-xl text-gray-300 leading-relaxed">
-                Tips, insights, and inspiration on photography, videography, live streaming, and visual storytelling from Brain Works Studio Africa.
+                Guides and behind-the-scenes stories on production, live streaming, photography and visual storytelling from Brain Works Studio Africa.
               </p>
             </motion.div>
           </div>

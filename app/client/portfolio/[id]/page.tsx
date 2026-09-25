@@ -58,7 +58,8 @@ interface PortfolioItem {
   updatedAt: string;
   createdBy: string;
   clientId: string | null;
-  pin?: string;
+  pin?: string; // admins only
+  hasPin?: boolean;
 }
 
 // ---------------------------------------------------
@@ -93,7 +94,12 @@ export default function ClientPortfolioPage() {
   useEffect(() => {
     const fetchPortfolioItem = async () => {
       try {
-        const response = await fetch(`/api/portfolio/${id}`);
+        // The API only returns the PIN itself to verified admins.
+        const headers: HeadersInit = {};
+        if (isAdmin && firebaseUser) {
+          headers['Authorization'] = `Bearer ${await firebaseUser.getIdToken()}`;
+        }
+        const response = await fetch(`/api/portfolio/${id}`, { headers });
         if (!response.ok) throw new Error('Not found');
         const data: PortfolioItem = await response.json();
         setItem(data);
@@ -125,7 +131,7 @@ export default function ClientPortfolioPage() {
     };
 
     if (id) fetchPortfolioItem();
-  }, [id, router, isAdmin]);
+  }, [id, router, isAdmin, firebaseUser]);
 
   // ---------------------------------------------------
   //  Single file download
@@ -151,7 +157,7 @@ export default function ClientPortfolioPage() {
   };
 
   const requestDownload = async (media: MediaItem) => {
-    if (isAdmin || isDownloadAuthorized || !item?.pin) {
+    if (isAdmin || isDownloadAuthorized || !item?.hasPin) {
       await triggerDownload(media.url, media.filename);
       return;
     }
@@ -165,7 +171,7 @@ export default function ClientPortfolioPage() {
   const downloadAllAsZip = async () => {
     if (!item || mediaList.length === 0) return;
 
-    if (isAdmin || isDownloadAuthorized || !item.pin) {
+    if (isAdmin || isDownloadAuthorized || !item.hasPin) {
       await createZip();
       return;
     }
