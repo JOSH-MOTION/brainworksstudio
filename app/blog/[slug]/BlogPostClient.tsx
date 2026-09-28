@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion } from 'framer-motion';
 import { Calendar, User, ArrowLeft, Clock, Eye, Share2, Twitter, Facebook, Linkedin } from 'lucide-react';
 import Link from 'next/link';
@@ -243,6 +244,32 @@ export default function BlogPostClient({ post }: BlogPostClientProps) {
               )}
             </div>
           </motion.div>
+
+          {/* FAQ Section — only rendered when the post has real authored Q&A */}
+          {post.faq.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="mt-16"
+            >
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-gray-900 mb-6">
+                Frequently Asked Questions
+              </h2>
+              <Accordion type="single" collapsible className="w-full">
+                {post.faq.map((item, index) => (
+                  <AccordionItem key={index} value={`faq-${index}`}>
+                    <AccordionTrigger className="text-left text-base sm:text-lg font-semibold text-gray-900">
+                      {item.question}
+                    </AccordionTrigger>
+                    <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                      {item.answer}
+                    </AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </motion.div>
+          )}
 
           {/* Share Section - Mobile */}
           <motion.div

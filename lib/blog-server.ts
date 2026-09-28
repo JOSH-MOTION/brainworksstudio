@@ -1,6 +1,11 @@
 import { adminDb } from '@/lib/firebase-admin';
 import { DocumentData } from 'firebase-admin/firestore';
 
+export interface ServerBlogFaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface ServerBlogPost {
   id: string;
   title: string;
@@ -11,6 +16,7 @@ export interface ServerBlogPost {
   author: { name: string; uid?: string };
   category: string;
   tags: string[];
+  faq: ServerBlogFaqItem[];
   createdAt: string;
   updatedAt?: string;
   views: number;
@@ -27,6 +33,9 @@ function normalizePost(id: string, data: DocumentData): ServerBlogPost {
     author: data.author || { name: 'Brain Works Studio Africa' },
     category: data.category || '',
     tags: data.tags || [],
+    faq: Array.isArray(data.faq)
+      ? data.faq.filter((f: any) => f?.question && f?.answer)
+      : [],
     createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt || new Date().toISOString(),
     updatedAt: data.updatedAt?.toDate?.()?.toISOString() || data.updatedAt || undefined,
     views: data.views || 0,

@@ -12,9 +12,14 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Plus, Edit, Trash2, Eye, Image as ImageIcon } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Image as ImageIcon, X } from 'lucide-react';
 import { uploadToCloudinary } from '@/lib/cloudinary';
 import Image from 'next/image';
+
+interface BlogFaqItem {
+  question: string;
+  answer: string;
+}
 
 interface BlogPost {
   id: string;
@@ -27,6 +32,7 @@ interface BlogPost {
   category: string;
   tags: string[];
   published: boolean;
+  faq?: BlogFaqItem[];
   createdAt: string;
   views: number;
 }
@@ -48,7 +54,22 @@ export default function AdminBlogPage() {
     category: '',
     tags: '',
     published: false,
+    faq: [] as BlogFaqItem[],
   });
+
+  const addFaqItem = () => {
+    setFormData({ ...formData, faq: [...formData.faq, { question: '', answer: '' }] });
+  };
+
+  const updateFaqItem = (index: number, field: 'question' | 'answer', value: string) => {
+    const faq = [...formData.faq];
+    faq[index] = { ...faq[index], [field]: value };
+    setFormData({ ...formData, faq });
+  };
+
+  const removeFaqItem = (index: number) => {
+    setFormData({ ...formData, faq: formData.faq.filter((_, i) => i !== index) });
+  };
 
   useEffect(() => {
     if (!authLoading && (!user || !isAdmin)) {
@@ -158,6 +179,7 @@ export default function AdminBlogPage() {
       category: post.category,
       tags: post.tags.join(', '),
       published: post.published,
+      faq: post.faq || [],
     });
     setDialogOpen(true);
   };
@@ -171,6 +193,7 @@ export default function AdminBlogPage() {
       category: '',
       tags: '',
       published: false,
+      faq: [],
     });
     setEditingPost(null);
   };
@@ -295,6 +318,60 @@ export default function AdminBlogPage() {
                         className="h-12 rounded-xl border-gray-300 focus:border-gray-900 focus:ring-gray-900"
                       />
                     </div>
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <Label className="text-sm font-semibold text-gray-900 block">
+                        FAQ <span className="font-normal text-gray-500">(optional — adds FAQ schema for search &amp; AI answers)</span>
+                      </Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addFaqItem}
+                        className="rounded-lg"
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add question
+                      </Button>
+                    </div>
+                    {formData.faq.length === 0 ? (
+                      <p className="text-sm text-gray-500 italic">
+                        No FAQ entries yet. Only add real questions with genuine answers — this becomes structured data search engines read directly.
+                      </p>
+                    ) : (
+                      <div className="space-y-4">
+                        {formData.faq.map((item, index) => (
+                          <div key={index} className="p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <Input
+                                value={item.question}
+                                onChange={(e) => updateFaqItem(index, 'question', e.target.value)}
+                                placeholder="Question, e.g. How much does a wedding shoot cost?"
+                                className="h-11 rounded-lg border-gray-300 focus:border-gray-900 focus:ring-gray-900"
+                              />
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => removeFaqItem(index)}
+                                className="shrink-0 text-gray-400 hover:text-red-600"
+                                aria-label="Remove question"
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                            <Textarea
+                              value={item.answer}
+                              onChange={(e) => updateFaqItem(index, 'answer', e.target.value)}
+                              placeholder="Answer in a clear, direct sentence or two"
+                              rows={2}
+                              className="rounded-lg border-gray-300 focus:border-gray-900 focus:ring-gray-900 resize-none"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-200">
                     <Switch

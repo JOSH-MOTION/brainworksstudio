@@ -88,6 +88,11 @@ export interface Contact {
 }
 
 // types/blog.ts
+export interface BlogFaqItem {
+  question: string;
+  answer: string;
+}
+
 export interface BlogPost {
   id: string;
   title: string;
@@ -102,6 +107,7 @@ export interface BlogPost {
   category: string;
   tags: string[];
   published: boolean;
+  faq?: BlogFaqItem[];
   createdAt: Date;
   updatedAt: Date;
   views: number;
