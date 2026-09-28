@@ -4,11 +4,13 @@
 import { useState } from 'react';
 import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatCategoryName } from '@/lib/pricing-format';
+import { PRICING_FAQ } from '@/lib/pricing-faq';
 
 interface PricingCategory {
   id: string;
@@ -142,6 +144,35 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
           )}
         </div>
       </section>
+
+      {/* FAQ Section — only real, admin-confirmed policy answers */}
+      {PRICING_FAQ.length > 0 && (
+        <section className="py-20 bg-white">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5 }}
+              className="font-serif text-3xl sm:text-4xl font-bold text-slate-900 mb-10 text-center"
+            >
+              Frequently Asked Questions
+            </motion.h2>
+            <Accordion type="single" collapsible className="w-full">
+              {PRICING_FAQ.map((item, index) => (
+                <AccordionItem key={index} value={`faq-${index}`}>
+                  <AccordionTrigger className="text-left text-base sm:text-lg font-semibold text-slate-900">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-navy-950">

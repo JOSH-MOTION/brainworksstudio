@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { getPublishedPricingCategories } from '@/lib/pricing-server';
+import { PRICING_FAQ } from '@/lib/pricing-faq';
 import PricingPageClient from './PricingPageClient';
 
 export const dynamic = 'force-dynamic';
@@ -38,7 +39,34 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumbJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: BASE_URL },
+    { '@type': 'ListItem', position: 2, name: 'Pricing', item: `${BASE_URL}/pricing` },
+  ],
+};
+
+const faqJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: PRICING_FAQ.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+
 export default async function PricingPage() {
   const categories = await getPublishedPricingCategories();
-  return <PricingPageClient initialCategories={categories as any} />;
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
+      {PRICING_FAQ.length > 0 && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+      )}
+      <PricingPageClient initialCategories={categories as any} />
+    </>
+  );
 }
