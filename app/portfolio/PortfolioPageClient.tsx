@@ -102,8 +102,9 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8 bg-gray-100"
+        className="w-full bg-white py-16"
       >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
           <motion.h1
@@ -370,6 +371,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
             </motion.div>
           </motion.div>
         )}
+        </div>
       </motion.section>
     </Layout>
   );
