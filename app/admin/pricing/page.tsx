@@ -285,7 +285,7 @@ export default function AdminPricingPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-teal-500 mx-auto"></div>
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gold-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading pricing...</p>
         </div>
       </div>
@@ -306,7 +306,7 @@ export default function AdminPricingPage() {
           if (!open) resetForm();
         }}>
           <DialogTrigger asChild>
-            <Button className="bg-teal-500 hover:bg-teal-600">
+            <Button className="bg-gold-500 hover:bg-gold-600">
               <Plus className="h-4 w-4 mr-2" />
               New Rate Card
             </Button>
@@ -330,7 +330,7 @@ export default function AdminPricingPage() {
                       variant={selectedServiceType === type.value ? "default" : "outline"}
                       className={`flex items-center gap-2 ${
                         selectedServiceType === type.value 
-                          ? 'bg-teal-500 text-white' 
+                          ? 'bg-gold-500 text-white' 
                           : 'border-gray-300'
                       }`}
                       onClick={() => handleServiceTypeChange(type.value as any)}
@@ -348,7 +348,7 @@ export default function AdminPricingPage() {
                   value={formData.category}
                   onValueChange={(value) => setFormData({ ...formData, category: value })}
                 >
-                  <SelectTrigger className="border-gray-300 focus:ring-teal-500">
+                  <SelectTrigger className="border-gray-300 focus:ring-gold-500">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
@@ -367,7 +367,7 @@ export default function AdminPricingPage() {
                   value={formData.serviceName}
                   onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
                   placeholder="e.g., Corporate Video Production"
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
               </div>
 
@@ -378,7 +378,7 @@ export default function AdminPricingPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Brief description of the service"
                   rows={2}
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
               </div>
 
@@ -391,7 +391,7 @@ export default function AdminPricingPage() {
                       value={formData.price}
                       onChange={(e) => setFormData({ ...formData, price: parseGHS(e.target.value) })}
                       placeholder="1500"
-                      className="border-gray-300 focus:ring-teal-500 pl-8"
+                      className="border-gray-300 focus:ring-gold-500 pl-8"
                     />
                   </div>
                 </div>
@@ -401,7 +401,7 @@ export default function AdminPricingPage() {
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
                     placeholder="e.g., 3 hours"
-                    className="border-gray-300 focus:ring-teal-500"
+                    className="border-gray-300 focus:ring-gold-500"
                   />
                 </div>
               </div>
@@ -414,7 +414,7 @@ export default function AdminPricingPage() {
                       value={include}
                       onChange={(e) => handleIncludeChange(index, e.target.value)}
                       placeholder={`Feature ${index + 1}`}
-                      className="border-gray-300 focus:ring-teal-500"
+                      className="border-gray-300 focus:ring-gold-500"
                     />
                     {includesInputs.length > 1 && (
                       <Button
@@ -432,7 +432,7 @@ export default function AdminPricingPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-teal-300 text-teal-500 hover:bg-teal-50"
+                    className="border-gold-300 text-gold-500 hover:bg-gold-50"
                     onClick={handleAddInclude}
                   >
                     <Plus className="h-4 w-4 mr-1" />
@@ -448,7 +448,7 @@ export default function AdminPricingPage() {
                   value={formData.order}
                   onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) || 0 })}
                   placeholder="1"
-                  className="border-gray-300 focus:ring-teal-500"
+                  className="border-gray-300 focus:ring-gold-500"
                 />
               </div>
 
@@ -462,7 +462,7 @@ export default function AdminPricingPage() {
 
               <Button
                 onClick={handleSubmit}
-                className="w-full bg-teal-500 hover:bg-teal-600"
+                className="w-full bg-gold-500 hover:bg-gold-600"
               >
                 {editingCard ? 'Update Rate Card' : 'Create Rate Card'}
               </Button>
@@ -498,7 +498,7 @@ export default function AdminPricingPage() {
         {filteredRateCards.map((card) => (
           <Card
             key={card.id || card.serviceName}
-            className={card.featured ? 'border-2 border-teal-500' : 'border-gray-200'}
+            className={card.featured ? 'border-2 border-gold-500' : 'border-gray-200'}
           >
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
@@ -507,12 +507,12 @@ export default function AdminPricingPage() {
                     {getServiceTypeIcon(card.serviceType)}
                     {card.serviceType.charAt(0).toUpperCase() + card.serviceType.slice(1)}
                   </Badge>
-                  <Badge variant="outline" className="text-xs border-teal-300 text-teal-600">
+                  <Badge variant="outline" className="text-xs border-gold-300 text-gold-600">
                     {card.category}
                   </Badge>
                 </div>
                 {card.featured && (
-                  <Badge className="bg-teal-100 text-teal-700 flex items-center gap-1">
+                  <Badge className="bg-gold-100 text-gold-700 flex items-center gap-1">
                     <Star className="h-3 w-3" />
                     Featured
                   </Badge>
@@ -521,7 +521,7 @@ export default function AdminPricingPage() {
               <CardTitle className="text-lg text-gray-900">{card.serviceName}</CardTitle>
               <CardDescription>{card.description}</CardDescription>
               <div className="mt-3 flex items-baseline gap-2">
-                <span className="text-2xl font-bold text-teal-500">{card.price}</span>
+                <span className="text-2xl font-bold text-gold-500">{card.price}</span>
               </div>
               {card.duration && (
                 <p className="text-sm text-gray-500 mt-1">{card.duration}</p>
@@ -540,7 +540,7 @@ export default function AdminPricingPage() {
                 <Button
                   variant="outline"
                   size="sm"
-                  className="flex-1 border-teal-300 text-teal-500 hover:bg-teal-50"
+                  className="flex-1 border-gold-300 text-gold-500 hover:bg-gold-50"
                   onClick={() => handleEdit(card)}
                 >
                   <Edit className="h-4 w-4 mr-1" />

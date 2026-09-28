@@ -84,7 +84,7 @@ export default function DashboardPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'accepted':
-        return 'bg-teal-500 text-white hover:bg-teal-600';
+        return 'bg-gold-500 text-white hover:bg-gold-600';
       case 'rejected':
         return 'bg-red-500 text-white hover:bg-coral-600';
       default:
@@ -118,7 +118,7 @@ export default function DashboardPage() {
         {/* Header Section */}
         <motion.div
           variants={sectionVariants}
-          className="bg-gradient-to-r from-teal-500 to-coral-500 rounded-2xl p-6 mb-8 shadow-lg"
+          className="bg-gradient-to-r from-gold-500 to-coral-500 rounded-2xl p-6 mb-8 shadow-lg"
         >
           <div className="flex items-center gap-4">
             {userProfile?.profileImageUrl ? (
@@ -137,14 +137,14 @@ export default function DashboardPage() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <User className="h-8 w-8 text-[#001F44]" />
+                <User className="h-8 w-8 text-navy-900" />
               </motion.div>
             )}
             <div>
               <h1 className="text-3xl font-bold text-white">
                 Welcome, {userProfile?.displayName || 'User'}!
               </h1>
-              <p className="text-teal-100">Manage your bookings and explore your photography journey.</p>
+              <p className="text-gold-100">Manage your bookings and explore your photography journey.</p>
             </div>
           </div>
         </motion.div>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
             className="text-center text-red-600 mb-6"
           >
             <p>Error: {error}</p>
-            <Button onClick={fetchBookings} className="mt-4 bg-teal-500 text-white">
+            <Button onClick={fetchBookings} className="mt-4 bg-gold-500 text-white">
               Retry
             </Button>
           </motion.div>
@@ -172,26 +172,26 @@ export default function DashboardPage() {
             {
               title: 'Book New Session',
               description: 'Schedule your next photography session',
-              icon: <Camera className="h-6 w-6 text-[#001F44]" />,
+              icon: <Camera className="h-6 w-6 text-navy-900" />,
               link: '/booking',
               buttonText: 'Book Now',
-              buttonClass: 'bg-teal-500 hover:bg-teal-600 text-white',
+              buttonClass: 'bg-gold-500 hover:bg-gold-600 text-white',
             },
             {
               title: 'Update Profile',
               description: 'Edit your personal information',
-              icon: <User className="h-6 w-6 text-[#001F44]" />,
+              icon: <User className="h-6 w-6 text-navy-900" />,
               link: '/profile',
               buttonText: 'Edit Profile',
-              buttonClass: 'border-teal-500 text-teal-500 hover:bg-teal-100',
+              buttonClass: 'border-gold-500 text-gold-500 hover:bg-gold-100',
             },
             {
               title: 'View Portfolio',
               description: 'Browse our latest work',
-              icon: <Camera className="h-6 w-6 text-[#001F44]" />,
+              icon: <Camera className="h-6 w-6 text-navy-900" />,
               link: '/portfolio',
               buttonText: 'View Gallery',
-              buttonClass: 'border-teal-500 text-teal-500 hover:bg-teal-100',
+              buttonClass: 'border-gold-500 text-gold-500 hover:bg-gold-100',
             },
           ].map((action, index) => (
             <motion.div
@@ -206,12 +206,12 @@ export default function DashboardPage() {
               <Card className="text-center bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300">
                 <CardContent className="p-6">
                   <motion.div
-                    className="p-3 bg-teal-100 rounded-full w-fit mx-auto mb-4"
+                    className="p-3 bg-gold-100 rounded-full w-fit mx-auto mb-4"
                     whileHover={{ rotate: 360, transition: { duration: 0.5 } }}
                   >
                     {action.icon}
                   </motion.div>
-                  <h3 className="font-semibold text-[#001F44] mb-2">{action.title}</h3>
+                  <h3 className="font-semibold text-navy-900 mb-2">{action.title}</h3>
                   <p className="text-gray-600 text-sm mb-4">{action.description}</p>
                   <Link href={action.link}>
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         <motion.div variants={sectionVariants}>
           <Card className="bg-white rounded-xl shadow-md">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-[#001F44]">
+              <CardTitle className="flex items-center gap-2 text-navy-900">
                 <Calendar className="h-5 w-5" />
                 Recent Bookings
               </CardTitle>
@@ -239,8 +239,8 @@ export default function DashboardPage() {
             <CardContent>
               {loading ? (
                 <div className="text-center">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-teal-500 mx-auto"></div>
-                  <p className="mt-4 text-[#001F44] text-lg font-medium">Loading bookings...</p>
+                  <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-gold-500 mx-auto"></div>
+                  <p className="mt-4 text-navy-900 text-lg font-medium">Loading bookings...</p>
                 </div>
               ) : bookings.length === 0 ? (
                 <motion.div
@@ -250,11 +250,11 @@ export default function DashboardPage() {
                   className="text-center py-8"
                 >
                   <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-[#001F44] mb-2">No bookings yet</h3>
+                  <h3 className="text-lg font-medium text-navy-900 mb-2">No bookings yet</h3>
                   <p className="text-gray-600 mb-4">Start by booking your first photography session!</p>
                   <Link href="/booking">
                     <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                      <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full">
+                      <Button className="bg-gold-500 hover:bg-gold-600 text-white rounded-full">
                         Book Your First Session
                       </Button>
                     </motion.div>
@@ -269,36 +269,36 @@ export default function DashboardPage() {
                       initial="hidden"
                       animate="visible"
                       transition={{ delay: index * 0.1 }}
-                      className="relative border-l-4 border-teal-500 bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-all duration-300"
+                      className="relative border-l-4 border-gold-500 bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition-all duration-300"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-lg font-semibold text-[#001F44]">{booking.serviceCategory}</h3>
+                            <h3 className="text-lg font-semibold text-navy-900">{booking.serviceCategory}</h3>
                             <Badge className={getStatusColor(booking.status)}>
                               {getStatusText(booking.status)}
                             </Badge>
                           </div>
                           <div className="space-y-2 text-sm text-gray-600">
                             <div className="flex items-center gap-2">
-                              <Calendar className="h-4 w-4 text-teal-500" />
+                              <Calendar className="h-4 w-4 text-gold-500" />
                               <span>{new Date(booking.startDateTime).toLocaleDateString()}</span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <Clock className="h-4 w-4 text-teal-500" />
+                              <Clock className="h-4 w-4 text-gold-500" />
                               <span>
                                 {new Date(booking.startDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
                                 {new Date(booking.endDateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </span>
                             </div>
                             <div className="flex items-center gap-2">
-                              <MapPin className="h-4 w-4 text-teal-500" />
+                              <MapPin className="h-4 w-4 text-gold-500" />
                               <span>{booking.location.address}</span>
                             </div>
                           </div>
                           {booking.additionalNotes && (
-                            <div className="mt-3 p-3 bg-teal-50 rounded-md">
-                              <p className="text-sm text-[#001F44]">
+                            <div className="mt-3 p-3 bg-gold-50 rounded-md">
+                              <p className="text-sm text-navy-900">
                                 <strong>Notes:</strong> {booking.additionalNotes}
                               </p>
                             </div>
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                     >
                       <Link href="/bookings">
                         <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
-                          <Button variant="outline" className="rounded-full border-teal-500 text-teal-500 hover:bg-teal-100">
+                          <Button variant="outline" className="rounded-full border-gold-500 text-gold-500 hover:bg-gold-100">
                             View All Bookings ({bookings.length})
                           </Button>
                         </motion.div>

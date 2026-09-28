@@ -95,14 +95,14 @@ export default function AdminSignupPage() {
 
   return (
     <Layout>
-      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-teal-50 to-white">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gold-50 to-white">
         <motion.div
           variants={formVariants}
           initial="hidden"
           animate="visible"
           className="w-full max-w-md"
         >
-          <Card className="rounded-2xl bg-white shadow-lg border border-teal-200">
+          <Card className="rounded-2xl bg-white shadow-lg border border-gold-200">
             <CardHeader className="text-center">
               <motion.div variants={logoVariants} className="mx-auto mb-4">
                 <Image
@@ -113,7 +113,7 @@ export default function AdminSignupPage() {
                   className="object-contain"
                 />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-[#001F44]">Admin Registration</CardTitle>
+              <CardTitle className="text-3xl font-bold text-navy-900">Admin Registration</CardTitle>
               <CardDescription className="text-gray-600">
                 Create an administrator account for Brain Works Studio Africa
               </CardDescription>
@@ -121,7 +121,7 @@ export default function AdminSignupPage() {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-5">
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="displayName" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="displayName" className="text-navy-900 font-semibold">
                     Full Name
                   </Label>
                   <Input
@@ -132,12 +132,12 @@ export default function AdminSignupPage() {
                     onChange={handleChange}
                     required
                     placeholder="Your full name"
-                    className="border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                    className="border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                   />
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="email" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="email" className="text-navy-900 font-semibold">
                     Email
                   </Label>
                   <Input
@@ -148,12 +148,12 @@ export default function AdminSignupPage() {
                     onChange={handleChange}
                     required
                     placeholder="admin@brainworksstudio.com"
-                    className="border-teal-300 focus:border-teal-500 focus:ring-teal-500"
+                    className="border-gold-300 focus:border-gold-500 focus:ring-gold-500"
                   />
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="password" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="password" className="text-navy-900 font-semibold">
                     Password
                   </Label>
                   <div className="relative">
@@ -165,12 +165,12 @@ export default function AdminSignupPage() {
                       onChange={handleChange}
                       required
                       placeholder="••••••••"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gold-600 hover:text-gold-700"
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -178,7 +178,7 @@ export default function AdminSignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="confirmPassword" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="confirmPassword" className="text-navy-900 font-semibold">
                     Confirm Password
                   </Label>
                   <div className="relative">
@@ -190,12 +190,12 @@ export default function AdminSignupPage() {
                       onChange={handleChange}
                       required
                       placeholder="••••••••"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gold-600 hover:text-gold-700"
                     >
                       {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -203,7 +203,7 @@ export default function AdminSignupPage() {
                 </motion.div>
 
                 <motion.div variants={inputVariants} className="space-y-2">
-                  <Label htmlFor="adminCode" className="text-[#001F44] font-semibold">
+                  <Label htmlFor="adminCode" className="text-navy-900 font-semibold">
                     Admin Access Code
                   </Label>
                   <div className="relative">
@@ -215,12 +215,12 @@ export default function AdminSignupPage() {
                       onChange={handleChange}
                       required
                       placeholder="Enter admin access code"
-                      className="border-teal-300 focus:border-teal-500 focus:ring-teal-500 pr-10"
+                      className="border-gold-300 focus:border-gold-500 focus:ring-gold-500 pr-10"
                     />
                     <button
                       type="button"
                       onClick={() => setShowAdminCode(!showAdminCode)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-teal-600 hover:text-teal-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gold-600 hover:text-gold-700"
                     >
                       {showAdminCode ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                     </button>
@@ -243,7 +243,7 @@ export default function AdminSignupPage() {
                 <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
                   <Button
                     type="submit"
-                    className="w-full bg-teal-600 hover:bg-teal-700 text-white"
+                    className="w-full bg-gold-600 hover:bg-gold-700 text-white"
                     disabled={loading}
                   >
                     {loading ? 'Creating Admin Account...' : 'Create Admin Account'}
@@ -254,13 +254,13 @@ export default function AdminSignupPage() {
               <div className="mt-6 text-center">
                 <p className="text-sm text-gray-600">
                   Regular user?{' '}
-                  <Link href="/auth/signup" className="text-teal-600 hover:text-teal-700 font-medium">
+                  <Link href="/auth/signup" className="text-gold-600 hover:text-gold-700 font-medium">
                     Sign up here
                   </Link>
                 </p>
                 <p className="text-sm text-gray-600 mt-2">
                   Already have an account?{' '}
-                  <Link href="/auth/login" className="text-teal-600 hover:text-teal-700 font-medium">
+                  <Link href="/auth/login" className="text-gold-600 hover:text-gold-700 font-medium">
                     Sign in
                   </Link>
                 </p>

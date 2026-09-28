@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { Check, Star, ArrowLeft, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatCategoryName, formatPrice } from '@/lib/pricing-format';
 
 interface PricingPackage {
   name: string;
@@ -40,7 +41,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
           <>
             <Image
               src={category.imageUrl}
-              alt={category.name}
+              alt={formatCategoryName(category.name)}
               fill
               sizes="100vw"
               className="object-cover"
@@ -52,7 +53,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
             <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-transparent" />
           </>
         ) : (
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900" />
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-gold-900" />
         )}
 
         <div className="absolute inset-0 flex items-center">
@@ -63,7 +64,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
               transition={{ duration: 0.6 }}
             >
               <Link href="/pricing">
-                <Button variant="ghost" className="text-white hover:text-teal-400 mb-6 -ml-2">
+                <Button variant="ghost" className="text-white hover:text-gold-400 mb-6 -ml-2">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to All Categories
                 </Button>
@@ -75,14 +76,14 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-4"
               >
-                <Sparkles className="w-4 h-4 text-teal-400" />
+                <Sparkles className="w-4 h-4 text-gold-400" />
                 <span className="text-sm text-white font-medium">
                   {category.packages.length} {category.packages.length === 1 ? 'Package' : 'Packages'} Available
                 </span>
               </motion.div>
 
               <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white mb-4">
-                {category.name}
+                {formatCategoryName(category.name)}
               </h1>
               <p className="text-xl text-gray-200 max-w-2xl">
                 {category.description}
@@ -168,14 +169,14 @@ export default function PricingCategoryClient({ category }: { category: PricingC
 
                     <CardHeader className="text-center pb-4 pt-8">
                       <CardTitle className="text-2xl text-slate-900 mb-2">
-                        {pkg.name}
+                        {formatCategoryName(pkg.name)}
                       </CardTitle>
                       <CardDescription className="text-gray-600 mb-4">
                         {pkg.description}
                       </CardDescription>
                       <div className="mt-4">
                         <span className="text-4xl font-bold text-coral-600">
-                          {pkg.price}
+                          {formatPrice(pkg.price)}
                         </span>
                         {pkg.duration && (
                           <p className="text-sm text-gray-500 mt-2">{pkg.duration}</p>
@@ -188,7 +189,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                         {pkg.includes.map((item, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                            <span className="text-sm text-gray-700">{item}</span>
+                            <span className="text-sm text-gray-700">{formatPrice(item)}</span>
                           </li>
                         ))}
                       </ul>
@@ -198,10 +199,10 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                           className={`w-full ${
                             pkg.featured
                               ? 'bg-coral-500 hover:bg-coral-600 text-white shadow-lg'
-                              : 'bg-teal-600 hover:bg-teal-700 text-white'
+                              : 'bg-gold-600 hover:bg-gold-700 text-white'
                           }`}
                         >
-                          Book {pkg.name}
+                          Book {formatCategoryName(pkg.name)}
                         </Button>
                       </Link>
                     </CardContent>
@@ -214,7 +215,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-gradient-to-br from-slate-950 via-slate-900 to-teal-950">
+      <section className="py-16 bg-gradient-to-br from-slate-950 via-slate-900 to-navy-950">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -235,7 +236,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
               </Button>
             </Link>
             <Link href="/pricing">
-              <Button variant="outline" className="border-white/30 text-teal-500 hover:text-white hover:bg-white/10 font-bold px-8 py-6 rounded-full">
+              <Button variant="outline" className="border-white/30 text-gold-500 hover:text-white hover:bg-white/10 font-bold px-8 py-6 rounded-full">
                 View Other Categories
               </Button>
             </Link>

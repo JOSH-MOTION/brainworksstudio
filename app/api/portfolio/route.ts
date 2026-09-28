@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import { adminDb, adminAuth } from '@/lib/firebase-admin';
 import { uploadToImageKit } from '@/lib/imagekit';
 import { PortfolioItem } from '@/types';
+import { isAdminRequest, withPinAccess } from '@/lib/portfolio-access';
 import { Query, CollectionReference, DocumentData } from 'firebase-admin/firestore';
 
 export const dynamic = 'force-dynamic';
@@ -74,9 +75,11 @@ export async function GET(request: NextRequest) {
     portfolioItems.sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1));
     console.log(`GET /api/portfolio: Returning ${portfolioItems.length} items`);
 
-    return NextResponse.json(portfolioItems, {
+    // PINs go to verified admins only, and admin responses must never be cached publicly.
+    const isAdmin = await isAdminRequest(request);
+    return NextResponse.json(portfolioItems.map((item) => withPinAccess(item, isAdmin)), {
       headers: {
-        'Cache-Control': 'public, max-age=60, stale-while-revalidate=300',
+        'Cache-Control': isAdmin ? 'private, no-store' : 'public, max-age=60, stale-while-revalidate=300',
       },
     });
   } catch (error: any) {

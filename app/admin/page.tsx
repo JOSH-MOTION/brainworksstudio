@@ -89,7 +89,7 @@ export default function AdminDashboard() {
 
   if (loading || loadingStats) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-coral-50 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gold-50 to-coral-50 dark:from-gray-900 dark:to-gray-800">
         <div className="text-center">
           <motion.div
             animate={{ rotate: 360 }}
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-teal-50 text-gray-900'} transition-colors duration-300`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-gray-100' : 'bg-gold-50 text-gray-900'} transition-colors duration-300`}>
       <motion.header
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
@@ -136,18 +136,18 @@ export default function AdminDashboard() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5 }}
               >
-                <User className="h-6 w-6 text-[#001F44] dark:text-teal-400" />
+                <User className="h-6 w-6 text-navy-900 dark:text-gold-400" />
               </motion.div>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-[#001F44] dark:text-teal-300">Studio Dashboard</h1>
+              <h1 className="text-2xl font-bold text-navy-900 dark:text-gold-300">Studio Dashboard</h1>
               <p className="text-sm text-gray-600 dark:text-gray-400">Welcome, {userProfile?.displayName || user.displayName || 'User'}</p>
             </div>
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link href="/admin/profile">
                 <Button
                   variant="outline"
-                  className="ml-4 border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-[#001F44] rounded-full"
+                  className="ml-4 border-gold-300 text-gold-600 dark:border-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-navy-900 rounded-full"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Profile
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
           <Button
             onClick={toggleTheme}
             variant="outline"
-            className="border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-[#001F44] rounded-full"
+            className="border-gold-300 text-gold-600 dark:border-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-navy-900 rounded-full"
           >
             {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
           </Button>
@@ -221,8 +221,8 @@ export default function AdminDashboard() {
             <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow">
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="p-2 bg-teal-100 dark:bg-[#001F44]/50 rounded-full">
-                    <Calendar className="h-6 w-6 text-teal-600 dark:text-teal-400" />
+                  <div className="p-2 bg-gold-100 dark:bg-navy-900/50 rounded-full">
+                    <Calendar className="h-6 w-6 text-gold-600 dark:text-gold-400" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Bookings</p>
@@ -313,7 +313,7 @@ export default function AdminDashboard() {
           <motion.div variants={cardVariants}>
             <Card className="bg-white dark:bg-gray-800 shadow-lg hover:shadow-xl transition-shadow">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-teal-600 dark:text-teal-400">
+                <CardTitle className="flex items-center gap-2 text-gold-600 dark:text-gold-400">
                   <Users className="h-5 w-5" />
                   Client Management
                 </CardTitle>
@@ -324,14 +324,14 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   <Link href="/admin/users">
-                    <Button className="w-full bg-teal-600 hover:bg-teal-700 dark:bg-teal-500 dark:hover:bg-teal-600 text-white rounded-lg">
+                    <Button className="w-full bg-gold-600 hover:bg-gold-700 dark:bg-gold-500 dark:hover:bg-gold-600 text-white rounded-lg">
                       View Clients
                     </Button>
                   </Link>
                   <Link href="/admin/users?role=admin">
                     <Button
                       variant="outline"
-                      className="w-full border-teal-300 text-teal-600 dark:border-teal-500 dark:text-teal-400 hover:bg-teal-100 dark:hover:bg-[#001F44]/50 rounded-lg"
+                      className="w-full border-gold-300 text-gold-600 dark:border-gold-500 dark:text-gold-400 hover:bg-gold-100 dark:hover:bg-navy-900/50 rounded-lg"
                     >
                       Team Members
                     </Button>
@@ -391,8 +391,8 @@ export default function AdminDashboard() {
                       className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
                     >
                       <div className="flex items-center gap-4">
-                        <div className="p-2 bg-teal-100 dark:bg-[#001F44]/50 rounded-full">
-                          <Calendar className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                        <div className="p-2 bg-gold-100 dark:bg-navy-900/50 rounded-full">
+                          <Calendar className="h-4 w-4 text-gold-600 dark:text-gold-400" />
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 dark:text-gray-100">{booking.serviceCategory} Request</p>

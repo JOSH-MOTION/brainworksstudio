@@ -238,9 +238,9 @@ export default function BookingPage() {
           variants={sectionVariants}
           className="min-h-screen flex items-center justify-center"
         >
-          <Card className="max-w-md mx-auto bg-teal-50 border-coral-100 rounded-xl shadow-sm">
+          <Card className="max-w-md mx-auto bg-gold-50 border-coral-100 rounded-xl shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl text-[#001F44]">Please Sign In</CardTitle>
+              <CardTitle className="text-xl text-navy-900">Please Sign In</CardTitle>
               <CardDescription className="text-sm text-gray-600">
                 You need to be signed in to book a session.
               </CardDescription>
@@ -249,7 +249,7 @@ export default function BookingPage() {
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Button
                   onClick={() => router.push('/auth/login')}
-                  className="w-full bg-teal-500 hover:bg-teal-600 text-white rounded-full"
+                  className="w-full bg-gold-500 hover:bg-gold-600 text-white rounded-full"
                 >
                   Sign In
                 </Button>
@@ -270,7 +270,7 @@ export default function BookingPage() {
           variants={sectionVariants}
           className="min-h-screen flex items-center justify-center"
         >
-          <Card className="max-w-md mx-auto bg-teal-50 border-coral-100 rounded-xl shadow-sm text-center">
+          <Card className="max-w-md mx-auto bg-gold-50 border-coral-100 rounded-xl shadow-sm text-center">
             <CardContent className="p-6">
               <motion.div
                 variants={messageVariants}
@@ -280,7 +280,7 @@ export default function BookingPage() {
                 <div className="mx-auto mb-3 p-2 bg-coral-50 rounded-full w-fit">
                   <CheckCircle className="h-6 w-6 text-coral-500" />
                 </div>
-                <h2 className="text-xl font-bold text-[#001F44] mb-2">Booking Submitted!</h2>
+                <h2 className="text-xl font-bold text-navy-900 mb-2">Booking Submitted!</h2>
                 <p className="text-sm text-gray-600 mb-3">
                   Thank you for your booking request. We'll respond within 24 hours.
                 </p>
@@ -302,13 +302,13 @@ export default function BookingPage() {
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="relative min-h-[30vh] flex items-center justify-center bg-teal-50"
+        className="relative min-h-[30vh] flex items-center justify-center bg-gold-50"
       >
         <motion.div
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="font-serif text-2xl md:text-3xl font-bold text-[#001F44] mb-3">
+          <motion.h1 className="font-serif text-2xl md:text-3xl font-bold text-navy-900 mb-3">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}
@@ -340,9 +340,9 @@ export default function BookingPage() {
         variants={sectionVariants}
         className="max-w-3xl mx-auto py-8 px-4 sm:px-6 lg:px-8"
       >
-        <Card className="bg-teal-50 border-coral-100 rounded-xl shadow-sm">
+        <Card className="bg-gold-50 border-coral-100 rounded-xl shadow-sm">
           <CardHeader>
-            <CardTitle className="text-xl text-[#001F44]">Book a Session</CardTitle>
+            <CardTitle className="text-xl text-navy-900">Book a Session</CardTitle>
             <CardDescription className="text-sm text-gray-600">
               Share your project details, and we'll provide a personalized quote.
             </CardDescription>
@@ -358,11 +358,11 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="serviceCategory" className="text-sm text-[#001F44]">
+                <Label htmlFor="serviceCategory" className="text-sm text-navy-900">
                   Service Type
                 </Label>
                 <Select onValueChange={handleSelectChange} value={formData.serviceCategory}>
-                  <SelectTrigger className="border-coral-200 focus:ring-teal-500 rounded-md">
+                  <SelectTrigger className="border-coral-200 focus:ring-gold-500 rounded-md">
                     <SelectValue placeholder="Select a service" />
                   </SelectTrigger>
                   <SelectContent>
@@ -385,7 +385,7 @@ export default function BookingPage() {
                   viewport={{ once: true }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="serviceName" className="text-sm text-[#001F44]">
+                  <Label htmlFor="serviceName" className="text-sm text-navy-900">
                     Selected Package
                   </Label>
                   <Input
@@ -435,7 +435,7 @@ export default function BookingPage() {
                     viewport={{ once: true }}
                     className="space-y-2"
                   >
-                    <Label htmlFor={field.id} className="text-sm text-[#001F44] flex items-center">
+                    <Label htmlFor={field.id} className="text-sm text-navy-900 flex items-center">
                       <field.icon className="h-4 w-4 mr-1 text-coral-500" />
                       {field.label}
                     </Label>
@@ -447,7 +447,7 @@ export default function BookingPage() {
                       onChange={handleChange}
                       min={field.type === 'date' ? new Date().toISOString().split('T')[0] : undefined}
                       required={field.required}
-                      className="border-coral-200 focus:ring-teal-500 rounded-md text-sm"
+                      className="border-coral-200 focus:ring-gold-500 rounded-md text-sm"
                     />
                   </motion.div>
                 ))}
@@ -462,7 +462,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="address" className="text-sm text-[#001F44] flex items-center">
+                <Label htmlFor="address" className="text-sm text-navy-900 flex items-center">
                   <MapPin className="h-4 w-4 mr-1 text-coral-500" />
                   Location Address
                 </Label>
@@ -473,7 +473,7 @@ export default function BookingPage() {
                   onChange={handleChange}
                   placeholder="Enter the session location"
                   required
-                  className="border-coral-200 focus:ring-teal-500 rounded-md text-sm"
+                  className="border-coral-200 focus:ring-gold-500 rounded-md text-sm"
                 />
               </motion.div>
 
@@ -486,7 +486,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="additionalNotes" className="text-sm text-[#001F44]">
+                <Label htmlFor="additionalNotes" className="text-sm text-navy-900">
                   Additional Notes
                 </Label>
                 <Textarea
@@ -496,7 +496,7 @@ export default function BookingPage() {
                   onChange={handleChange}
                   placeholder="Share your project details, special requests, or creative vision..."
                   rows={6}
-                  className="border-coral-200 focus:ring-teal-500 rounded-md text-sm"
+                  className="border-coral-200 focus:ring-gold-500 rounded-md text-sm"
                 />
               </motion.div>
 
@@ -509,7 +509,7 @@ export default function BookingPage() {
                 viewport={{ once: true }}
                 className="space-y-2"
               >
-                <Label htmlFor="attachments" className="text-sm text-[#001F44] flex items-center">
+                <Label htmlFor="attachments" className="text-sm text-navy-900 flex items-center">
                   <Upload className="h-4 w-4 mr-1 text-coral-500" />
                   Reference Images (Optional)
                 </Label>
@@ -560,7 +560,7 @@ export default function BookingPage() {
               >
                 <Button
                   type="submit"
-                  className="w-full bg-teal-500 hover:bg-teal-600 text-white rounded-full text-sm py-2"
+                  className="w-full bg-gold-500 hover:bg-gold-600 text-white rounded-full text-sm py-2"
                   disabled={loading || !formData.serviceCategory || !formData.date || !formData.startTime || !formData.endTime || !formData.address}
                 >
                   {loading ? 'Submitting Booking...' : 'Submit Booking Request'}

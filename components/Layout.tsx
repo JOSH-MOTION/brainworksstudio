@@ -5,11 +5,23 @@ import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Camera, User, LogOut, Menu, Instagram, Twitter, Facebook, Send, Linkedin } from 'lucide-react';
+import { LogOut, Menu, X, Instagram, Twitter, Facebook, Send, Linkedin, MessageCircle, Phone, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { motion, AnimatePresence, Variants } from 'framer-motion';
+import { motion, AnimatePresence, MotionConfig, Variants } from 'framer-motion';
 import Image from 'next/image';
+import { SITE, SERVICE_PILLARS } from '@/lib/site-config';
+
+const NAV_ITEMS = [
+  { href: '/portfolio', label: 'Work' },
+  { href: '/services', label: 'Services' },
+  { href: '/about', label: 'About' },
+  { href: '/pricing', label: 'Pricing' },
+  { href: '/blog', label: 'Insights' },
+  { href: '/contact', label: 'Contact' },
+];
+
+const isActive = (pathname: string, href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
 // Animation variants for header
 const headerVariants: Variants = {
@@ -130,8 +142,10 @@ export default function RootLayout({ children }: LayoutProps) {
   };
 
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen font-sans">
-        {/* Header - Conditional Background Based on Route and Screen Size */}
+        {/* Header - transparent over the homepage hero (all screen sizes); fills in with navy
+            once the visitor scrolls, opens the mobile menu, or is on any other page */}
         <motion.header
           initial="hidden"
           animate={showNavbar ? "visible" : "hidden"}
@@ -140,43 +154,34 @@ export default function RootLayout({ children }: LayoutProps) {
             visible: { opacity: 1, y: 0 },
           }}
           transition={{ duration: 0.3 }}
-          className={`fixed top-0 left-0 w-full backdrop-blur-md z-50 ${
-            pathname === '/' ? 'bg-slate-900/95 lg:bg-transparent' : 'bg-slate-900/95'
+          className={`fixed top-0 left-0 w-full z-50 transition-colors duration-300 ${
+            pathname !== '/' || lastScrollY > 80 || mobileMenuOpen
+              ? 'bg-navy-900/95 backdrop-blur-md'
+              : 'bg-transparent'
           }`}
         >
           <div className="max-w-[95%] mx-auto px-4 sm:px-6">
             <div className="flex justify-between items-center h-20">
               {/* Logo - Left Aligned */}
-              <Link href="/" className="flex items-center space-x-2 group">
+              <Link href="/" className="flex items-center" aria-label="Brain Works Studio Africa — home">
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
+                  whileHover={{ scale: 1.03 }}
                   transition={{ duration: 0.3, type: 'spring' }}
                 >
                   <Image
-                    src="/newlogo3.png"
-                    alt="Brain Works Studio Africa Logo"
-                    width={40}
-                    height={40}
-                    className="drop-shadow-[0_0_8px_rgba(20,184,166,0.3)]"
+                    src="/logo-white.png"
+                    alt="Brain Works Studio Africa"
+                    width={112}
+                    height={48}
+                    priority
+                    className="h-7 w-auto lg:h-8"
                   />
                 </motion.div>
-                <span className="text-lg font-bold tracking-[0.15em] text-white uppercase group-hover:text-teal-400 transition-colors duration-300">
-                  BWSA
-                </span>
               </Link>
 
               {/* Desktop Navigation - Right Aligned with small text */}
-              <nav className="hidden lg:flex items-center space-x-8">
-                {[
-                  { href: '/', label: 'Home' },
-                  { href: '/portfolio', label: 'Portfolio' },
-                  { href: '/services', label: 'Services' },
-                  { href: '/pricing', label: 'Pricing' },
-                  { href: '/blog', label: 'Blog' },
-                  { href: '/about', label: 'About' },
-                  { href: '/contact', label: 'Contact' },
-                  { href: '/booking', label: 'Book' },
-                ].map((item, index) => (
+              <nav className="hidden lg:flex items-center space-x-8" aria-label="Main">
+                {NAV_ITEMS.map((item, index) => (
                   <motion.div
                     key={item.href}
                     custom={index}
@@ -188,9 +193,10 @@ export default function RootLayout({ children }: LayoutProps) {
                   >
                     <Link
                       href={item.href}
+                      aria-current={isActive(pathname, item.href) ? 'page' : undefined}
                       className={`text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
-                        pathname === item.href
-                          ? 'text-white'
+                        isActive(pathname, item.href)
+                          ? 'text-gold-300'
                           : 'text-white/80 hover:text-white'
                       }`}
                     >
@@ -199,9 +205,16 @@ export default function RootLayout({ children }: LayoutProps) {
                   </motion.div>
                 ))}
 
+                <Link
+                  href="/contact"
+                  className="rounded-full bg-gold-500 px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-lg shadow-gold-500/20 transition-colors hover:bg-gold-400"
+                >
+                  Start a Project
+                </Link>
+
                 {/* User Auth Section */}
                 {user ? (
-                  <div className="flex items-center space-x-6 ml-4">
+                  <div className="flex items-center space-x-6 ml-2 pl-6 border-l border-white/15">
                     <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
                       <Link href="/dashboard" className="text-xs font-medium text-white/80 hover:text-white uppercase tracking-wider transition-colors">
                         Dashboard
@@ -214,7 +227,7 @@ export default function RootLayout({ children }: LayoutProps) {
                     </motion.div>
                     {isAdmin && (
                       <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                        <Link href="/admin" className="text-xs font-medium text-teal-400 hover:text-teal-300 uppercase tracking-wider transition-colors">
+                        <Link href="/admin" className="text-xs font-medium text-gold-400 hover:text-gold-300 uppercase tracking-wider transition-colors">
                           Admin
                         </Link>
                       </motion.div>
@@ -223,7 +236,7 @@ export default function RootLayout({ children }: LayoutProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-xs text-white hover:text-white/80 hover:bg-teal-600 uppercase tracking-wider"
+                        className="text-xs text-white hover:text-white/80 hover:bg-gold-600 uppercase tracking-wider"
                         onClick={signOut}
                       >
                         <LogOut className="h-3 w-3 mr-2" />
@@ -232,31 +245,30 @@ export default function RootLayout({ children }: LayoutProps) {
                     </motion.div>
                   </div>
                 ) : (
-                  <div className="flex items-center space-x-6 ml-4">
-                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                      <Link href="/auth/login" className="text-xs font-medium text-white/80 hover:text-white uppercase tracking-wider transition-colors">
-                        Login
-                      </Link>
-                    </motion.div>
-                    <motion.div variants={navLinkVariants} whileHover="hover" whileTap="tap">
-                      <Link href="/auth/signup" className="text-xs font-medium text-white/80 hover:text-white uppercase tracking-wider transition-colors">
-                        Sign Up
-                      </Link>
-                    </motion.div>
-                  </div>
+                  <Link href="/auth/login" className="text-xs font-medium text-white/60 hover:text-white uppercase tracking-wider transition-colors">
+                    Client Login
+                  </Link>
                 )}
               </nav>
 
-              {/* Mobile Menu Button */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2"
-                aria-label="Toggle mobile menu"
-              >
-                <Menu className="h-6 w-6 text-white" />
-              </motion.button>
+              {/* Mobile: Start a Project stays visible next to the menu button */}
+              <div className="flex items-center gap-2 lg:hidden">
+                <Link
+                  href="/contact"
+                  className="rounded-full bg-gold-500 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white"
+                >
+                  Start a Project
+                </Link>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="p-2"
+                  aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+                  aria-expanded={mobileMenuOpen}
+                >
+                  {mobileMenuOpen ? <X className="h-6 w-6 text-white" /> : <Menu className="h-6 w-6 text-white" />}
+                </motion.button>
+              </div>
             </div>
 
             {/* Mobile Navigation */}
@@ -267,19 +279,10 @@ export default function RootLayout({ children }: LayoutProps) {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="lg:hidden absolute top-full left-0 w-full bg-slate-900/95 backdrop-blur-xl"
+                  className="lg:hidden absolute top-full left-0 w-full bg-navy-900/95 backdrop-blur-xl"
                 >
                   <div className="flex flex-col space-y-1 py-6 px-6">
-                    {[
-                      { href: '/', label: 'Home' },
-                      { href: '/portfolio', label: 'Portfolio' },
-                      { href: '/services', label: 'Services' },
-                      { href: '/pricing', label: 'Pricing' },
-                      { href: '/blog', label: 'Blog' },
-                      { href: '/about', label: 'About' },
-                      { href: '/contact', label: 'Contact' },
-                      { href: '/booking', label: 'Book' },
-                    ].map((item, index) => (
+                    {[{ href: '/', label: 'Home' }, ...NAV_ITEMS].map((item, index) => (
                       <motion.div
                         key={item.href}
                         custom={index}
@@ -291,7 +294,7 @@ export default function RootLayout({ children }: LayoutProps) {
                           href={item.href}
                           className={`block px-4 py-3 text-sm font-medium uppercase tracking-wider transition-colors ${
                             pathname === item.href
-                              ? 'text-white'
+                              ? 'text-gold-300'
                               : 'text-white/80 hover:text-white'
                           }`}
                           onClick={() => setMobileMenuOpen(false)}
@@ -300,6 +303,24 @@ export default function RootLayout({ children }: LayoutProps) {
                         </Link>
                       </motion.div>
                     ))}
+
+                    {/* Quick contact */}
+                    <div className="grid grid-cols-2 gap-3 pt-4">
+                      <a
+                        href={SITE.whatsappUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-xs font-bold uppercase tracking-wider text-white"
+                      >
+                        <MessageCircle className="h-4 w-4" /> WhatsApp
+                      </a>
+                      <a
+                        href={`tel:${SITE.phoneE164}`}
+                        className="flex items-center justify-center gap-2 rounded-full border border-white/20 px-4 py-3 text-xs font-bold uppercase tracking-wider text-white"
+                      >
+                        <Phone className="h-4 w-4" /> Call
+                      </a>
+                    </div>
 
                     {/* Mobile Auth Buttons */}
                     {user ? (
@@ -333,18 +354,13 @@ export default function RootLayout({ children }: LayoutProps) {
                         </Button>
                       </div>
                     ) : (
-                      <div className="pt-4 space-y-3">
-                        <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)}>
-                          <Button className="w-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm text-xs uppercase tracking-wider">
-                            Login
-                          </Button>
-                        </Link>
-                        <Link href="/auth/signup" onClick={() => setMobileMenuOpen(false)}>
-                          <Button className="w-full bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm text-xs uppercase tracking-wider">
-                            Sign Up
-                          </Button>
-                        </Link>
-                      </div>
+                      <Link
+                        href="/auth/login"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block px-4 pt-4 text-xs font-medium uppercase tracking-wider text-white/60 hover:text-white"
+                      >
+                        Client Login
+                      </Link>
                     )}
                   </div>
                 </motion.div>
@@ -362,27 +378,41 @@ export default function RootLayout({ children }: LayoutProps) {
           whileInView="visible"
           viewport={{ once: true }}
           variants={footerVariants}
-          className="bg-slate-950 text-gray-300 border-t border-white/5"
+          className="bg-navy-950 text-gray-300 border-t border-white/5"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {/* Company Info */}
               <motion.div custom={0} variants={footerSectionVariants} className="col-span-1 sm:col-span-2 lg:col-span-1">
-                <Link href="/" className="flex items-center space-x-3 mb-4">
+                <Link href="/" className="inline-block mb-5" aria-label="Brain Works Studio Africa — home">
                   <Image
-                    src="/newlogo3.png"
-                    alt="Brain Works Studio Africa Logo"
-                    width={40}
-                    height={40}
-                    className="drop-shadow-[0_0_8px_rgba(20,184,166,0.3)]"
+                    src="/logo-white.png"
+                    alt="Brain Works Studio Africa"
+                    width={150}
+                    height={64}
+                    className="h-12 w-auto"
                   />
-                  <span className="text-lg font-bold text-white uppercase tracking-wider">
-                    BWSA
-                  </span>
                 </Link>
                 <p className="text-sm text-gray-400 mb-4 leading-relaxed">
-                  Crafting timeless visuals with passion and creativity. Your moments, our artistry.
+                  {SITE.positioning}
                 </p>
+                <ul className="mb-5 space-y-2 text-sm">
+                  <li>
+                    <a href={`mailto:${SITE.email}`} className="flex items-center gap-2 text-gray-400 hover:text-gold-300">
+                      <Mail className="h-4 w-4" /> {SITE.email}
+                    </a>
+                  </li>
+                  <li>
+                    <a href={`tel:${SITE.phoneE164}`} className="flex items-center gap-2 text-gray-400 hover:text-gold-300">
+                      <Phone className="h-4 w-4" /> {SITE.phoneDisplay}
+                    </a>
+                  </li>
+                  <li>
+                    <a href={SITE.whatsappUrl} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-400 hover:text-gold-300">
+                      <MessageCircle className="h-4 w-4" /> WhatsApp us
+                    </a>
+                  </li>
+                </ul>
                 <div className="flex space-x-4">
                   {[
                     { href: 'https://www.instagram.com/brainworks_studio_africa?igsh=dmg2MzU5NDNnOXg%3D&utm_source=qr', icon: Instagram, label: 'Instagram' },
@@ -401,7 +431,7 @@ export default function RootLayout({ children }: LayoutProps) {
                       className="w-10 h-10 rounded-full bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
                       aria-label={`Visit our ${social.label}`}
                     >
-                      <social.icon className="h-5 w-5 text-gray-400 hover:text-teal-400 transition-colors" />
+                      <social.icon className="h-5 w-5 text-gray-400 hover:text-gold-400 transition-colors" />
                     </motion.a>
                   ))}
                 </div>
@@ -411,31 +441,11 @@ export default function RootLayout({ children }: LayoutProps) {
               <motion.div custom={1} variants={footerSectionVariants}>
                 <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Services</h3>
                 <ul className="space-y-2 text-sm">
-                  {[
-                    'Event & Corporate Photography',
-                    'Wedding Photography',
-                    'Portrait Sessions',
-                    'Product & Commercial Photography',
-                    'Real Estate & Fashion Photography',
-                    'Aerial & Drone Photography',
-                    'Video Production & Wedding Films',
-                    'Documentary & Music Videos',
-                    'Corporate & Training Videos',
-                    'Live Streaming',
-                    'Voiceover Services',
-                    'Ad Production',
-                    'Graphic Design & Branding',
-                    'Motion Graphics & Animation',
-                    'Social Media Content Creation',
-                    'Photo & Video Editing',
-                  ].map((service, index) => (
-                    <motion.li
-                      key={index}
-                      whileHover={{ x: 5, color: '#5eead4' }}
-                      transition={{ duration: 0.2 }}
-                      className="text-gray-400 hover:text-teal-300 cursor-pointer"
-                    >
-                      {service}
+                  {SERVICE_PILLARS.map((pillar) => (
+                    <motion.li key={pillar.slug} whileHover={{ x: 5 }} transition={{ duration: 0.2 }}>
+                      <Link href={pillar.href} className="text-gray-400 hover:text-gold-300 transition-colors">
+                        {pillar.name}
+                      </Link>
                     </motion.li>
                   ))}
                 </ul>
@@ -446,21 +456,20 @@ export default function RootLayout({ children }: LayoutProps) {
                 <h3 className="text-base font-bold text-white mb-4 uppercase tracking-wider">Quick Links</h3>
                 <ul className="space-y-2 text-sm">
                   {[
-                    { href: '/about', label: 'About Us' },
-                    { href: '/portfolio', label: 'Portfolio' },
+                    { href: '/contact', label: 'Start a Project' },
+                    { href: '/portfolio', label: 'Our Work' },
                     { href: '/services', label: 'Services' },
+                    { href: '/about', label: 'About Us' },
                     { href: '/pricing', label: 'Pricing' },
-                    { href: '/blog', label: 'Blog' },
+                    { href: '/blog', label: 'Insights' },
                     { href: '/booking', label: 'Book a Session' },
-                    { href: '/privacy', label: 'Privacy Policy' },
-                    { href: '/terms', label: 'Terms of Service' },
                   ].map((link, index) => (
                     <motion.li
                       key={index}
                       whileHover={{ x: 5 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <Link href={link.href} className="text-gray-400 hover:text-teal-300 transition-colors">
+                      <Link href={link.href} className="text-gray-400 hover:text-gold-300 transition-colors">
                         {link.label}
                       </Link>
                     </motion.li>
@@ -480,14 +489,14 @@ export default function RootLayout({ children }: LayoutProps) {
                     placeholder="Your email"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
-                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-teal-400 focus:ring-teal-400/20 rounded-lg"
+                    className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-gold-400 focus:ring-gold-400/20 rounded-lg"
                     required
                     disabled={loading}
                   />
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                     <Button
                       type="submit"
-                      className="w-full bg-teal-500 text-white hover:bg-teal-600 font-semibold rounded-lg shadow-lg shadow-teal-500/20"
+                      className="w-full bg-gold-500 text-white hover:bg-gold-600 font-semibold rounded-lg shadow-lg shadow-gold-500/20"
                       disabled={loading}
                     >
                       <Send className="h-4 w-4 mr-2" />
@@ -504,10 +513,11 @@ export default function RootLayout({ children }: LayoutProps) {
               transition={{ duration: 0.4, delay: 0.4 }}
               className="border-t border-white/5 mt-12 pt-8 text-center text-sm text-gray-500"
             >
-              <p>&copy; 2025 Brain Works Studio Africa. All rights reserved.</p>
+              <p>&copy; {new Date().getFullYear()} Brain Works Studio Africa. All rights reserved.</p>
             </motion.div>
           </div>
         </motion.footer>
     </div>
+    </MotionConfig>
   );
 }

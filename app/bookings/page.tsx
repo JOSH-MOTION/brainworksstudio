@@ -118,11 +118,11 @@ export default function UserBookingsPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'accepted':
-        return 'bg-teal-100 text-teal-800';
+        return 'bg-gold-100 text-gold-800';
       case 'rejected':
         return 'bg-coral-100 text-coral-800';
       default:
-        return 'bg-teal-50 text-teal-600';
+        return 'bg-gold-50 text-gold-600';
     }
   };
 
@@ -154,7 +154,7 @@ export default function UserBookingsPage() {
           className="min-h-screen flex items-center justify-center"
         >
           <div className="text-center">
-            <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-teal-500 mx-auto"></div>
+            <div className="animate-spin rounded-full h-24 w-24 border-b-2 border-gold-500 mx-auto"></div>
             <p className="mt-3 text-sm text-gray-600">Loading your bookings...</p>
           </div>
         </motion.div>
@@ -169,13 +169,13 @@ export default function UserBookingsPage() {
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="relative min-h-[30vh] flex items-center justify-center bg-teal-50"
+        className="relative min-h-[30vh] flex items-center justify-center bg-gold-50"
       >
         <motion.div
           variants={heroContentVariants}
           className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.h1 className="text-2xl md:text-3xl font-bold text-[#001F44] mb-3">
+          <motion.h1 className="text-2xl md:text-3xl font-bold text-navy-900 mb-3">
             {headingText.map((word, index) => (
               <motion.span
                 key={index}
@@ -210,9 +210,9 @@ export default function UserBookingsPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
           {[
-            { number: bookings.length, label: 'Total Bookings', color: 'text-[#001F44]' },
-            { number: bookings.filter((b) => b.status === 'pending').length, label: 'Pending', color: 'text-teal-600' },
-            { number: bookings.filter((b) => b.status === 'accepted').length, label: 'Approved', color: 'text-teal-600' },
+            { number: bookings.length, label: 'Total Bookings', color: 'text-navy-900' },
+            { number: bookings.filter((b) => b.status === 'pending').length, label: 'Pending', color: 'text-gold-600' },
+            { number: bookings.filter((b) => b.status === 'accepted').length, label: 'Approved', color: 'text-gold-600' },
             { number: bookings.filter((b) => b.status === 'rejected').length, label: 'Declined', color: 'text-coral-600' },
           ].map((stat, index) => (
             <motion.div
@@ -224,7 +224,7 @@ export default function UserBookingsPage() {
               whileInView="visible"
               viewport={{ once: true }}
             >
-              <Card className="bg-teal-50 border-coral-100 rounded-xl shadow-sm">
+              <Card className="bg-gold-50 border-coral-100 rounded-xl shadow-sm">
                 <CardContent className="p-4 text-center">
                   <div className={`text-xl font-bold ${stat.color}`}>{stat.number}</div>
                   <div className="text-xs text-gray-600">{stat.label}</div>
@@ -242,7 +242,7 @@ export default function UserBookingsPage() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <Card className="bg-teal-50 border-coral-100 rounded-xl shadow-sm mb-6">
+          <Card className="bg-gold-50 border-coral-100 rounded-xl shadow-sm mb-6">
             <CardContent className="p-4">
               <div className="flex flex-col sm:flex-row gap-3">
                 <div className="flex-1">
@@ -252,12 +252,12 @@ export default function UserBookingsPage() {
                       placeholder="Search by service or location..."
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10 border-coral-200 focus:ring-teal-500 rounded-md text-sm"
+                      className="pl-10 border-coral-200 focus:ring-gold-500 rounded-md text-sm"
                     />
                   </div>
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[140px] border-coral-200 focus:ring-teal-500 rounded-md">
+                  <SelectTrigger className="w-[140px] border-coral-200 focus:ring-gold-500 rounded-md">
                     <Filter className="h-4 w-4 mr-2 text-coral-500" />
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
@@ -281,9 +281,9 @@ export default function UserBookingsPage() {
           whileInView="visible"
           viewport={{ once: true }}
         >
-          <Card className="bg-teal-50 border-coral-100 rounded-xl shadow-sm">
+          <Card className="bg-gold-50 border-coral-100 rounded-xl shadow-sm">
             <CardHeader>
-              <CardTitle className="text-xl text-[#001F44]">Your Booking History</CardTitle>
+              <CardTitle className="text-xl text-navy-900">Your Booking History</CardTitle>
               <CardDescription className="text-sm text-gray-600">
                 All your session requests and their current status
               </CardDescription>
@@ -292,7 +292,7 @@ export default function UserBookingsPage() {
               {filteredBookings.length === 0 ? (
                 <div className="text-center py-6">
                   <Calendar className="h-10 w-10 text-gray-400 mx-auto mb-3" />
-                  <h3 className="text-base font-medium text-[#001F44] mb-2">
+                  <h3 className="text-base font-medium text-navy-900 mb-2">
                     {bookings.length === 0 ? 'No bookings yet' : 'No bookings match your filters'}
                   </h3>
                   <p className="text-sm text-gray-600 mb-3">
@@ -303,7 +303,7 @@ export default function UserBookingsPage() {
                   {bookings.length === 0 && (
                     <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                       <Link href="/booking">
-                        <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full text-sm">
+                        <Button className="bg-gold-500 hover:bg-gold-600 text-white rounded-full text-sm">
                           Book Your First Session
                         </Button>
                       </Link>
@@ -321,12 +321,12 @@ export default function UserBookingsPage() {
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true }}
-                      className="border border-coral-100 rounded-lg p-4 hover:bg-teal-100 transition-colors"
+                      className="border border-coral-100 rounded-lg p-4 hover:bg-gold-100 transition-colors"
                     >
                       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
-                            <h3 className="text-base font-semibold text-[#001F44]">{booking.serviceCategory}</h3>
+                            <h3 className="text-base font-semibold text-navy-900">{booking.serviceCategory}</h3>
                             <Badge className={getStatusColor(booking.status)}>
                               {getStatusText(booking.status)}
                             </Badge>
@@ -356,7 +356,7 @@ export default function UserBookingsPage() {
                             </div>
                           </div>
                           {booking.additionalNotes && (
-                            <div className="mt-2 p-2 bg-teal-50 rounded-md">
+                            <div className="mt-2 p-2 bg-gold-50 rounded-md">
                               <p className="text-xs text-gray-700">
                                 <strong>Your Notes:</strong> {booking.additionalNotes}
                               </p>
@@ -400,7 +400,7 @@ export default function UserBookingsPage() {
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link href="/booking">
-              <Button className="bg-teal-500 hover:bg-teal-600 text-white rounded-full text-sm">
+              <Button className="bg-gold-500 hover:bg-gold-600 text-white rounded-full text-sm">
                 <Calendar className="h-4 w-4 mr-2" />
                 Book Another Session
               </Button>

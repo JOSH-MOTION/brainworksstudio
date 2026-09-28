@@ -98,14 +98,14 @@ const PortfolioCard = memo(({
               <Badge className="absolute top-3 left-3 bg-amber-400 text-black text-xs font-medium">Featured</Badge>
             )}
             {item.pin && (
-              <Badge className="absolute top-3 left-20 bg-teal-600 text-white text-xs font-medium">PIN Protected</Badge>
+              <Badge className="absolute top-3 left-20 bg-gold-600 text-white text-xs font-medium">PIN Protected</Badge>
             )}
             {item.videoUrl && previewingId !== item.id && (
               <Button
                 size="sm"
                 variant="ghost"
                 onClick={() => setPreviewingId(item.id)}
-                className="absolute inset-0 m-auto h-12 w-12 bg-teal-600/80 text-white rounded-full hover:bg-teal-700"
+                className="absolute inset-0 m-auto h-12 w-12 bg-gold-600/80 text-white rounded-full hover:bg-gold-700"
                 aria-label="Play video"
               >
                 <Play className="h-6 w-6" />
@@ -128,7 +128,7 @@ const PortfolioCard = memo(({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-8 w-8 bg-gray-100 hover:bg-teal-600 text-gray-800 rounded-full"
+                  className="h-8 w-8 bg-gray-100 hover:bg-gold-600 text-gray-800 rounded-full"
                   title="Edit Item"
                   aria-label="Edit portfolio item"
                 >
@@ -152,7 +152,7 @@ const PortfolioCard = memo(({
                 <Button
                   size="icon"
                   variant="ghost"
-                  className="h-8 w-8 bg-gray-100 hover:bg-teal-600 text-gray-800 rounded-full"
+                  className="h-8 w-8 bg-gray-100 hover:bg-gold-600 text-gray-800 rounded-full"
                   title="View Client Page"
                   aria-label="View client portfolio page"
                 >
@@ -164,7 +164,7 @@ const PortfolioCard = memo(({
                 variant="ghost"
                 onClick={() => copyClientUrl(item)}
                 disabled={copyingId === item.id}
-                className="h-8 w-8 bg-gray-100 hover:bg-teal-600 text-gray-800 rounded-full"
+                className="h-8 w-8 bg-gray-100 hover:bg-gold-600 text-gray-800 rounded-full"
                 title="Copy Client URL"
                 aria-label="Copy client URL"
               >
@@ -175,7 +175,7 @@ const PortfolioCard = memo(({
                 variant="ghost"
                 onClick={() => downloadMedia(item)}
                 disabled={downloadingId === item.id || (!item.imageUrls?.length && !item.videoUrl)}
-                className="h-8 w-8 bg-gray-100 hover:bg-teal-600 text-gray-800 rounded-full"
+                className="h-8 w-8 bg-gray-100 hover:bg-gold-600 text-gray-800 rounded-full"
                 title="Download Media"
                 aria-label="Download media"
               >
@@ -188,7 +188,7 @@ const PortfolioCard = memo(({
                   setItemToSetPin(item);
                   setPinDialogOpen(true);
                 }}
-                className="h-8 w-8 bg-gray-100 hover:bg-teal-600 text-gray-800 rounded-full"
+                className="h-8 w-8 bg-gray-100 hover:bg-gold-600 text-gray-800 rounded-full"
                 title="Set PIN"
                 aria-label="Set PIN for portfolio item"
               >
@@ -200,7 +200,7 @@ const PortfolioCard = memo(({
             <h3 className="text-lg font-semibold text-gray-800 truncate">{item.title || 'Untitled'}</h3>
             <div className="flex items-center justify-between">
               <Badge variant="outline" className="text-xs text-gray-600 border-gray-300">{item.category || 'Uncategorized'}</Badge>
-              <Badge variant="secondary" className="text-xs bg-teal-100 text-teal-800">{item.type || 'Unknown'}</Badge>
+              <Badge variant="secondary" className="text-xs bg-gold-100 text-gold-800">{item.type || 'Unknown'}</Badge>
             </div>
             {(item.clientId && clients[item.clientId]) || item.clientName ? (
               <div className="flex items-center gap-2 text-sm text-gray-600">
@@ -211,10 +211,10 @@ const PortfolioCard = memo(({
             {item.tags?.length > 0 && (
               <div className="flex flex-wrap gap-1">
                 {item.tags.slice(0, 3).map((tag) => (
-                  <Badge key={tag} variant="secondary" className="text-xs bg-teal-100 text-teal-800">{tag}</Badge>
+                  <Badge key={tag} variant="secondary" className="text-xs bg-gold-100 text-gold-800">{tag}</Badge>
                 ))}
                 {item.tags.length > 3 && (
-                  <Badge variant="secondary" className="text-xs bg-teal-100 text-teal-800">+{item.tags.length - 3}</Badge>
+                  <Badge variant="secondary" className="text-xs bg-gold-100 text-gold-800">+{item.tags.length - 3}</Badge>
                 )}
               </div>
             )}
@@ -225,7 +225,7 @@ const PortfolioCard = memo(({
                 href={`/client/portfolio/${item.id}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-teal-600 hover:underline"
+                className="text-gold-600 hover:underline"
               >
                 {`/client/portfolio/${item.id}`}
               </a>
@@ -277,7 +277,12 @@ export default function AdminPortfolioPage() {
 
   const fetchPortfolioItems = async () => {
     try {
-      const response = await fetch('/api/portfolio');
+      // Send the admin token so the API includes download PINs.
+      const token = await firebaseUser?.getIdToken();
+      const response = await fetch('/api/portfolio', {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        cache: 'no-store',
+      });
       if (response.ok) {
         const data = await response.json();
         setPortfolioItems(data);
@@ -455,7 +460,7 @@ export default function AdminPortfolioPage() {
       <AdminLayout>
         <div className="min-h-screen flex items-center justify-center bg-gray-50">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-teal-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-gold-600 mx-auto"></div>
             <p className="mt-4 text-gray-600 text-sm font-medium">Loading portfolio...</p>
           </div>
           </div>
@@ -476,7 +481,7 @@ export default function AdminPortfolioPage() {
             <p className="text-sm text-gray-600 mt-1">Manage your studio's portfolio items efficiently</p>
           </div>
           <Link href="/admin/portfolio/upload">
-            <Button className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-4 py-2 text-sm flex items-center">
+            <Button className="bg-gold-600 hover:bg-gold-700 text-white rounded-lg px-4 py-2 text-sm flex items-center">
               <Plus className="h-4 w-4 mr-2" />
               Add New Item
             </Button>
@@ -492,11 +497,11 @@ export default function AdminPortfolioPage() {
                   placeholder="Search by title, category, tags, or client..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 border-gray-300 focus:ring-teal-600 text-sm rounded-lg"
+                  className="pl-10 border-gray-300 focus:ring-gold-600 text-sm rounded-lg"
                 />
               </div>
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full sm:w-48 border-gray-300 focus:ring-teal-600 text-sm rounded-lg">
+                <SelectTrigger className="w-full sm:w-48 border-gray-300 focus:ring-gold-600 text-sm rounded-lg">
                   <Filter className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Filter by category" />
                 </SelectTrigger>
@@ -543,7 +548,7 @@ export default function AdminPortfolioPage() {
                 : 'Try adjusting your search or filter criteria.'}
             </p>
             <Link href="/admin/portfolio/upload">
-              <Button className="bg-teal-600 hover:bg-teal-700 text-white rounded-lg px-4 py-2 text-sm flex items-center">
+              <Button className="bg-gold-600 hover:bg-gold-700 text-white rounded-lg px-4 py-2 text-sm flex items-center">
                 <Plus className="h-4 w-4 mr-2" />
                 Upload Portfolio Item
               </Button>
@@ -591,7 +596,7 @@ export default function AdminPortfolioPage() {
                 placeholder="Enter PIN (at least 4 characters)"
                 value={newPin}
                 onChange={(e) => setNewPin(e.target.value)}
-                className="border-gray-300 focus:ring-teal-600 text-sm rounded-lg mb-4"
+                className="border-gray-300 focus:ring-gold-600 text-sm rounded-lg mb-4"
               />
               {pinError && <p className="text-red-600 text-sm mb-4">{pinError}</p>}
             </div>
@@ -610,7 +615,7 @@ export default function AdminPortfolioPage() {
               </Button>
               <Button
                 onClick={setPin}
-                className="bg-teal-600 text-white hover:bg-teal-700 rounded-lg text-sm"
+                className="bg-gold-600 text-white hover:bg-gold-700 rounded-lg text-sm"
               >
                 Save PIN
               </Button>

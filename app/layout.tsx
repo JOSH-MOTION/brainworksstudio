@@ -17,9 +17,9 @@ const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: 'Brain Works Studio Africa | Wedding & Event Photographer, Videographer in Accra, Ghana',
+  title: 'Brain Works Studio Africa | Creative Production Company in Accra, Ghana',
   description:
-    'Brain Works Studio Africa offers professional wedding photography, corporate event coverage, portraits, live streaming, and cinematic videography in Accra, Ghana and across Africa.',
+    'African creative production company in Accra, Ghana producing commercials, corporate films, branded content, live broadcasts, events, photography and social-first video.',
   keywords: [
     'Brain Works Studio Africa',
     'BWSA',
@@ -131,9 +131,9 @@ export const metadata: Metadata = {
     shortcut: '/favicon.ico',
   },
   openGraph: {
-    title: 'Brain Works Studio Africa | Wedding & Event Photographer, Videographer in Accra, Ghana',
+    title: 'Brain Works Studio Africa | Creative Production Company in Accra, Ghana',
     description:
-      'Professional wedding photography, event coverage, and cinematic videography in Accra, Ghana and across Africa.',
+      'Commercials, corporate films, live broadcasts, events, photography and social-first video from Accra, Ghana.',
     url: BASE_URL,
     siteName: 'Brain Works Studio Africa',
     images: [
@@ -151,7 +151,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Brain Works Studio Africa',
     description:
-      'Photography, videography, and creative storytelling across Ghana and Africa.',
+      'Creative production — commercials, corporate, live, social and photography — across Ghana and Africa.',
     images: [`${BASE_URL}/newlogo2.jpg`],
   },
   other: {
@@ -208,7 +208,7 @@ export default async function RootLayout({
               name: "Brain Works Studio Africa",
               alternateName: "BWSA",
               description:
-                'Professional photography, videography, live streaming, voiceover, and ad production studio based in Accra, Ghana, serving clients across Africa and the diaspora.',
+                'African creative production company based in Accra, Ghana, producing commercials, corporate films, branded content, live broadcasts, events, photography and social-first video for clients across Africa and the diaspora.',
               url: BASE_URL,
               logo: `${BASE_URL}/android-chrome-512x512.png`,
               image: `${BASE_URL}/android-chrome-512x512.png`,

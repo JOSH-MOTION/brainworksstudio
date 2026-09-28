@@ -4,9 +4,9 @@ import AboutPageClient from './AboutPageClient';
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
 export const metadata: Metadata = {
-  title: 'About Us | Brain Works Studio Africa — Photography & Video Team in Accra, Ghana',
+  title: 'About Us | Brain Works Studio Africa — Creative Production Company in Accra, Ghana',
   description:
-    'Meet the team behind Brain Works Studio Africa: founded in 2019 in Accra, Ghana, delivering photography, videography, live streaming, and creative production for 500+ clients across Africa.',
+    'Brain Works Studio Africa is an African creative production company founded in 2019 in Accra, Ghana — producing commercials, corporate films, live broadcasts, events, photography and social content.',
   keywords: [
     'Brain Works Studio Africa team',
     'photography studio Accra about',
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'About Brain Works Studio Africa',
     description:
-      'Founded in 2019 in Accra, Ghana. Meet the photographers, cinematographers, and creatives behind Brain Works Studio Africa.',
+      'Founded in 2019 in Accra, Ghana. Meet the creative production team behind Brain Works Studio Africa.',
     url: `${BASE_URL}/about`,
     siteName: 'Brain Works Studio Africa',
     type: 'website',
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'About Brain Works Studio Africa',
     description:
-      'Founded in 2019 in Accra, Ghana. Meet the photographers, cinematographers, and creatives behind Brain Works Studio Africa.',
+      'Founded in 2019 in Accra, Ghana. Meet the creative production team behind Brain Works Studio Africa.',
     images: [`${BASE_URL}/newlogo2.jpg`],
   },
 };

@@ -70,7 +70,8 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPag
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      <PortfolioDetailClient id={params.id} />
+      {/* Pass the item so the project renders server-side (item has hasPin, never the PIN). */}
+      <PortfolioDetailClient id={params.id} initialItem={item} />
     </>
   );
 }

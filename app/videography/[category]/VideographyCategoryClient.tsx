@@ -59,10 +59,10 @@ export default function VideographyCategoryClient({ category }: { category: stri
   if (loading) {
     return (
       <Layout>
-        <div className="min-h-[80vh] sm:min-h-screen flex items-center justify-center bg-teal-50">
+        <div className="min-h-[80vh] sm:min-h-screen flex items-center justify-center bg-gold-50">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-coral-500 mx-auto"></div>
-            <p className="mt-4 text-sm text-[#001F44]">Loading...</p>
+            <p className="mt-4 text-sm text-navy-900">Loading...</p>
           </div>
         </div>
       </Layout>
@@ -72,7 +72,7 @@ export default function VideographyCategoryClient({ category }: { category: stri
   if (error) {
     return (
       <Layout>
-        <div className="min-h-[80vh] sm:min-h-screen flex items-center justify-center bg-teal-50">
+        <div className="min-h-[80vh] sm:min-h-screen flex items-center justify-center bg-gold-50">
           <p className="text-red-600 text-sm sm:text-base">{error}</p>
         </div>
       </Layout>
@@ -101,7 +101,7 @@ export default function VideographyCategoryClient({ category }: { category: stri
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-[#001F44]/50"></div>
+          <div className="absolute inset-0 bg-navy-900/50"></div>
         </motion.div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center">
           <motion.h1
@@ -128,12 +128,12 @@ export default function VideographyCategoryClient({ category }: { category: stri
         whileInView="visible"
         viewport={{ once: true }}
         variants={sectionVariants}
-        className="py-16 sm:py-20 bg-teal-50"
+        className="py-16 sm:py-20 bg-gold-50"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {items.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-[#001F44] text-sm sm:text-base">No videos found in this category yet.</p>
+              <p className="text-navy-900 text-sm sm:text-base">No videos found in this category yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -172,14 +172,14 @@ export default function VideographyCategoryClient({ category }: { category: stri
                       }}
                     />
                     {item.videoUrl && (
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-[#001F44]/50">
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-navy-900/50">
                         <Play className="h-8 w-8 text-white" />
                       </div>
                     )}
                     <div className="absolute bottom-4 left-4 right-4 text-white">
                       <h3 className="font-semibold text-sm sm:text-base truncate">{item.title}</h3>
                       <p className="text-xs sm:text-sm truncate">{item.clientName || 'Unknown Client'}</p>
-                      {item.pin && (
+                      {item.hasPin && (
                         <p className="text-xs text-coral-200">PIN Protected</p>
                       )}
                     </div>

@@ -107,7 +107,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         {/* Header */}
         <div className="text-center mb-12">
           <motion.h1
-            className="font-serif text-4xl md:text-5xl font-bold text-[#001F44] mb-4 tracking-tight"
+            className="font-serif text-4xl md:text-5xl font-bold text-navy-900 mb-4 tracking-tight"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
@@ -139,8 +139,8 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
               }}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                 selectedType === 'all'
-                  ? 'bg-teal-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-teal-600'
+                  ? 'bg-gold-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-gold-600'
               }`}
             >
               All
@@ -153,8 +153,8 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
               }}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                 selectedType === 'photography'
-                  ? 'bg-teal-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-teal-600'
+                  ? 'bg-gold-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-gold-600'
               }`}
             >
               <Camera className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -168,8 +168,8 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
               }}
               className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 sm:px-6 sm:py-3 sm:text-base ${
                 selectedType === 'videography'
-                  ? 'bg-teal-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-teal-600'
+                  ? 'bg-gold-600 text-white shadow-md'
+                  : 'text-gray-600 hover:text-gold-600'
               }`}
             >
               <Video className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -187,12 +187,12 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
           className="flex flex-col sm:flex-row gap-4 mb-8 items-center justify-center"
         >
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-[#001F44]" />
-            <span className="font-medium text-[#001F44]">Refine by:</span>
+            <Filter className="h-5 w-5 text-navy-900" />
+            <span className="font-medium text-navy-900">Refine by:</span>
           </div>
 
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[200px] bg-white border-teal-200 focus:ring-teal-500 rounded-full shadow-sm">
+            <SelectTrigger className="w-[200px] bg-white border-gold-200 focus:ring-gold-500 rounded-full shadow-sm">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -206,7 +206,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
 
           {tags.length > 1 && (
             <Select value={selectedTag} onValueChange={setSelectedTag}>
-              <SelectTrigger className="w-[180px] bg-white border-teal-200 focus:ring-teal-500 rounded-full shadow-sm">
+              <SelectTrigger className="w-[180px] bg-white border-gold-200 focus:ring-gold-500 rounded-full shadow-sm">
                 <SelectValue placeholder="Tag" />
               </SelectTrigger>
               <SelectContent>
@@ -223,7 +223,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"
-                className="border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full px-6 py-2 shadow-sm"
+                className="border-gold-600 text-gold-600 hover:bg-gold-500 hover:text-white transition-colors rounded-full px-6 py-2 shadow-sm"
                 onClick={() => {
                   setSelectedType('all');
                   setSelectedCategory('all');
@@ -239,7 +239,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         {/* Results count */}
         <div className="text-center mb-8">
           <p className="text-gray-600">
-            Showing <span className="font-semibold text-teal-600">{filteredItems.length}</span> {filteredItems.length === 1 ? 'item' : 'items'}
+            Showing <span className="font-semibold text-gold-600">{filteredItems.length}</span> {filteredItems.length === 1 ? 'item' : 'items'}
           </p>
         </div>
 
@@ -288,14 +288,14 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
 
                     {/* Top-left: featured marker */}
                     {item.featured && (
-                      <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-[#001F44] shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
+                      <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-navy-900 shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
                         <Star className="h-2.5 w-2.5 fill-[#CB9D06] text-[#CB9D06] sm:h-3 sm:w-3" />
                         Featured
                       </div>
                     )}
 
                     {/* Top-right: media type indicator */}
-                    <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-[#001F44] shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
+                    <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-navy-900 shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
                       {item.type === 'photography' ? (
                         <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
                       ) : (
@@ -310,13 +310,13 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
                           variants={cardPlayVariants}
                           className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg sm:h-16 sm:w-16"
                         >
-                          <Play className="ml-0.5 h-4 w-4 fill-[#001F44] text-[#001F44] sm:h-6 sm:w-6" />
+                          <Play className="ml-0.5 h-4 w-4 fill-navy-900 text-navy-900 sm:h-6 sm:w-6" />
                         </motion.div>
                       </div>
                     )}
 
                     {/* Bottom scrim + metadata */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#001F44]/95 via-[#001F44]/50 to-transparent px-2.5 pb-2.5 pt-8 sm:px-5 sm:pb-5 sm:pt-16">
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-900/95 via-navy-900/50 to-transparent px-2.5 pb-2.5 pt-8 sm:px-5 sm:pb-5 sm:pt-16">
                       <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/75 sm:mb-1 sm:text-xs sm:tracking-[0.12em]">
                         {item.category}
                       </p>
@@ -353,12 +353,12 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
                 <Filter className="h-16 w-16 text-gray-400 mx-auto" />
               )}
             </div>
-            <p className="text-[#001F44] text-lg font-medium mb-2">No items found</p>
+            <p className="text-navy-900 text-lg font-medium mb-2">No items found</p>
             <p className="text-gray-600 mb-6">Try adjusting your filters to see more results</p>
             <motion.div variants={buttonVariants} whileHover="hover" whileTap="tap">
               <Button
                 variant="outline"
-                className="border-teal-600 text-teal-600 hover:bg-teal-500 hover:text-white transition-colors rounded-full px-6 py-2"
+                className="border-gold-600 text-gold-600 hover:bg-gold-500 hover:text-white transition-colors rounded-full px-6 py-2"
                 onClick={() => {
                   setSelectedType('all');
                   setSelectedCategory('all');

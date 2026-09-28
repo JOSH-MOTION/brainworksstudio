@@ -1,7 +1,14 @@
 // app/api/contact/route.ts
+// "Start a Project" enquiry form. Saves the lead to Firestore, emails BWSA,
+// and sends the client a confirmation.
 import { NextRequest, NextResponse } from 'next/server';
 import { adminDb } from '@/lib/firebase-admin';
-import { createTransporter } from '@/lib/nodemailer';
+import { createTransporter, escapeHtml } from '@/lib/nodemailer';
+import { PROJECT_TYPES } from '@/lib/site-config';
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const clean = (value: unknown, max = 200) => (typeof value === 'string' ? value.trim().slice(0, max) : '');
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,75 +17,95 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
     }
 
-    const formData = await request.json();
-    
-    // Validate form data
-    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const body = await request.json();
+
+    // Honeypot: real visitors never see or fill this field. Pretend success so bots don't retry.
+    if (clean(body.website)) {
+      return NextResponse.json({ success: true });
     }
 
-    // Save contact to Firestore
-    const contactData = {
-      name: formData.name,
-      email: formData.email,
-      phone: formData.phone || '',
-      subject: formData.subject,
-      message: formData.message,
-      createdAt: new Date(),
+    const lead = {
+      name: clean(body.name, 120),
+      company: clean(body.company, 160),
+      email: clean(body.email, 254).toLowerCase(),
+      phone: clean(body.phone, 40),
+      projectType: clean(body.projectType, 40),
+      message: clean(body.message, 5000),
+      preferredDate: clean(body.preferredDate, 20),
+      location: clean(body.location, 200),
+      budget: clean(body.budget, 60),
+      referralSource: clean(body.referralSource, 60),
+      sourcePage: clean(body.sourcePage, 200),
     };
 
-    await adminDb.collection('contacts').add(contactData);
+    if (!lead.name || !lead.email || !lead.phone || !lead.projectType || !lead.message) {
+      return NextResponse.json({ error: 'Please fill in all required fields.' }, { status: 400 });
+    }
+    if (!EMAIL_RE.test(lead.email)) {
+      return NextResponse.json({ error: 'Please enter a valid email address.' }, { status: 400 });
+    }
 
-    // Send confirmation email to user
+    const projectTypeLabel = PROJECT_TYPES.find((t) => t.value === lead.projectType)?.label || lead.projectType;
+    // Keep `subject` for continuity with older documents in the contacts collection.
+    const subject = `${projectTypeLabel}${lead.company ? ` — ${lead.company}` : ''}`;
+
+    await adminDb.collection('contacts').add({ ...lead, subject, status: 'new', createdAt: new Date() });
+
+    const e = escapeHtml;
+    const rows: [string, string][] = [
+      ['Name', lead.name],
+      ['Company', lead.company || '—'],
+      ['Email', lead.email],
+      ['Phone / WhatsApp', lead.phone],
+      ['Project type', projectTypeLabel],
+      ['Preferred date', lead.preferredDate || '—'],
+      ['Location', lead.location || '—'],
+      ['Budget', lead.budget || '—'],
+      ['Heard about us', lead.referralSource || '—'],
+      ['Sent from', lead.sourcePage || '—'],
+    ];
+    const detailsTable = rows
+      .map(([label, value]) => `<tr><td style="padding:4px 12px 4px 0;color:#555;"><strong>${label}</strong></td><td>${e(value)}</td></tr>`)
+      .join('');
+    const messageHtml = e(lead.message).replace(/\n/g, '<br>');
+
     const transporter = createTransporter();
-    
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: formData.email,
-      subject: 'Thank you for contacting Brain Works Studio Africa',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #8B4513;">Thank You for Reaching Out</h2>
-          <p>Dear ${formData.name},</p>
-          <p>Thank you for contacting Brain Works Studio Africa. We've received your message and will get back to you within 24 hours.</p>
-          
-          <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <h3>Your Message:</h3>
-            <p><strong>Subject:</strong> ${formData.subject}</p>
-            <p><strong>Message:</strong> ${formData.message}</p>
-          </div>
-          
-          <p>We look forward to discussing your project!</p>
-          <p>Best regards,<br>Brain Works Studio Africa Team</p>
-        </div>
-      `,
-    });
 
-    // Send notification to admin
     await transporter.sendMail({
       from: process.env.GMAIL_USER,
       to: process.env.GMAIL_USER,
-      subject: `New Contact Form Submission: ${formData.subject}`,
+      replyTo: lead.email,
+      subject: `New project enquiry: ${subject}`,
       html: `
-        <h2>New Contact Form Submission</h2>
-        <p><strong>Name:</strong> ${formData.name}</p>
-        <p><strong>Email:</strong> ${formData.email}</p>
-        <p><strong>Phone:</strong> ${formData.phone || 'Not provided'}</p>
-        <p><strong>Subject:</strong> ${formData.subject}</p>
-        <p><strong>Message:</strong></p>
-        <div style="background: #f5f5f5; padding: 15px; border-radius: 5px;">
-          ${formData.message}
+        <h2>New Project Enquiry</h2>
+        <table>${detailsTable}</table>
+        <p><strong>Project description:</strong></p>
+        <div style="background:#f5f5f5;padding:15px;border-radius:5px;">${messageHtml}</div>
+        <p><strong>Submitted at:</strong> ${new Date().toLocaleString('en-GB', { timeZone: 'Africa/Accra' })}</p>
+      `,
+    });
+
+    await transporter.sendMail({
+      from: process.env.GMAIL_USER,
+      to: lead.email,
+      subject: 'We received your project enquiry — Brain Works Studio Africa',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color:#1A3050;">Thanks, ${e(lead.name)} — we've got your brief.</h2>
+          <p>Our team will review your ${e(projectTypeLabel.toLowerCase())} enquiry and get back to you within one business day.</p>
+          <div style="background:#f5f5f5;padding:20px;border-radius:8px;margin:20px 0;">
+            <p><strong>What you told us:</strong></p>
+            <p>${messageHtml}</p>
+          </div>
+          <p>Need to reach us sooner? Reply to this email or call +233 24 240 3450.</p>
+          <p>Best regards,<br>Brain Works Studio Africa</p>
         </div>
-        <p><strong>Submitted at:</strong> ${new Date().toLocaleString()}</p>
       `,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error processing contact form:', error);
-    return NextResponse.json(
-      { error: 'Failed to send message' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to send your enquiry' }, { status: 500 });
   }
 }

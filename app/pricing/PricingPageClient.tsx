@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatCategoryName } from '@/lib/pricing-format';
 
 interface PricingCategory {
   id: string;
@@ -26,7 +27,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 overflow-hidden">
+      <section className="relative py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-gold-900 overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
@@ -46,13 +47,13 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
             transition={{ duration: 0.5 }}
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6"
           >
-            <Sparkles className="w-4 h-4 text-teal-400" />
+            <Sparkles className="w-4 h-4 text-gold-400" />
             <span className="text-sm text-white font-medium">Transparent & Flexible Pricing</span>
           </motion.div>
 
           <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Choose Your
-            <span className="block mt-2 bg-gradient-to-r from-white via-teal-200 to-teal-400 bg-clip-text text-transparent">
+            <span className="block mt-2 bg-gradient-to-r from-white via-gold-200 to-gold-400 bg-clip-text text-transparent">
               Perfect Package
             </span>
           </h1>
@@ -92,7 +93,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
                           {category.imageUrl ? (
                             <Image
                               src={category.imageUrl}
-                              alt={category.name}
+                              alt={formatCategoryName(category.name)}
                               fill
                               sizes="(max-width: 768px) 100vw, 40vw"
                               className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -101,7 +102,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
                               }}
                             />
                           ) : (
-                            <div className="absolute inset-0 bg-gradient-to-br from-teal-500 to-coral-500 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-br from-gold-500 to-coral-500 flex items-center justify-center">
                               <span className="text-6xl font-bold text-white opacity-20">
                                 {category.name.charAt(0)}
                               </span>
@@ -121,13 +122,13 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
 
                         {/* Content Section */}
                         <CardContent className="flex-1 p-8 flex flex-col justify-center">
-                          <h2 className="font-serif text-3xl font-bold text-slate-900 mb-3 group-hover:text-teal-600 transition-colors">
-                            {category.name}
+                          <h2 className="font-serif text-3xl font-bold text-slate-900 mb-3 group-hover:text-gold-600 transition-colors">
+                            {formatCategoryName(category.name)}
                           </h2>
                           <p className="text-gray-600 mb-6 leading-relaxed">
                             {category.description}
                           </p>
-                          <div className="flex items-center text-teal-600 font-bold group-hover:gap-3 gap-2 transition-all text-lg">
+                          <div className="flex items-center text-gold-600 font-bold group-hover:gap-3 gap-2 transition-all text-lg">
                             View Packages
                             <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
                           </div>
@@ -143,7 +144,7 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-teal-950">
+      <section className="py-20 bg-gradient-to-br from-slate-950 via-slate-900 to-navy-950">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
