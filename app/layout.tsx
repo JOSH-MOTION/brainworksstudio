@@ -213,7 +213,7 @@ export default async function RootLayout({
               logo: `${BASE_URL}/android-chrome-512x512.png`,
               image: `${BASE_URL}/android-chrome-512x512.png`,
               telephone: "+233242403450",
-              email: "brainworksstudio2@gmail.com",
+              email: "bwsa@brainworksstudioafrica.com",
               priceRange: "₵₵",
               ...(aggregateRating ? { aggregateRating } : {}),
               address: {

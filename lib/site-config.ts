@@ -6,7 +6,7 @@ export const SITE = {
   name: 'Brain Works Studio Africa',
   shortName: 'BWSA',
   url: 'https://brainworksstudioafrica.com',
-  email: 'brainworksstudio2@gmail.com',
+  email: 'bwsa@brainworksstudioafrica.com',
   phoneDisplay: '+233 24 240 3450',
   phoneE164: '+233242403450',
   // TODO(BWSA): confirm this number is the WhatsApp line.
