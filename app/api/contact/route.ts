@@ -69,39 +69,45 @@ export async function POST(request: NextRequest) {
       .join('');
     const messageHtml = e(lead.message).replace(/\n/g, '<br>');
 
-    const transporter = createTransporter();
+    // The lead is already saved above, so an email hiccup shouldn't make the
+    // visitor think their enquiry was lost — log it and keep going.
+    try {
+      const transporter = createTransporter();
 
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: process.env.GMAIL_USER,
-      replyTo: lead.email,
-      subject: `New project enquiry: ${subject}`,
-      html: `
-        <h2>New Project Enquiry</h2>
-        <table>${detailsTable}</table>
-        <p><strong>Project description:</strong></p>
-        <div style="background:#f5f5f5;padding:15px;border-radius:5px;">${messageHtml}</div>
-        <p><strong>Submitted at:</strong> ${new Date().toLocaleString('en-GB', { timeZone: 'Africa/Accra' })}</p>
-      `,
-    });
+      await transporter.sendMail({
+        from: process.env.SMTP_USER,
+        to: process.env.SMTP_USER,
+        replyTo: lead.email,
+        subject: `New project enquiry: ${subject}`,
+        html: `
+          <h2>New Project Enquiry</h2>
+          <table>${detailsTable}</table>
+          <p><strong>Project description:</strong></p>
+          <div style="background:#f5f5f5;padding:15px;border-radius:5px;">${messageHtml}</div>
+          <p><strong>Submitted at:</strong> ${new Date().toLocaleString('en-GB', { timeZone: 'Africa/Accra' })}</p>
+        `,
+      });
 
-    await transporter.sendMail({
-      from: process.env.GMAIL_USER,
-      to: lead.email,
-      subject: 'We received your project enquiry — Brain Works Studio Africa',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color:#1A3050;">Thanks, ${e(lead.name)} — we've got your brief.</h2>
-          <p>Our team will review your ${e(projectTypeLabel.toLowerCase())} enquiry and get back to you within one business day.</p>
-          <div style="background:#f5f5f5;padding:20px;border-radius:8px;margin:20px 0;">
-            <p><strong>What you told us:</strong></p>
-            <p>${messageHtml}</p>
+      await transporter.sendMail({
+        from: process.env.SMTP_USER,
+        to: lead.email,
+        subject: 'We received your project enquiry — Brain Works Studio Africa',
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color:#1A3050;">Thanks, ${e(lead.name)} — we've got your brief.</h2>
+            <p>Our team will review your ${e(projectTypeLabel.toLowerCase())} enquiry and get back to you within one business day.</p>
+            <div style="background:#f5f5f5;padding:20px;border-radius:8px;margin:20px 0;">
+              <p><strong>What you told us:</strong></p>
+              <p>${messageHtml}</p>
+            </div>
+            <p>Need to reach us sooner? Reply to this email or call +233 24 240 3450.</p>
+            <p>Best regards,<br>Brain Works Studio Africa</p>
           </div>
-          <p>Need to reach us sooner? Reply to this email or call +233 24 240 3450.</p>
-          <p>Best regards,<br>Brain Works Studio Africa</p>
-        </div>
-      `,
-    });
+        `,
+      });
+    } catch (emailError) {
+      console.error('Contact form saved, but notification email failed:', emailError);
+    }
 
     return NextResponse.json({ success: true });
   } catch (error) {

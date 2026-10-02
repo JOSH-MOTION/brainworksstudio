@@ -9,12 +9,15 @@ export const escapeHtml = (value: unknown): string =>
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 
+// Zoho Mail SMTP (bwsa@brainworksstudioafrica.com is hosted on Zoho, not Gmail).
 export const createTransporter = () => {
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.zoho.com',
+    port: 465,
+    secure: true,
     auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
     },
   });
 };
@@ -23,7 +26,7 @@ export const sendBookingConfirmation = async (userEmail: string, bookingDetails:
   const transporter = createTransporter();
   
   const mailOptions = {
-    from: process.env.GMAIL_USER,
+    from: process.env.SMTP_USER,
     to: userEmail,
     subject: 'Booking Confirmation - Brain Works Studio Africa',
     html: `
@@ -56,7 +59,7 @@ export const sendBookingStatusUpdate = async (userEmail: string, status: string,
   const statusColor = status === 'accepted' ? '#22C55E' : '#EF4444';
   
   const mailOptions = {
-    from: process.env.GMAIL_USER,
+    from: process.env.SMTP_USER,
     to: userEmail,
     subject: `Booking ${statusText} - Brain Works Studio Africa`,
     html: `
