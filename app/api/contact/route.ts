@@ -71,6 +71,9 @@ export async function POST(request: NextRequest) {
 
     // The lead is already saved above, so an email hiccup shouldn't make the
     // visitor think their enquiry was lost — log it and keep going.
+    // TEMP-DIAGNOSTIC: surfacing the real error in the response to debug a
+    // production SMTP issue. Remove emailDebug before shipping normally.
+    let emailDebug: { sent: boolean; error?: string } = { sent: false };
     try {
       const transporter = createTransporter();
 
@@ -105,11 +108,13 @@ export async function POST(request: NextRequest) {
           </div>
         `,
       });
-    } catch (emailError) {
+      emailDebug = { sent: true };
+    } catch (emailError: any) {
       console.error('Contact form saved, but notification email failed:', emailError);
+      emailDebug = { sent: false, error: emailError?.message || String(emailError) };
     }
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, emailDebug });
   } catch (error) {
     console.error('Error processing contact form:', error);
     return NextResponse.json({ error: 'Failed to send your enquiry' }, { status: 500 });
