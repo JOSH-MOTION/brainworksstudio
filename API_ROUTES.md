@@ -367,3 +367,58 @@ const submitContact = async (contactData) => {
   return response.json();
 };
 ```
+
+## Bulk SMS Routes (admin only — require `Authorization: Bearer <firebase_id_token>`, role `admin`)
+
+Separate from the `contacts` collection (contact-form leads) — these manage
+`smsContacts`, the admin's own phone-number list for bulk SMS campaigns.
+
+### GET /api/admin/sms-contacts
+List all SMS contacts, newest first.
+
+### POST /api/admin/sms-contacts
+Add **or edit** one contact. Body: `{ name?: string, phone: string, birthday?: string | null }`
+(`birthday` as `"YYYY-MM-DD"`). Upserts by normalized phone number (used as
+the Firestore doc ID) — calling this again with an existing number updates
+that contact in place (the UI uses this same endpoint for its Edit dialog)
+rather than duplicating it. Preserves `source`, `createdAt`, and
+`lastBirthdaySentYear` across an edit.
+
+### POST /api/admin/sms-contacts/import
+Bulk upsert. Body: `{ rows: { name?: string, phone: string, birthday?: string }[] }`.
+Response: `{ ok, imported, skipped }`. A row's `birthday` is only written
+when present, so a plain name/phone CSV re-import never clears a birthday
+added later by hand.
+
+### DELETE /api/admin/sms-contacts/[id]
+Remove one contact (id = normalized phone number).
+
+### POST /api/admin/sms/send
+Body: `{ contactIds: string[], message: string }`. `message` may contain a
+`{name}` token — recipients are grouped by their rendered text so a plain
+broadcast (no token) still goes out as one batched call, while a
+personalized one sends per distinct name. Sends via Quick SMS
+(`QUICKSMS_PUBLIC_API_KEY` + `QUICKSMS_SENDER_ID` env vars); if those aren't set,
+returns `{ ok: false, configured: false, recipients: string[] }` instead of
+erroring, so the admin UI can offer a "copy numbers" fallback. Successful
+sends are logged to `smsLogs`.
+
+### GET /api/admin/sms/birthday-settings
+Returns `{ enabled: boolean, template: string }` (defaults to a built-in
+template, disabled, if `settings/birthdaySms` doesn't exist yet).
+
+### PUT /api/admin/sms/birthday-settings
+Body: `{ enabled: boolean, template: string }`. `template` may contain `{name}`.
+
+## Cron Routes
+
+### GET /api/cron/birthday-sms
+Runs daily (see `vercel.json`'s `crons` entry — schedule `0 7 * * *`,
+7am Ghana time). Finds every `smsContacts` doc whose `birthdayMonthDay`
+matches today, skips anyone with `lastBirthdaySentYear` already equal to
+the current year (so a retry or a second manual trigger same day can't
+double-send), sends the saved template, and stamps `lastBirthdaySentYear`
+on each contact sent to. No-ops with `{ ok: true, skipped: ... }` if
+birthday autosend is disabled. If `CRON_SECRET` is set, requires
+`Authorization: Bearer <CRON_SECRET>` (Vercel Cron sends this
+automatically when the env var is configured).

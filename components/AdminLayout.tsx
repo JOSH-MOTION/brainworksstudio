@@ -4,7 +4,7 @@ import { ReactNode } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
-import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder, FileText, DollarSign, Star, User } from 'lucide-react';
+import { Camera, LogOut, Menu, Calendar, Users, Settings, Folder, FileText, DollarSign, Star, User, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence, Variants } from 'framer-motion';
@@ -101,6 +101,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                   { href: '/admin/pricing-categories', label: 'Pricing Categories', icon: DollarSign },
                   { href: '/admin/reviews', label: 'Reviews', icon: Star },
                   { href: '/admin/users', label: 'Clients', icon: Users },
+                  { href: '/admin/bulk-sms', label: 'Bulk SMS', icon: MessageSquare },
                   { href: '/admin/profile', label: 'Profile', icon: User }, // Updated to /admin/profile
                 ].map((item, index) => (
                   <motion.div
@@ -166,6 +167,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                       { href: '/admin/pricing', label: 'Pricing', icon: DollarSign },
                       { href: '/admin/reviews', label: 'Reviews', icon: Star },
                       { href: '/admin/users', label: 'Clients', icon: Users },
+                      { href: '/admin/bulk-sms', label: 'Bulk SMS', icon: MessageSquare },
                       { href: '/admin/profile', label: 'Profile', icon: User }, // Updated to /admin/profile
                     ].map((item, index) => (
                       <motion.div

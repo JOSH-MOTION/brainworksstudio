@@ -73,6 +73,48 @@
 }
 ```
 
+### smsContacts
+Separate from `contacts` above — this is the admin's own phone-number list
+for bulk SMS campaigns (imported from CSV or added manually), not
+website-submitted leads.
+```javascript
+{
+  id: string,                     // Normalized phone number, e.g. "233207342441" (doc ID)
+  name: string,                   // May be empty — many imported rows have no name
+  phone: string,                  // Same as id, kept as a field for convenience
+  birthday?: string | null,       // "YYYY-MM-DD" as entered (year may be approximate/unknown)
+  birthdayMonthDay?: string | null, // Derived "MM-DD", indexed for the birthday cron's equality query
+  lastBirthdaySentYear?: number | null, // Set after a birthday SMS goes out — prevents re-sending same year
+  source: 'import' | 'manual',
+  createdAt: Date                // Last imported/added timestamp
+}
+```
+
+### settings/birthdaySms
+Single document controlling the birthday autosend cron.
+```javascript
+{
+  enabled: boolean,
+  template: string,               // May contain {name}
+  updatedAt: Date
+}
+```
+
+### smsLogs
+```javascript
+{
+  id: string,                     // Auto-generated document ID
+  sentBy: string,                 // Admin's Firebase Auth UID, or "cron:birthday-sms"
+  recipientCount: number,
+  message: string,                // The template as composed — may still contain {name}
+  personalized: boolean,          // Whether {name} was used
+  type?: 'birthday',              // Present only for automated birthday sends
+  success: boolean,
+  results: { ok: boolean, count: number, error: string | null }[],  // Per-batch provider results
+  createdAt: Date
+}
+```
+
 ## Security Rules
 
 ### Basic Firestore Security Rules
