@@ -71,6 +71,7 @@ export default function BulkSmsPage() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [message, setMessage] = useState('');
+  const [fallbackName, setFallbackName] = useState('there');
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState<{ ok: boolean; text: string; recipients?: string[] } | null>(null);
   const [importOpen, setImportOpen] = useState(false);
@@ -92,6 +93,7 @@ export default function BulkSmsPage() {
   // Birthday autosend settings.
   const [birthdayEnabled, setBirthdayEnabled] = useState(false);
   const [birthdayTemplate, setBirthdayTemplate] = useState('');
+  const [birthdayFallbackName, setBirthdayFallbackName] = useState('friend');
   const [birthdaySaving, setBirthdaySaving] = useState(false);
   const [birthdaySaved, setBirthdaySaved] = useState(false);
 
@@ -137,6 +139,7 @@ export default function BulkSmsPage() {
       const data = await res.json();
       setBirthdayEnabled(data.enabled);
       setBirthdayTemplate(data.template);
+      setBirthdayFallbackName(data.fallbackName || 'friend');
     } catch {
       // Non-critical — the card just falls back to its default state.
     }
@@ -170,6 +173,11 @@ export default function BulkSmsPage() {
       return next;
     });
   };
+
+  // Explicit "every contact" controls — distinct from the header checkbox,
+  // which only selects whatever the current search matches.
+  const selectAllContacts = () => setSelected(new Set(contacts.map((c) => c.id)));
+  const clearSelection = () => setSelected(new Set());
 
   const deleteContact = async (id: string) => {
     const prev = contacts;
@@ -259,8 +267,12 @@ export default function BulkSmsPage() {
   const usesPersonalization = /\{name\}/i.test(message);
   const firstSelectedName = useMemo(() => {
     const first = contacts.find((c) => selected.has(c.id));
-    return first?.name || 'there';
-  }, [contacts, selected]);
+    return first?.name || fallbackName || 'there';
+  }, [contacts, selected, fallbackName]);
+  const selectedWithNoName = useMemo(
+    () => Array.from(selected).filter((id) => !contacts.find((c) => c.id === id)?.name).length,
+    [contacts, selected]
+  );
 
   const sendSms = async () => {
     setSending(true);
@@ -269,7 +281,7 @@ export default function BulkSmsPage() {
       const res = await authedFetch('/api/admin/sms/send', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contactIds: Array.from(selected), message }),
+        body: JSON.stringify({ contactIds: Array.from(selected), message, fallbackName }),
       });
       const data = await res.json();
       if (data.configured === false) {
@@ -307,7 +319,7 @@ export default function BulkSmsPage() {
       const res = await authedFetch('/api/admin/sms/birthday-settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ enabled: birthdayEnabled, template: birthdayTemplate }),
+        body: JSON.stringify({ enabled: birthdayEnabled, template: birthdayTemplate, fallbackName: birthdayFallbackName }),
       });
       if (!res.ok) throw new Error('Save failed');
       setBirthdaySaved(true);
@@ -367,6 +379,25 @@ export default function BulkSmsPage() {
               <div className="relative w-56">
                 <Search className="h-4 w-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name or phone" className="pl-8 h-9" />
+              </div>
+            </div>
+            <div className="flex items-center justify-between gap-3 pt-1 text-sm">
+              <span className="text-gray-600">
+                {selectedCount > 0 ? `${selectedCount} selected` : 'None selected'}
+              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={selectAllContacts}
+                  className="font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Select all {contacts.length} contacts
+                </button>
+                {selectedCount > 0 && (
+                  <button type="button" onClick={clearSelection} className="text-gray-500 hover:text-gray-700">
+                    Clear
+                  </button>
+                )}
               </div>
             </div>
           </CardHeader>
@@ -433,6 +464,20 @@ export default function BulkSmsPage() {
                   <span className="block mt-1 text-gray-600">Preview: &ldquo;{message.replace(/\{name\}/gi, firstSelectedName)}&rdquo;</span>
                 )}
               </p>
+              {usesPersonalization && (
+                <div>
+                  <Label htmlFor="fallback-name" className="text-xs text-gray-600">
+                    Greeting for contacts with no name on file{selectedWithNoName > 0 && ` (${selectedWithNoName} of your selected contacts)`}
+                  </Label>
+                  <Input
+                    id="fallback-name"
+                    value={fallbackName}
+                    onChange={(e) => setFallbackName(e.target.value)}
+                    placeholder="there"
+                    className="mt-1.5 h-9"
+                  />
+                </div>
+              )}
               <div className="flex justify-between text-xs text-gray-500">
                 <span>{message.length} characters · {segments} segment{segments === 1 ? '' : 's'}</span>
                 <span>{selectedCount} recipient{selectedCount === 1 ? '' : 's'} selected</span>
@@ -481,6 +526,18 @@ export default function BulkSmsPage() {
                 placeholder="Happy birthday, {name}! 🎉"
                 rows={3}
               />
+              <div>
+                <Label htmlFor="birthday-fallback" className="text-xs text-gray-600">
+                  Greeting for contacts with no name on file
+                </Label>
+                <Input
+                  id="birthday-fallback"
+                  value={birthdayFallbackName}
+                  onChange={(e) => setBirthdayFallbackName(e.target.value)}
+                  placeholder="friend"
+                  className="mt-1.5 h-9"
+                />
+              </div>
               <p className="text-xs text-gray-500">
                 Runs once a day. Only contacts with a birthday saved (edit a contact to add one) and matching today's date get a message — each contact is wished once per year.
               </p>

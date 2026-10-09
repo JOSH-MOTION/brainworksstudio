@@ -39,7 +39,7 @@ export async function GET(request: Request) {
   }
 
   const contacts = due.map((d) => ({ id: d.id, phone: d.data().phone as string, name: d.data().name as string }));
-  const results = await sendPersonalizedBatch(contacts, settings.template);
+  const results = await sendPersonalizedBatch(contacts, settings.template, settings.fallbackName || 'friend');
   const allOk = results.every((r) => r.ok);
 
   const batch = db.batch();

@@ -13,13 +13,14 @@ export async function POST(request: NextRequest) {
   const admin = await requireAdmin(request);
   if (admin instanceof NextResponse) return admin;
 
-  const { contactIds, message } = await request.json().catch(() => ({}));
+  const { contactIds, message, fallbackName } = await request.json().catch(() => ({}));
   if (!Array.isArray(contactIds) || contactIds.length === 0) {
     return NextResponse.json({ error: 'No recipients selected' }, { status: 400 });
   }
   if (typeof message !== 'string' || !message.trim()) {
     return NextResponse.json({ error: 'Message is empty' }, { status: 400 });
   }
+  const resolvedFallback = typeof fallbackName === 'string' && fallbackName.trim() ? fallbackName.trim() : 'there';
 
   const db = adminDb!;
   const docs = await Promise.all(contactIds.map((id: string) => db.collection('smsContacts').doc(id).get()));
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
   }
 
   const template = message.trim();
-  const results = await sendPersonalizedBatch(recipients, template);
+  const results = await sendPersonalizedBatch(recipients, template, resolvedFallback);
   const allOk = results.every((r) => r.ok);
 
   await db.collection('smsLogs').add({

@@ -41,8 +41,8 @@ export async function sendViaQuickSms(recipients: string[], message: string): Pr
   return results;
 }
 
-export function personalize(template: string, name: string | undefined | null) {
-  const safeName = (name || '').trim() || 'there';
+export function personalize(template: string, name: string | undefined | null, fallbackName = 'there') {
+  const safeName = (name || '').trim() || fallbackName;
   return template.replace(/\{name\}/gi, safeName);
 }
 
@@ -50,11 +50,16 @@ export function personalize(template: string, name: string | undefined | null) {
  * Sends a (possibly) personalized message to many contacts, grouping
  * recipients that end up with identical rendered text into one API call —
  * so a plain broadcast with no {name} token still costs a single request.
+ * `fallbackName` fills {name} for contacts with no name on file.
  */
-export async function sendPersonalizedBatch(contacts: { phone: string; name?: string }[], template: string) {
+export async function sendPersonalizedBatch(
+  contacts: { phone: string; name?: string }[],
+  template: string,
+  fallbackName = 'there'
+) {
   const groups = new Map<string, string[]>();
   for (const c of contacts) {
-    const rendered = personalize(template, c.name);
+    const rendered = personalize(template, c.name, fallbackName);
     const list = groups.get(rendered) ?? [];
     list.push(c.phone);
     groups.set(rendered, list);
