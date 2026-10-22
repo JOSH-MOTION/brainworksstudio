@@ -90,13 +90,24 @@ const config: Config = {
           900: '#4A3816',
           950: '#2B200C',
         },
-      },
+        // Was previously nested outside `colors` by mistake, so every
+        // coral-* class across the admin/booking/portfolio/pricing pages
+        // silently resolved to nothing. 50/500/600/900 are the original
+        // values; the rest fill out a matching scale.
         coral: {
           50: '#FFF5F5',
+          100: '#FFE3E3',
+          200: '#FFC9C9',
+          300: '#FFA8A8',
+          400: '#FF8787',
           500: '#F56565',
           600: '#E53E3E',
+          700: '#C53030',
+          800: '#9B2C2C',
           900: '#742A2A',
+          950: '#4A1818',
         },
+      },
       keyframes: {
         'accordion-down': {
           from: {
