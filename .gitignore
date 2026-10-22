@@ -34,3 +34,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# /brag (HyperFrames) ad-video output — local scratch, not app code
+/brag-output/
+/brag-output-*/
