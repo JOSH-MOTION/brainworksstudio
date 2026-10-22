@@ -196,44 +196,81 @@ export default function HomePageClient({
         </div>
       </section>
 
-      {/* 4. Selected Work */}
+      {/* 4. Selected Work — masonry "story cards", intro block flows as the first column item */}
       {selectedWork.length > 0 && (
         <section className="py-24 sm:py-28 bg-navy-950 text-white">
           <div className="max-w-7xl mx-auto px-6 lg:px-8">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-14">
-              <div>
-                <span className="text-xs uppercase tracking-[0.25em] text-gold-300 font-semibold block mb-4">Selected Work</span>
-                <h2 className="font-serif text-3xl sm:text-5xl font-bold tracking-tight">Proof, not promises.</h2>
+            <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
+              <div className="mb-6 break-inside-avoid">
+                <h2 className="font-serif text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
+                  This is what
+                  <br />a story
+                  <br />looks like
+                </h2>
+                <p className="mt-6 max-w-xs text-white/60">
+                  Recent shoots, start to finish. Open one to see the full set.
+                </p>
+                <Link
+                  href="/portfolio"
+                  className="mt-6 inline-flex items-center gap-3 rounded-full border border-white/20 py-2 pl-6 pr-2 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-white/5"
+                >
+                  All Work
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </span>
+                </Link>
               </div>
-              <Link href="/portfolio" className="inline-flex items-center text-sm font-semibold text-gold-300 hover:text-gold-200">
-                View all work <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {selectedWork.map((work, index) => (
-                <MotionCard key={work.id} index={index} lift={8} className="rounded-xl bg-navy-800">
-                  <Link href={`/portfolio/${work.id}`} className="block">
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <Image
-                        src={work.imageUrls[0]}
-                        alt={`${work.title} — ${work.category} by Brain Works Studio Africa`}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-navy-950/95" />
-                      <div className="absolute inset-x-0 bottom-0 p-6 transition-transform duration-500 group-hover:-translate-y-2">
-                        <p className="text-xs uppercase tracking-wider text-gold-300 mb-1">{work.category || work.type}</p>
-                        <h3 className="text-xl font-bold">{work.title}</h3>
-                        <span className="mt-2 inline-flex translate-y-2 items-center text-sm font-semibold text-gold-300 opacity-0 transition-all duration-500 group-hover:translate-y-0 group-hover:opacity-100">
-                          View project <ArrowRight className="ml-2 h-4 w-4" />
+              {selectedWork.map((work, index) => {
+                const year = new Date(work.createdAt).getFullYear();
+                return (
+                  <MotionCard
+                    key={work.id}
+                    index={index}
+                    accent={false}
+                    className="mb-6 break-inside-avoid overflow-hidden rounded-3xl bg-gold-50 text-navy-900"
+                  >
+                    <Link href={`/portfolio/${work.id}`} className="block">
+                      <div className="relative aspect-[3/4] overflow-hidden">
+                        <Image
+                          src={work.imageUrls[0]}
+                          alt={`${work.title} — ${work.category} by Brain Works Studio Africa`}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/75 via-black/10 via-40% to-black/20" />
+                        {/* Fades the photo into the cream footer below instead of a hard seam */}
+                        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-gold-50 to-transparent" />
+                        <div className="absolute inset-x-5 top-5 flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-wider text-gold-300">{work.category || work.type}</p>
+                            <h3 className="mt-1 font-serif text-xl font-bold leading-tight text-white">{work.title}</h3>
+                          </div>
+                          <div className="shrink-0 text-right">
+                            <p className="text-[10px] uppercase tracking-wider text-white/50">Year</p>
+                            <p className="text-sm font-bold text-white">{year}</p>
+                            <p className="mt-2 text-[10px] uppercase tracking-wider text-white/50">Type</p>
+                            <p className="text-sm font-bold capitalize text-white">{work.type}</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center justify-between px-5 py-4">
+                        <div className="flex items-baseline gap-2">
+                          <span className="font-serif text-3xl font-bold">{String(work.imageUrls.length).padStart(2, '0')}</span>
+                          <span className="text-xs leading-tight text-navy-900/60">
+                            Frames
+                            <br />in this story
+                          </span>
+                        </div>
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-900 text-white transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+                          <ArrowUpRight className="h-4 w-4" />
                         </span>
                       </div>
-                    </div>
-                  </Link>
-                </MotionCard>
-              ))}
+                    </Link>
+                  </MotionCard>
+                );
+              })}
             </div>
           </div>
         </section>
