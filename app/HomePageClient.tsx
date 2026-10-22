@@ -9,10 +9,12 @@ import { ArrowRight, ArrowUpRight, Star, Award, Play, Check } from 'lucide-react
 import Link from 'next/link';
 import Image from 'next/image';
 import VideoPlayer from '@/components/VideoPlayer';
-import { SERVICE_PILLARS, VERIFIED_STATS } from '@/lib/site-config';
+import { SERVICE_PILLARS, VERIFIED_STATS, GOOGLE_QUOTES } from '@/lib/site-config';
 import { PortfolioItem } from '@/types';
 import MotionCard from '@/components/MotionCard';
 import ImageCard from '@/components/ImageCard';
+import GoogleRatingBadge from '@/components/GoogleRatingBadge';
+import GoogleG from '@/components/GoogleG';
 
 // Animation variants
 const fadeInUp: Variants = {
@@ -400,6 +402,9 @@ export default function HomePageClient({
               <motion.h2 variants={fadeInUp} className="font-serif text-3xl sm:text-5xl font-bold text-navy-900 tracking-tight">
                 What Clients Say
               </motion.h2>
+              <motion.div variants={fadeInUp} className="mt-6 flex justify-center">
+                <GoogleRatingBadge />
+              </motion.div>
             </motion.div>
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -453,6 +458,18 @@ export default function HomePageClient({
                       )}
                     </CardContent>
                   </Card>
+                </MotionCard>
+              ))}
+            </div>
+
+            {/* More, quoted from the real Google Business listing (excludes
+                reviews left by BWSA's own team) */}
+            <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {GOOGLE_QUOTES.map((quote, index) => (
+                <MotionCard key={quote.name} index={index} accent={false} className="rounded-2xl border border-gray-100 bg-slate-50 p-6">
+                  <GoogleG className="h-5 w-5" />
+                  <p className="mt-3 text-sm leading-relaxed text-gray-700">&ldquo;{quote.text}&rdquo;</p>
+                  <p className="mt-4 text-sm font-bold text-navy-900">{quote.name}</p>
                 </MotionCard>
               ))}
             </div>

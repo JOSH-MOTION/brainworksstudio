@@ -15,7 +15,43 @@ export const SITE = {
   hours: 'Mon–Fri: 9am–6pm GMT · Weekends by appointment',
   positioning:
     'An African creative production company creating powerful visual stories for brands, organisations, events and people.',
+  // Google Business Profile — update these by hand as the real listing
+  // changes (static badge, not a live API sync).
+  googleReviewUrl: 'https://share.google/gWSVlK9LwY2XtZFQi',
+  googleRating: 4.8,
+  googleReviewCount: 16,
 };
+
+// Hand-picked from the real Google Business listing — excludes reviews left
+// by BWSA's own team members (Joshua Doe/CEO, Michael Bekoe Otoo/Director,
+// Albert Makafui Kakabiku/Designer all reviewed their own company on
+// Google). Update by hand if the listing changes.
+export const GOOGLE_QUOTES: { name: string; text: string }[] = [
+  {
+    name: 'Bernice Kissiwaa Asante',
+    text: 'The photographers were highly professional, arrived early, and made everyone feel comfortable and relaxed.',
+  },
+  {
+    name: 'Elsie Elphine',
+    text: 'Very good photography and videography, trustworthy and professional — definitely getting them again for my graduation next year.',
+  },
+  {
+    name: 'Jessica Doe',
+    text: 'I recently worked with Brain works studio and they were really amazing. What I love most is how much they care about their clients.',
+  },
+  {
+    name: 'Diana Adigbli',
+    text: 'The layout is clean and elegant, allowing the stunning photography to take center stage.',
+  },
+  {
+    name: 'Sandra Attimah',
+    text: 'They are the best, their pictures look natural.',
+  },
+  {
+    name: 'Gershon Atta',
+    text: 'A team at its best. Highly recommended.',
+  },
+];
 
 // Only figures BWSA can substantiate belong here (audit §4). Sections that
 // display stats are hidden while this list is empty.
