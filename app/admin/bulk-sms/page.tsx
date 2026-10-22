@@ -73,7 +73,12 @@ export default function BulkSmsPage() {
   const [message, setMessage] = useState('');
   const [fallbackName, setFallbackName] = useState('there');
   const [sending, setSending] = useState(false);
-  const [sendResult, setSendResult] = useState<{ ok: boolean; text: string; recipients?: string[] } | null>(null);
+  const [sendResult, setSendResult] = useState<{
+    status: 'success' | 'partial' | 'error' | 'not-configured';
+    text: string;
+    recipients?: string[]; // numbers to copy when no provider is configured
+    failedPhones?: string[]; // numbers to retry after a partial failure
+  } | null>(null);
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState('');
   const [importing, setImporting] = useState(false);
@@ -286,21 +291,40 @@ export default function BulkSmsPage() {
       const data = await res.json();
       if (data.configured === false) {
         setSendResult({
-          ok: false,
+          status: 'not-configured',
           text: 'No SMS provider is connected yet, so this couldn’t be sent automatically. Copy the numbers below and paste them into your SMS platform for now.',
           recipients: data.recipients,
         });
         return;
       }
-      if (!res.ok || !data.ok) throw new Error(data.error || 'Send failed');
-      setSendResult({ ok: true, text: `Sent to ${data.recipientCount} recipient${data.recipientCount === 1 ? '' : 's'}.` });
-      setMessage('');
-      setSelected(new Set());
+      if (!res.ok) throw new Error(data.error || 'Send failed');
+
+      if (data.ok) {
+        setSendResult({ status: 'success', text: `Sent to all ${data.sentCount} recipient${data.sentCount === 1 ? '' : 's'}.` });
+        setMessage('');
+        setSelected(new Set());
+      } else {
+        const failedCount = data.failedPhones?.length ?? 0;
+        setSendResult({
+          status: 'partial',
+          text: `Sent to ${data.sentCount} of ${data.recipientCount} — ${failedCount} failed (the provider rejected or timed out on these; check your QuickSMS balance if this keeps happening). Message and selection are kept below so you can retry just the failed ones.`,
+          failedPhones: data.failedPhones,
+        });
+        // Deliberately NOT clearing message/selected — a partial failure
+        // means the job isn't done, unlike a full success above.
+      }
     } catch (err: any) {
-      setSendResult({ ok: false, text: err?.message || 'Send failed' });
+      setSendResult({ status: 'error', text: err?.message || 'Send failed' });
     } finally {
       setSending(false);
     }
+  };
+
+  const retryFailed = (failedPhones: string[]) => {
+    const phoneSet = new Set(failedPhones);
+    const ids = contacts.filter((c) => phoneSet.has(c.phone)).map((c) => c.id);
+    setSelected(new Set(ids));
+    setSendResult(null);
   };
 
   const copyRecipients = async (numbers: string[]) => {
@@ -488,7 +512,15 @@ export default function BulkSmsPage() {
               </Button>
 
               {sendResult && (
-                <div className={`rounded-md p-3 text-sm ${sendResult.ok ? 'bg-green-50 text-green-800' : 'bg-amber-50 text-amber-900'}`}>
+                <div
+                  className={`rounded-md p-3 text-sm ${
+                    sendResult.status === 'success'
+                      ? 'bg-green-50 text-green-800'
+                      : sendResult.status === 'partial'
+                        ? 'bg-amber-50 text-amber-900'
+                        : 'bg-red-50 text-red-800'
+                  }`}
+                >
                   <p>{sendResult.text}</p>
                   {sendResult.recipients && (
                     <Button
@@ -500,6 +532,17 @@ export default function BulkSmsPage() {
                       {copied ? <Check className="h-3.5 w-3.5 mr-1.5" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
                       {copied ? 'Copied' : `Copy ${sendResult.recipients.length} numbers`}
                     </Button>
+                  )}
+                  {sendResult.failedPhones && sendResult.failedPhones.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button variant="outline" size="sm" onClick={() => retryFailed(sendResult.failedPhones!)}>
+                        Select the {sendResult.failedPhones.length} that failed, to retry
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => copyRecipients(sendResult.failedPhones!)}>
+                        {copied ? <Check className="h-3.5 w-3.5 mr-1.5" /> : <Copy className="h-3.5 w-3.5 mr-1.5" />}
+                        {copied ? 'Copied' : 'Copy failed numbers'}
+                      </Button>
+                    </div>
                   )}
                 </div>
               )}

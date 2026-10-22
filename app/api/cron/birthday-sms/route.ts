@@ -40,17 +40,27 @@ export async function GET(request: Request) {
 
   const contacts = due.map((d) => ({ id: d.id, phone: d.data().phone as string, name: d.data().name as string }));
   const results = await sendPersonalizedBatch(contacts, settings.template, settings.fallbackName || 'friend');
-  const allOk = results.every((r) => r.ok);
+  const failedPhones = new Set(results.filter((r) => !r.ok).flatMap((r) => r.phones));
+  const allOk = failedPhones.size === 0;
 
-  const batch = db.batch();
-  for (const c of contacts) {
-    batch.update(db.collection('smsContacts').doc(c.id), { lastBirthdaySentYear: currentYear });
+  // Only stamp lastBirthdaySentYear for contacts whose send actually
+  // succeeded — otherwise a failure here (same rate-limit/balance issue
+  // seen on a manual send) would permanently skip their birthday message
+  // for the year, with no way to retry.
+  const succeeded = contacts.filter((c) => !failedPhones.has(c.phone));
+  if (succeeded.length > 0) {
+    const batch = db.batch();
+    for (const c of succeeded) {
+      batch.update(db.collection('smsContacts').doc(c.id), { lastBirthdaySentYear: currentYear });
+    }
+    await batch.commit();
   }
-  await batch.commit();
 
   await db.collection('smsLogs').add({
     sentBy: 'cron:birthday-sms',
     recipientCount: contacts.length,
+    sentCount: succeeded.length,
+    failedCount: failedPhones.size,
     message: settings.template,
     personalized: true,
     type: 'birthday',
@@ -59,5 +69,5 @@ export async function GET(request: Request) {
     createdAt: new Date(),
   });
 
-  return NextResponse.json({ ok: allOk, sent: contacts.length, matched: snapshot.size });
+  return NextResponse.json({ ok: allOk, sent: succeeded.length, failed: failedPhones.size, matched: snapshot.size });
 }

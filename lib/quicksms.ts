@@ -11,7 +11,9 @@
 
 export interface QuickSmsBatchResult {
   ok: boolean;
-  count: number;
+  /** Numbers actually in this batch — without this, a partial failure is
+   * unrecoverable: there's no way to know who needs a retry. */
+  phones: string[];
   error: string | null;
 }
 
@@ -20,22 +22,49 @@ export function quickSmsConfigured() {
 }
 
 const CHUNK_SIZE = 200;
+// A 100-contact personalized send can fan out into 80+ individual calls in
+// a tight loop. A real send hit this exact pattern — ~31 through, then every
+// subsequent call failed with no error captured (that bug is fixed below
+// too) — consistent with either rate-limiting or the account running out of
+// credit mid-send. This delay is a cheap guard against the rate-limit case;
+// it does nothing for a balance issue, which needs checking on the
+// QuickSMS dashboard instead.
+const THROTTLE_MS = Number(process.env.QUICKSMS_THROTTLE_MS ?? 350);
 
-/** Sends one message to many numbers (all get identical text). */
-export async function sendViaQuickSms(recipients: string[], message: string): Promise<QuickSmsBatchResult[]> {
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function callQuickSms(numbers: string[], message: string): Promise<{ ok: boolean; error: string | null }> {
   const apiKey = process.env.QUICKSMS_PUBLIC_API_KEY!;
   const senderId = process.env.QUICKSMS_SENDER_ID!;
+  const params = new URLSearchParams({ sender: senderId, message, numbers: numbers.join(',') });
+  const res = await fetch(`https://linksengineering.net/apisms/api/qapiv2?${params.toString()}`, {
+    method: 'POST',
+    headers: { 'api-key': apiKey },
+  });
+  const data = await res.json().catch(() => ({}));
+  const ok = res.ok && data.status === 'success';
+  // Previously only stringified `data` when the HTTP call itself failed —
+  // but QuickSMS can return HTTP 200 with a failure status in the body
+  // (e.g. insufficient balance), which was silently logged as `error: null`.
+  return { ok, error: ok ? null : `HTTP ${res.status}: ${JSON.stringify(data)}` };
+}
+
+/** Sends one message to many numbers (all get identical text), one retry on failure after a short delay. */
+export async function sendViaQuickSms(recipients: string[], message: string): Promise<QuickSmsBatchResult[]> {
   const results: QuickSmsBatchResult[] = [];
 
   for (let i = 0; i < recipients.length; i += CHUNK_SIZE) {
     const chunk = recipients.slice(i, i + CHUNK_SIZE);
-    const params = new URLSearchParams({ sender: senderId, message, numbers: chunk.join(',') });
-    const res = await fetch(`https://linksengineering.net/apisms/api/qapiv2?${params.toString()}`, {
-      method: 'POST',
-      headers: { 'api-key': apiKey },
-    });
-    const data = await res.json().catch(() => ({}));
-    results.push({ ok: res.ok && data.status === 'success', count: chunk.length, error: res.ok ? null : JSON.stringify(data) });
+    if (i > 0) await sleep(THROTTLE_MS);
+
+    let outcome = await callQuickSms(chunk, message);
+    if (!outcome.ok) {
+      await sleep(THROTTLE_MS * 2);
+      outcome = await callQuickSms(chunk, message);
+    }
+    results.push({ ok: outcome.ok, phones: chunk, error: outcome.error });
   }
 
   return results;
@@ -66,8 +95,10 @@ export async function sendPersonalizedBatch(
   }
 
   const results: QuickSmsBatchResult[] = [];
-  for (const rendered of Array.from(groups.keys())) {
-    const batch = await sendViaQuickSms(groups.get(rendered)!, rendered);
+  const keys = Array.from(groups.keys());
+  for (let i = 0; i < keys.length; i++) {
+    if (i > 0) await sleep(THROTTLE_MS);
+    const batch = await sendViaQuickSms(groups.get(keys[i])!, keys[i]);
     results.push(...batch);
   }
   return results;

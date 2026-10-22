@@ -43,11 +43,15 @@ export async function POST(request: NextRequest) {
 
   const template = message.trim();
   const results = await sendPersonalizedBatch(recipients, template, resolvedFallback);
-  const allOk = results.every((r) => r.ok);
+  const failedPhones = results.filter((r) => !r.ok).flatMap((r) => r.phones);
+  const sentCount = recipients.length - failedPhones.length;
+  const allOk = failedPhones.length === 0;
 
   await db.collection('smsLogs').add({
     sentBy: admin.uid,
     recipientCount: recipients.length,
+    sentCount,
+    failedCount: failedPhones.length,
     message: template,
     personalized: /\{name\}/i.test(template),
     success: allOk,
@@ -55,5 +59,11 @@ export async function POST(request: NextRequest) {
     createdAt: new Date(),
   });
 
-  return NextResponse.json({ ok: allOk, configured: true, recipientCount: recipients.length, results });
+  return NextResponse.json({
+    ok: allOk,
+    configured: true,
+    recipientCount: recipients.length,
+    sentCount,
+    failedPhones,
+  });
 }
