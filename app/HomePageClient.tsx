@@ -9,12 +9,13 @@ import { ArrowRight, ArrowUpRight, Star, Award, Play, Check } from 'lucide-react
 import Link from 'next/link';
 import Image from 'next/image';
 import VideoPlayer from '@/components/VideoPlayer';
-import { SERVICE_PILLARS, VERIFIED_STATS, GOOGLE_QUOTES } from '@/lib/site-config';
+import { SERVICE_PILLARS, VERIFIED_STATS, GOOGLE_QUOTES, HOW_IT_WORKS, SITE } from '@/lib/site-config';
 import { PortfolioItem } from '@/types';
 import MotionCard from '@/components/MotionCard';
 import ImageCard from '@/components/ImageCard';
 import GoogleRatingBadge from '@/components/GoogleRatingBadge';
 import GoogleG from '@/components/GoogleG';
+import RotatingBadge from '@/components/RotatingBadge';
 
 // Animation variants
 const fadeInUp: Variants = {
@@ -36,6 +37,17 @@ const staggerContainer: Variants = {
     },
   },
 };
+
+// Fixed offsets (px) + rotation (deg) fanning real portfolio photos out in
+// an arc above the final CTA, centred on the headline.
+const FAN_POSITIONS = [
+  { x: -230, y: 60, rotate: -22 },
+  { x: -140, y: 0, rotate: -13 },
+  { x: -48, y: -28, rotate: -5 },
+  { x: 48, y: -28, rotate: 5 },
+  { x: 140, y: 0, rotate: 13 },
+  { x: 230, y: 60, rotate: 22 },
+];
 
 const WHY_BWSA = [
   { title: 'Creative direction', description: 'Concept and story first — every shoot starts with what the work needs to achieve.' },
@@ -98,6 +110,18 @@ export default function HomePageClient({
           className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-28 text-center"
         >
           <div className="max-w-5xl mx-auto">
+            {SITE.availableForBookings && (
+              <motion.div
+                variants={fadeInUp}
+                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm"
+              >
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+                </span>
+                Available for bookings
+              </motion.div>
+            )}
             <motion.p variants={fadeInUp} className="mb-6 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-gold-300">
               African Creative Production Company · Accra, Ghana
             </motion.p>
@@ -305,6 +329,63 @@ export default function HomePageClient({
         </div>
       </section>
 
+      {/* 6b. How It Works */}
+      <section className="py-24 sm:py-28 bg-navy-950 text-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-14">
+          <div>
+            <span className="text-xs uppercase tracking-[0.25em] text-gold-300 font-semibold block mb-4">How It Works</span>
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold tracking-tight mb-6">
+              From the first message to the final gallery.
+            </h2>
+            <p className="text-gray-400 leading-relaxed mb-12 max-w-md">
+              Every project moves through the same four steps, whether it&rsquo;s a social shoot or a full commercial production.
+            </p>
+
+            <div className="relative">
+              <div className="absolute left-5 top-2 bottom-2 w-px bg-white/10" aria-hidden="true" />
+              <div className="space-y-10">
+                {HOW_IT_WORKS.map((item, index) => (
+                  <motion.div
+                    key={item.step}
+                    initial={{ opacity: 0, x: -16 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: '-60px' }}
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    className="relative flex gap-6 pl-0"
+                  >
+                    <span className="relative z-10 flex h-10 w-10 flex-none items-center justify-center rounded-full bg-gold-500 text-sm font-bold text-white">
+                      {item.step}
+                    </span>
+                    <div className="pt-1.5">
+                      <h3 className="text-lg font-bold text-white">{item.title}</h3>
+                      <p className="mt-1.5 text-sm leading-relaxed text-gray-400">{item.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {selectedWork[0] && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true, margin: '-80px' }}
+              transition={{ duration: 0.7 }}
+              className="relative h-80 min-h-full w-full overflow-hidden rounded-3xl lg:h-auto"
+            >
+              <Image
+                src={selectedWork[0].imageUrls[0]}
+                alt={`${selectedWork[0].title} by Brain Works Studio Africa`}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </motion.div>
+          )}
+        </div>
+      </section>
+
       {/* 7. Services for Business (with showreel) */}
       <section className="py-24 sm:py-28 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
@@ -403,7 +484,7 @@ export default function HomePageClient({
                 What Clients Say
               </motion.h2>
               <motion.div variants={fadeInUp} className="mt-6 flex justify-center">
-                <GoogleRatingBadge />
+                <GoogleRatingBadge showReviewers />
               </motion.div>
             </motion.div>
 
@@ -507,20 +588,40 @@ export default function HomePageClient({
 
       {/* 11. Final CTA */}
       <section className="relative py-28 bg-gradient-to-br from-navy-950 via-navy-900 to-navy-950 overflow-hidden">
+        {/* Fanned photo arc, real portfolio work, desktop only */}
+        {selectedWork.length > 0 && (
+          <div className="pointer-events-none absolute left-1/2 top-0 hidden -translate-x-1/2 sm:block" aria-hidden="true">
+            {FAN_POSITIONS.map((pos, index) => {
+              const work = selectedWork[index % selectedWork.length];
+              return (
+                <div
+                  key={index}
+                  className="absolute h-24 w-20 overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/10 lg:h-32 lg:w-24"
+                  style={{ transform: `translate(${pos.x}px, ${pos.y}px) rotate(${pos.rotate}deg)` }}
+                >
+                  <Image src={work.imageUrls[0]} alt="" fill sizes="120px" className="object-cover" />
+                </div>
+              );
+            })}
+          </div>
+        )}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={staggerContainer}
-          className="relative max-w-4xl mx-auto text-center px-6 lg:px-8"
+          className="relative z-10 max-w-4xl mx-auto text-center px-6 lg:px-8"
         >
           <motion.h2 variants={fadeInUp} className="font-serif text-4xl sm:text-6xl font-bold text-white mb-6 tracking-tight">
             Have a project in mind?
             <span className="block mt-2 text-gold-300">Let&rsquo;s build it.</span>
           </motion.h2>
-          <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-12 max-w-2xl mx-auto font-light leading-relaxed">
+          <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto font-light leading-relaxed">
             Tell us what you need and we&rsquo;ll come back with ideas, availability and a quote within one business day.
           </motion.p>
+          <motion.div variants={fadeInUp} className="mb-4 flex justify-center">
+            <RotatingBadge text="Book a Session" href="/booking" tone="light" />
+          </motion.div>
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/contact" className="w-full sm:w-auto">
               <Button size="lg" className="group w-full sm:w-auto bg-white text-navy-900 hover:bg-gray-100 text-base font-bold py-3 pl-10 pr-3 rounded-full">

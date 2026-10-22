@@ -1,8 +1,9 @@
 import { Star } from 'lucide-react';
-import { SITE } from '@/lib/site-config';
+import { SITE, GOOGLE_QUOTES } from '@/lib/site-config';
 import GoogleG from '@/components/GoogleG';
+import AvatarCluster from '@/components/AvatarCluster';
 
-export default function GoogleRatingBadge({ className = '' }: { className?: string }) {
+export default function GoogleRatingBadge({ className = '', showReviewers = false }: { className?: string; showReviewers?: boolean }) {
   const fillPct = Math.max(0, Math.min(1, SITE.googleRating / 5)) * 100;
 
   return (
@@ -12,6 +13,12 @@ export default function GoogleRatingBadge({ className = '' }: { className?: stri
       rel="noopener noreferrer"
       className={`inline-flex items-center gap-3 rounded-full border border-gray-200 bg-white px-5 py-2.5 shadow-sm transition-shadow hover:shadow-md ${className}`}
     >
+      {showReviewers && (
+        <>
+          <AvatarCluster names={GOOGLE_QUOTES.slice(0, 4).map((q) => q.name)} totalCount={SITE.googleReviewCount} />
+          <span className="h-5 w-px bg-gray-200" />
+        </>
+      )}
       <GoogleG className="h-5 w-5 flex-shrink-0" />
       <span className="h-5 w-px bg-gray-200" />
       <span className="relative inline-flex" aria-hidden="true">

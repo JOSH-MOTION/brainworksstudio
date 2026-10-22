@@ -81,7 +81,15 @@ export default function ServicesHubPage() {
       <section className="bg-navy-900 pb-4 pt-16 sm:pt-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-3xl font-bold leading-tight text-white sm:text-5xl">
-            Weddings, commercials, corporate films
+            Weddings
+            <span className="relative mx-1.5 -mt-2 inline-block h-10 w-10 overflow-hidden rounded-full align-middle sm:h-14 sm:w-14">
+              <Image src="/image.jpg" alt="" fill sizes="56px" className="object-cover" />
+            </span>
+            , commercials
+            <span className="relative mx-1.5 -mt-3 inline-block h-10 w-10 overflow-hidden rounded-full align-middle sm:h-14 sm:w-14">
+              <Image src="/hero1.jpg" alt="" fill sizes="56px" className="object-cover" />
+            </span>
+            , corporate films
             <span className="text-white/40"> — all under one roof.</span>
           </h2>
         </div>

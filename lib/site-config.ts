@@ -20,6 +20,8 @@ export const SITE = {
   googleReviewUrl: 'https://share.google/gWSVlK9LwY2XtZFQi',
   googleRating: 4.8,
   googleReviewCount: 16,
+  // Flip to false by hand when fully booked — shown as a status pill in the hero.
+  availableForBookings: true,
 };
 
 // Hand-picked from the real Google Business listing — excludes reviews left
@@ -50,6 +52,29 @@ export const GOOGLE_QUOTES: { name: string; text: string }[] = [
   {
     name: 'Gershon Atta',
     text: 'A team at its best. Highly recommended.',
+  },
+];
+
+export const HOW_IT_WORKS: { step: string; title: string; description: string }[] = [
+  {
+    step: '01',
+    title: 'Reach out',
+    description: 'Message us on WhatsApp, call, or fill in the project form with your occasion, date and the look you have in mind.',
+  },
+  {
+    step: '02',
+    title: 'Get your quote',
+    description: 'We come back within one business day with ideas, availability and a clear, itemised quote.',
+  },
+  {
+    step: '03',
+    title: 'Production day',
+    description: 'Our crew arrives prepared and directs every shot — lighting, posing and setup handled from start to finish.',
+  },
+  {
+    step: '04',
+    title: 'Delivery',
+    description: 'Edited, colour-graded final photos and films delivered to your own private online gallery.',
   },
 ];
 
