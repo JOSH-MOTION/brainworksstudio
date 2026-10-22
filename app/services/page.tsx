@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ArrowUpRight } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { SERVICES } from '@/lib/services-config';
 import { SERVICE_PILLARS } from '@/lib/site-config';
 import ImageCard from '@/components/ImageCard';
+import ServiceChapterRow from '@/components/ServiceChapterRow';
 
 const BASE_URL = 'https://brainworksstudioafrica.com';
 
@@ -47,7 +49,15 @@ export default function ServicesHubPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <section className="relative flex min-h-[45vh] items-center overflow-hidden text-white">
         <div className="absolute inset-0">
-          <Image src="/hero/photography-brain.jpg" alt="Brain Works Studio Africa production crew" fill priority quality={85} sizes="100vw" className="object-cover" />
+          <Image
+            src="/mic.jpg"
+            alt="Brain Works Studio Africa media crew on location"
+            fill
+            priority
+            quality={85}
+            sizes="100vw"
+            className="object-cover object-[center_22%]"
+          />
           <div className="absolute inset-0 bg-navy-900/75" />
         </div>
         <div className="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 lg:px-8">
@@ -57,39 +67,20 @@ export default function ServicesHubPage() {
           </p>
           <Link
             href="/contact"
-            className="mt-8 inline-block rounded-full bg-gold-500 px-8 py-4 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gold-600"
+            className="mt-8 inline-flex items-center gap-3 rounded-full bg-gold-500 py-2 pl-8 pr-2 text-sm font-semibold uppercase tracking-wider text-white transition-colors hover:bg-gold-600"
           >
             Start a Project
+            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
+              <ArrowUpRight className="h-4 w-4" />
+            </span>
           </Link>
         </div>
       </section>
 
-      {/* Service pillars */}
-      <section className="bg-white py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {SERVICE_PILLARS.map((pillar, index) => (
-              <ImageCard
-                key={pillar.slug}
-                index={index}
-                href={pillar.href}
-                image={pillar.image}
-                imageAlt={`${pillar.name} by Brain Works Studio Africa`}
-                title={pillar.name}
-                summary={pillar.summary}
-                headingLevel="h2"
-                cta={pillar.href.startsWith('/services') ? 'Learn more' : 'Get a quote'}
-              >
-                <ul className="mt-3 space-y-1 text-xs text-white/70">
-                  {pillar.includes.map((item) => (
-                    <li key={item}>· {item}</li>
-                  ))}
-                </ul>
-              </ImageCard>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Service pillars — one full-bleed, alternating-tone chapter per service */}
+      {SERVICE_PILLARS.map((pillar, index) => (
+        <ServiceChapterRow key={pillar.slug} pillar={pillar} index={index} />
+      ))}
 
       {/* Detailed service pages */}
       <section className="bg-gray-50 py-16 sm:py-24">

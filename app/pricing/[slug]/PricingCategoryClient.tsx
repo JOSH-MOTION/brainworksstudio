@@ -185,10 +185,12 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                     </CardHeader>
 
                     <CardContent>
-                      <ul className="space-y-3 mb-8">
+                      <ul className="mb-8 divide-y divide-gray-100">
                         {pkg.includes.map((item, i) => (
-                          <li key={i} className="flex items-start gap-3">
-                            <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                          <li key={i} className="flex items-center gap-3 py-2.5">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-coral-500/10 text-coral-600">
+                              <Check className="h-3.5 w-3.5" strokeWidth={3} />
+                            </span>
                             <span className="text-sm text-gray-700">{formatPrice(item)}</span>
                           </li>
                         ))}

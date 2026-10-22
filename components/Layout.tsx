@@ -506,12 +506,21 @@ export default function RootLayout({ children }: LayoutProps) {
                 </form>
               </motion.div>
             </div>
+          </div>
 
+          {/* Giant low-contrast wordmark — pure brand presence, no function */}
+          <div className="overflow-hidden" aria-hidden="true">
+            <p className="select-none whitespace-nowrap px-4 pt-8 text-center font-serif text-[20vw] font-bold leading-none text-white/[0.04] sm:text-[14vw]">
+              BRAIN WORKS
+            </p>
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.4 }}
-              className="border-t border-white/5 mt-12 pt-8 text-center text-sm text-gray-500"
+              className="border-t border-white/5 pt-8 pb-10 text-center text-sm text-gray-500"
             >
               <p>&copy; {new Date().getFullYear()} Brain Works Studio Africa. All rights reserved.</p>
             </motion.div>

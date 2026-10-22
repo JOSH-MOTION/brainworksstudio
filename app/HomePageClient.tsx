@@ -5,7 +5,7 @@ import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Star, Award, Play, Check } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Star, Award, Play, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import VideoPlayer from '@/components/VideoPlayer';
@@ -105,7 +105,13 @@ export default function HomePageClient({
               className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-10 sm:mb-12 leading-[1.1] tracking-tight"
             >
               We Create Visual Stories
-              <span className="block mt-1 sm:mt-2 text-gold-300">That Move People.</span>
+              <span className="block mt-1 sm:mt-2 text-gold-300">
+                That{' '}
+                <em className="bg-gradient-to-r from-gold-200 via-gold-400 to-gold-200 bg-clip-text font-serif italic text-transparent">
+                  Move
+                </em>{' '}
+                People.
+              </span>
             </motion.h1>
 
             <motion.div
@@ -115,19 +121,24 @@ export default function HomePageClient({
               <Link href="/contact" className="w-full sm:w-auto">
                 <Button
                   size="lg"
-                  className="group w-full sm:w-auto bg-gold-500 text-white hover:bg-gold-400 border-0 text-base font-bold py-7 px-10 rounded-full shadow-2xl shadow-gold-500/30"
+                  className="group w-full sm:w-auto bg-gold-500 text-white hover:bg-gold-400 border-0 text-base font-bold py-3 pl-10 pr-3 rounded-full shadow-2xl shadow-gold-500/30"
                 >
                   START A PROJECT
-                  <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="ml-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/20 transition-transform group-hover:translate-x-0.5">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </span>
                 </Button>
               </Link>
               <Link href="/portfolio" className="w-full sm:w-auto">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:text-white hover:bg-white/10 hover:border-white/50 text-base font-bold py-7 px-10 rounded-full"
+                  className="group w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:text-white hover:bg-white/10 hover:border-white/50 text-base font-bold py-3 pl-10 pr-3 rounded-full"
                 >
                   VIEW OUR WORK
+                  <span className="ml-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 transition-transform group-hover:translate-x-0.5">
+                    <ArrowUpRight className="h-4 w-4" />
+                  </span>
                 </Button>
               </Link>
             </motion.div>
@@ -258,33 +269,50 @@ export default function HomePageClient({
       {/* 7. Services for Business (with showreel) */}
       <section className="py-24 sm:py-28 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
-          <button
-            type="button"
-            onClick={() => setSelectedVideo(embedUrl)}
-            className="group relative aspect-video w-full overflow-hidden rounded-2xl bg-slate-200 shadow-xl"
-            aria-label="Play the BWSA showreel"
-          >
-            <Image
-              src={videoThumbnail}
-              alt="BWSA showreel"
-              fill
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover transition-transform duration-700 group-hover:scale-105"
-              onError={() => {
-                if (videoThumbnail.includes('maxresdefault')) {
-                  setVideoThumbnail(`https://img.youtube.com/vi/${showreelId}/hqdefault.jpg`);
-                } else {
-                  setVideoThumbnail('/hero1.jpg');
-                }
-              }}
-            />
-            <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
-                <Play className="ml-1 h-6 w-6 fill-navy-900 text-navy-900" />
-              </span>
+          {/* Filmstrip frame: perforation dots above/below the showreel, like a real strip of film */}
+          <div className="rounded-3xl bg-navy-950 p-3 shadow-xl">
+            <div className="mb-3 flex justify-between px-1" aria-hidden="true">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <span key={i} className="h-1.5 w-1.5 rounded-full bg-white/15" />
+              ))}
             </div>
-          </button>
+            <button
+              type="button"
+              onClick={() => setSelectedVideo(embedUrl)}
+              className="group relative aspect-video w-full overflow-hidden rounded-xl bg-slate-200"
+              aria-label="Play the BWSA showreel"
+            >
+              <Image
+                src={videoThumbnail}
+                alt="BWSA showreel"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                onError={() => {
+                  if (videoThumbnail.includes('maxresdefault')) {
+                    setVideoThumbnail(`https://img.youtube.com/vi/${showreelId}/hqdefault.jpg`);
+                  } else {
+                    setVideoThumbnail('/hero1.jpg');
+                  }
+                }}
+              />
+              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg">
+                  <Play className="ml-1 h-6 w-6 fill-navy-900 text-navy-900" />
+                </span>
+              </div>
+              <div className="absolute inset-x-0 bottom-0 flex items-center gap-2 bg-gradient-to-t from-black/70 to-transparent p-4">
+                <span className="h-1.5 w-1.5 rounded-full bg-gold-400" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-white/90">Watch the Showreel</span>
+              </div>
+            </button>
+            <div className="mt-3 flex justify-between px-1" aria-hidden="true">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <span key={i} className="h-1.5 w-1.5 rounded-full bg-white/15" />
+              ))}
+            </div>
+          </div>
 
           <div>
             <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">For Business</span>
@@ -441,18 +469,23 @@ export default function HomePageClient({
           </motion.p>
           <motion.div variants={fadeInUp} className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link href="/contact" className="w-full sm:w-auto">
-              <Button size="lg" className="group w-full sm:w-auto bg-white text-navy-900 hover:bg-gray-100 text-base font-bold py-7 px-10 rounded-full">
+              <Button size="lg" className="group w-full sm:w-auto bg-white text-navy-900 hover:bg-gray-100 text-base font-bold py-3 pl-10 pr-3 rounded-full">
                 Start a Project
-                <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
+                <span className="ml-3 flex h-9 w-9 items-center justify-center rounded-full bg-navy-900/10 transition-transform group-hover:translate-x-0.5">
+                  <ArrowUpRight className="h-4 w-4" />
+                </span>
               </Button>
             </Link>
             <Link href="/booking" className="w-full sm:w-auto">
               <Button
                 size="lg"
                 variant="outline"
-                className="w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:text-white hover:bg-white/10 text-base font-bold py-7 px-10 rounded-full"
+                className="group w-full sm:w-auto bg-transparent border-2 border-white/30 text-white hover:text-white hover:bg-white/10 text-base font-bold py-3 pl-10 pr-3 rounded-full"
               >
                 Book a Session
+                <span className="ml-3 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 transition-transform group-hover:translate-x-0.5">
+                  <ArrowUpRight className="h-4 w-4" />
+                </span>
               </Button>
             </Link>
           </motion.div>
