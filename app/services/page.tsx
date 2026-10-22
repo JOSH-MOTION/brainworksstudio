@@ -77,6 +77,16 @@ export default function ServicesHubPage() {
         </div>
       </section>
 
+      {/* Intro line for the chapters below — bold nouns, dimmed connective tail */}
+      <section className="bg-navy-900 pb-4 pt-16 sm:pt-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h2 className="font-serif text-3xl font-bold leading-tight text-white sm:text-5xl">
+            Weddings, commercials, corporate films
+            <span className="text-white/40"> — all under one roof.</span>
+          </h2>
+        </div>
+      </section>
+
       {/* Service pillars — one full-bleed, alternating-tone chapter per service */}
       {SERVICE_PILLARS.map((pillar, index) => (
         <ServiceChapterRow key={pillar.slug} pillar={pillar} index={index} />
