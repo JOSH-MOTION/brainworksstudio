@@ -282,7 +282,7 @@ export default function BookingPage() {
                 </div>
                 <h2 className="text-xl font-bold text-navy-900 mb-2">Booking Submitted!</h2>
                 <p className="text-sm text-gray-600 mb-3">
-                  Thank you for your booking request. We'll respond within 24 hours.
+                  Thank you for your booking request. We&apos;ll respond within 24 hours.
                 </p>
                 <p className="text-xs text-gray-500">
                   Redirecting to your bookings...
@@ -344,7 +344,7 @@ export default function BookingPage() {
           <CardHeader>
             <CardTitle className="text-xl text-navy-900">Book a Session</CardTitle>
             <CardDescription className="text-sm text-gray-600">
-              Share your project details, and we'll provide a personalized quote.
+              Share your project details, and we&apos;ll provide a personalized quote.
             </CardDescription>
           </CardHeader>
           <CardContent>

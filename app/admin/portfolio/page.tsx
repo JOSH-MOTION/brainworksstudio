@@ -236,6 +236,7 @@ const PortfolioCard = memo(({
     </motion.div>
   );
 });
+PortfolioCard.displayName = 'PortfolioCard';
 
 // Main component
 export default function AdminPortfolioPage() {
@@ -478,7 +479,7 @@ export default function AdminPortfolioPage() {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">Portfolio Management</h1>
-            <p className="text-sm text-gray-600 mt-1">Manage your studio's portfolio items efficiently</p>
+            <p className="text-sm text-gray-600 mt-1">Manage your studio&apos;s portfolio items efficiently</p>
           </div>
           <Link href="/admin/portfolio/upload">
             <Button className="bg-gold-600 hover:bg-gold-700 text-white rounded-lg px-4 py-2 text-sm flex items-center">
@@ -563,7 +564,7 @@ export default function AdminPortfolioPage() {
             </DialogHeader>
             <div className="py-4">
               <p className="text-gray-600 text-sm">
-                Are you sure you want to delete "{itemToDelete?.title || 'Untitled'}"? This action cannot be undone.
+                Are you sure you want to delete &quot;{itemToDelete?.title || 'Untitled'}&quot;? This action cannot be undone.
               </p>
             </div>
             <div className="flex justify-end gap-2">

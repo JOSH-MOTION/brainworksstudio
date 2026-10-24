@@ -582,7 +582,7 @@ export default function BulkSmsPage() {
                 />
               </div>
               <p className="text-xs text-gray-500">
-                Runs once a day. Only contacts with a birthday saved (edit a contact to add one) and matching today's date get a message — each contact is wished once per year.
+                Runs once a day. Only contacts with a birthday saved (edit a contact to add one) and matching today&apos;s date get a message — each contact is wished once per year.
               </p>
               <Button onClick={saveBirthdaySettings} disabled={birthdaySaving || !birthdayTemplate.trim()} variant="outline" className="w-full">
                 {birthdaySaving ? 'Saving…' : birthdaySaved ? 'Saved' : 'Save birthday settings'}
@@ -600,7 +600,7 @@ export default function BulkSmsPage() {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-600 mb-2">
-                Upload a CSV with "Name,Phone" per line — add a third column, "Name,Phone,Birthday" (YYYY-MM-DD), to include birthdays too:
+                Upload a CSV with &quot;Name,Phone&quot; per line — add a third column, &quot;Name,Phone,Birthday&quot; (YYYY-MM-DD), to include birthdays too:
               </p>
               <input ref={fileInputRef} type="file" accept=".csv,text/csv" onChange={handleFileChange} disabled={importing} />
             </div>

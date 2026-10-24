@@ -317,7 +317,7 @@ export default function ClientPortfolioPage() {
         >
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Not Found</h2>
           <p className="text-gray-600 mb-6">
-            This portfolio item doesn't exist.
+            This portfolio item doesn&apos;t exist.
           </p>
           <Button
             onClick={() => router.push('/')}

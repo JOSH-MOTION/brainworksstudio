@@ -407,7 +407,7 @@ export default function AdminPricingPage() {
               </div>
 
               <div>
-                <Label>What's Included</Label>
+                <Label>What&apos;s Included</Label>
                 {includesInputs.map((include, index) => (
                   <div key={index} className="flex items-center gap-2 mb-2">
                     <Input
