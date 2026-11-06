@@ -118,14 +118,8 @@ export default function HomePageClient({
               variants={fadeInUp}
               className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-10 sm:mb-12 leading-[1.1] tracking-tight"
             >
-              One team for the whole shoot
-              <span className="block mt-1 sm:mt-2 text-gold-300">
-                camera to{' '}
-                <em className="bg-gradient-to-r from-gold-200 via-gold-400 to-gold-200 bg-clip-text font-serif italic text-transparent">
-                  final cut
-                </em>
-                .
-              </span>
+              Photography, film and live production
+              <span className="block mt-1 sm:mt-2 text-gold-300">for weddings, brands and events.</span>
             </motion.h1>
 
             <motion.div
@@ -217,9 +211,7 @@ export default function HomePageClient({
             <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
               <div className="mb-6 break-inside-avoid">
                 <h2 className="font-serif text-4xl font-bold leading-[1.05] tracking-tight sm:text-5xl">
-                  This is what
-                  <br />a story
-                  <br />looks like
+                  Selected Work
                 </h2>
                 <p className="mt-6 max-w-xs text-white/60">
                   Recent shoots, start to finish. Open one to see the full set.
@@ -571,7 +563,7 @@ export default function HomePageClient({
       </section>
 
       {/* 11. Final CTA */}
-      <section className="relative py-28 bg-gradient-to-br from-navy-950 via-navy-900 to-navy-950 overflow-hidden">
+      <section className="relative pb-28 pt-28 sm:pt-52 lg:pt-60 bg-gradient-to-br from-navy-950 via-navy-900 to-navy-950 overflow-hidden">
         {/* Fanned photo arc, real portfolio work, desktop only */}
         {selectedWork.length > 0 && (
           <div className="pointer-events-none absolute left-1/2 top-0 hidden -translate-x-1/2 sm:block" aria-hidden="true">
