@@ -168,6 +168,14 @@ export async function PUT(
       const caption = (formData.get('caption') as string).trim();
       updateData.caption = caption || null;
     }
+    if (formData.has('location')) {
+      const location = (formData.get('location') as string).trim();
+      updateData.location = location || null;
+    }
+    if (formData.has('brief')) {
+      const brief = (formData.get('brief') as string).trim();
+      updateData.brief = brief || null;
+    }
     if (formData.has('clientName')) {
       const clientName = (formData.get('clientName') as string).trim();
       updateData.clientName = clientName || null;

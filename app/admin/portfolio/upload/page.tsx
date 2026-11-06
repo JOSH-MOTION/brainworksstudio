@@ -52,6 +52,8 @@ export default function UploadPortfolio() {
   const [category, setCategory] = useState('');
   const [tags, setTags] = useState('');
   const [caption, setCaption] = useState('');
+  const [location, setLocation] = useState('');
+  const [brief, setBrief] = useState('');
   const [clientName, setClientName] = useState('');
   const [files, setFiles] = useState<FileList | null>(null);
   const [previewFiles, setPreviewFiles] = useState<PreviewFile[]>([]);
@@ -180,6 +182,8 @@ export default function UploadPortfolio() {
       formData.append('category', category);
       formData.append('tags', tags);
       formData.append('caption', caption);
+      formData.append('location', location);
+      formData.append('brief', brief);
       formData.append('clientName', clientName);
       formData.append('featured', 'false');
       formData.append('pin', pin);
@@ -320,6 +324,30 @@ export default function UploadPortfolio() {
                     value={caption}
                     onChange={(e) => setCaption(e.target.value)}
                     placeholder="Describe your project..."
+                    rows={4}
+                    className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                  />
+                </motion.div>
+
+                <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
+                  <Label htmlFor="location" className="text-navy-900 text-sm">Location</Label>
+                  <Input
+                    id="location"
+                    type="text"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    placeholder="e.g., East Legon, Accra"
+                    className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                  />
+                </motion.div>
+
+                <motion.div custom={5} variants={formElementVariants} initial="hidden" animate="visible">
+                  <Label htmlFor="brief" className="text-navy-900 text-sm">Brief</Label>
+                  <Textarea
+                    id="brief"
+                    value={brief}
+                    onChange={(e) => setBrief(e.target.value)}
+                    placeholder="What was the assignment? A short case-study paragraph for the project page."
                     rows={4}
                     className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
                   />

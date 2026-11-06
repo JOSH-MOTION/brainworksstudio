@@ -10,10 +10,11 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
 import Image from 'next/image';
-import { X, Play, ArrowDown, Eye, EyeOff, Lock, Download, Heart, Share2, Loader2 } from 'lucide-react';
+import { X, Play, ArrowDown, Eye, EyeOff, Lock, Download, Heart, Share2, Loader2, MapPin, Calendar, Briefcase } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import logo from "../../../public/newlogo1.png";
+import { SITE } from '@/lib/site-config';
 
 // ---------------------------------------------------
 //  Animation Variants
@@ -433,6 +434,42 @@ export default function PortfolioDetailClient({ id, initialItem }: { id: string;
             </p>
           </motion.div>
         </motion.div>
+
+        {/* Case Study Strip — Location / Service / Year, plus the brief, when present */}
+        <div className="border-b border-gray-200 bg-slate-50">
+          <div className="mx-auto max-w-7xl px-4 py-10">
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="mt-0.5 h-5 w-5 flex-none text-gold-600" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Location</p>
+                  <p className="mt-1 text-sm font-medium text-navy-900">{item.location || SITE.location}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Briefcase className="mt-0.5 h-5 w-5 flex-none text-gold-600" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Service</p>
+                  <p className="mt-1 text-sm font-medium capitalize text-navy-900">
+                    {item.category} &middot; {item.type}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Calendar className="mt-0.5 h-5 w-5 flex-none text-gold-600" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">Year</p>
+                  <p className="mt-1 text-sm font-medium text-navy-900">{new Date(item.createdAt).getFullYear()}</p>
+                </div>
+              </div>
+            </div>
+            {(item.brief || item.caption) && (
+              <p className="mt-8 max-w-3xl font-serif text-xl leading-relaxed text-navy-900">
+                {item.brief || item.caption}
+              </p>
+            )}
+          </div>
+        </div>
 
         {/* Gallery Section - Below Hero */}
         <div id="gallery-section" className="bg-white py-12">

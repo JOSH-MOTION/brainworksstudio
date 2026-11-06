@@ -62,6 +62,8 @@ export async function GET(request: NextRequest) {
         imageUrls: data.imageUrls || [],
         videoUrl: data.videoUrl || null,
         caption: data.caption || null,
+        location: data.location || null,
+        brief: data.brief || null,
         clientName: data.clientName || null,
         featured: data.featured || false,
         createdAt: data.createdAt?.toDate?.()?.toISOString() || data.createdAt || new Date().toISOString(),
@@ -124,6 +126,8 @@ export async function POST(request: NextRequest) {
     const category = formData.get('category') as string;
     const tags = formData.get('tags') as string;
     const caption = formData.get('caption') as string;
+    const location = formData.get('location') as string;
+    const brief = formData.get('brief') as string;
     const clientName = formData.get('clientName') as string;
     const featured = formData.get('featured') === 'true';
     const clientId = formData.get('clientId') as string | null;
@@ -221,6 +225,8 @@ export async function POST(request: NextRequest) {
       imageUrls,
       videoUrl: finalVideoUrl,
       caption: caption?.trim() || null,
+      location: location?.trim() || null,
+      brief: brief?.trim() || null,
       clientName: clientName?.trim() || null,
       featured: Boolean(featured),
       pin: finalPin.trim(),

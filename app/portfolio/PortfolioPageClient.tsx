@@ -244,96 +244,101 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
           </p>
         </div>
 
-        {/* Portfolio Grid */}
-        <motion.div
-          className="grid grid-cols-2 gap-3 sm:gap-6 lg:grid-cols-3 lg:gap-8"
-          variants={sectionVariants}
-        >
+        {/* Portfolio Grid — mixed aspect ratios in a masonry layout, editorial pacing instead of a uniform grid */}
+        <motion.div className="columns-2 gap-3 sm:gap-6 lg:columns-3 lg:gap-8" variants={sectionVariants}>
           <AnimatePresence mode="wait">
-            {filteredItems.map((item, index) => (
-              <motion.div
-                key={item.id}
-                custom={index}
-                variants={cardVariants}
-                initial="hidden"
-                animate="visible"
-                exit={{ opacity: 0, scale: 0.96 }}
-                transition={{ delay: index * 0.05 }}
-              >
-                <Link href={`/portfolio/${item.id}`} className="block">
-                  <motion.div
-                    initial="rest"
-                    animate="rest"
-                    whileHover="hover"
-                    variants={cardShadowVariants}
-                    className="relative aspect-[4/5] w-full overflow-hidden rounded-xl sm:rounded-2xl bg-slate-100"
-                  >
-                    <motion.div variants={cardImageVariants} className="absolute inset-0">
-                      <Image
-                        src={
-                          item.imageUrls && item.imageUrls.length > 0
-                            ? item.imageUrls[0]
-                            : item.videoUrl
-                              ? '/video-placeholder.jpg'
-                              : '/placeholder-image.jpg'
-                        }
-                        alt={`${item.title} — ${item.category} ${item.type === 'photography' ? 'photography' : 'videography'} by Brain Works Studio Africa, Accra, Ghana`}
-                        fill
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-                        className="object-cover"
-                        onError={(e) => {
-                          e.currentTarget.src = '/placeholder-image.jpg';
-                        }}
-                      />
-                    </motion.div>
+            {filteredItems.map((item, index) => {
+              const aspect = ['aspect-[3/4]', 'aspect-[4/5]', 'aspect-square', 'aspect-[4/5]'][index % 4];
+              const year = new Date(item.createdAt).getFullYear();
+              return (
+                <motion.div
+                  key={item.id}
+                  custom={index}
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  exit={{ opacity: 0, scale: 0.96 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="mb-3 break-inside-avoid sm:mb-6 lg:mb-8"
+                >
+                  <Link href={`/portfolio/${item.id}`} className="block">
+                    <motion.div
+                      initial="rest"
+                      animate="rest"
+                      whileHover="hover"
+                      variants={cardShadowVariants}
+                      className={`relative ${aspect} w-full overflow-hidden rounded-xl bg-slate-100 sm:rounded-2xl`}
+                    >
+                      <motion.div variants={cardImageVariants} className="absolute inset-0">
+                        <Image
+                          src={
+                            item.imageUrls && item.imageUrls.length > 0
+                              ? item.imageUrls[0]
+                              : item.videoUrl
+                                ? '/video-placeholder.jpg'
+                                : '/placeholder-image.jpg'
+                          }
+                          alt={`${item.title} — ${item.category} ${item.type === 'photography' ? 'photography' : 'videography'} by Brain Works Studio Africa, Accra, Ghana`}
+                          fill
+                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = '/placeholder-image.jpg';
+                          }}
+                        />
+                      </motion.div>
 
-                    {/* Top-left: featured marker */}
-                    {item.featured && (
-                      <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-navy-900 shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
-                        <Star className="h-2.5 w-2.5 fill-[#CB9D06] text-[#CB9D06] sm:h-3 sm:w-3" />
-                        Featured
-                      </div>
-                    )}
-
-                    {/* Top-right: media type indicator */}
-                    <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-navy-900 shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
-                      {item.type === 'photography' ? (
-                        <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                      ) : (
-                        <Video className="h-3 w-3 sm:h-4 sm:w-4" />
+                      {/* Top-left: featured marker */}
+                      {item.featured && (
+                        <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-navy-900 shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
+                          <Star className="h-2.5 w-2.5 fill-[#CB9D06] text-[#CB9D06] sm:h-3 sm:w-3" />
+                          Featured
+                        </div>
                       )}
-                    </div>
 
-                    {/* Video play affordance */}
-                    {item.videoUrl && (
-                      <div className="absolute inset-0 flex items-center justify-center">
+                      {/* Top-right: media type indicator */}
+                      <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-navy-900 shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
+                        {item.type === 'photography' ? (
+                          <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+                        ) : (
+                          <Video className="h-3 w-3 sm:h-4 sm:w-4" />
+                        )}
+                      </div>
+
+                      {/* Video play affordance */}
+                      {item.videoUrl && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <motion.div
+                            variants={cardPlayVariants}
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg sm:h-16 sm:w-16"
+                          >
+                            <Play className="ml-0.5 h-4 w-4 fill-navy-900 text-navy-900 sm:h-6 sm:w-6" />
+                          </motion.div>
+                        </div>
+                      )}
+
+                      {/* Bottom scrim + metadata — category/year always visible, not hover-only */}
+                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-900/95 via-navy-900/55 to-transparent px-2.5 pb-2.5 pt-10 sm:px-5 sm:pb-5 sm:pt-16">
+                        <div className="mb-0.5 flex items-center justify-between sm:mb-1">
+                          <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-white/75 sm:text-xs sm:tracking-[0.12em]">
+                            {item.category}
+                          </p>
+                          <p className="text-[9px] font-semibold text-white/60 sm:text-xs">{year}</p>
+                        </div>
+                        <h3 className="font-serif text-xs leading-snug text-white sm:text-xl">{item.title}</h3>
                         <motion.div
-                          variants={cardPlayVariants}
-                          className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg sm:h-16 sm:w-16"
+                          variants={cardRevealVariants}
+                          className="mt-1.5 hidden items-center gap-1.5 text-sm font-medium text-white sm:mt-3 sm:flex"
                         >
-                          <Play className="ml-0.5 h-4 w-4 fill-navy-900 text-navy-900 sm:h-6 sm:w-6" />
+                          View project
+                          <ArrowUpRight className="h-4 w-4" />
                         </motion.div>
                       </div>
-                    )}
-
-                    {/* Bottom scrim + metadata */}
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-900/95 via-navy-900/50 to-transparent px-2.5 pb-2.5 pt-8 sm:px-5 sm:pb-5 sm:pt-16">
-                      <p className="mb-0.5 text-[9px] font-semibold uppercase tracking-[0.1em] text-white/75 sm:mb-1 sm:text-xs sm:tracking-[0.12em]">
-                        {item.category}
-                      </p>
-                      <h3 className="font-serif text-xs leading-snug text-white sm:text-xl">{item.title}</h3>
-                      <motion.div
-                        variants={cardRevealVariants}
-                        className="mt-1.5 hidden items-center gap-1.5 text-sm font-medium text-white sm:mt-3 sm:flex"
-                      >
-                        View project
-                        <ArrowUpRight className="h-4 w-4" />
-                      </motion.div>
-                    </div>
-                  </motion.div>
-                </Link>
-              </motion.div>
-            ))}
+                    </motion.div>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </motion.div>
 

@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Camera } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatCategoryName } from '@/lib/pricing-format';
@@ -25,41 +25,37 @@ interface PricingCategory {
 
 export default function PricingPageClient({ initialCategories }: { initialCategories: PricingCategory[] }) {
   const [categories] = useState<PricingCategory[]>(initialCategories);
+  // Real work, not a stock/gradient hero — use whichever category has the
+  // most packages as the flagship image (falls back to the first with a photo).
+  const heroImage = [...categories].sort((a, b) => (b.packages?.length || 0) - (a.packages?.length || 0)).find(
+    (c) => c.imageUrl
+  )?.imageUrl;
 
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-gold-900 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
-            backgroundSize: '48px 48px'
-          }} />
-        </div>
+      <section className="relative overflow-hidden py-28 sm:py-36">
+        {heroImage ? (
+          <div className="absolute inset-0 z-0">
+            <Image src={heroImage} alt="Brain Works Studio Africa production" fill sizes="100vw" className="object-cover" priority />
+            <div className="absolute inset-0 bg-navy-950/80" />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/40 to-navy-950/70" />
+          </div>
+        ) : (
+          <div className="absolute inset-0 z-0 bg-navy-950" />
+        )}
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
+          className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center"
         >
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-6"
-          >
-            <Sparkles className="w-4 h-4 text-gold-400" />
-            <span className="text-sm text-white font-medium">Transparent & Flexible Pricing</span>
-          </motion.div>
-
           <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
             Choose Your
-            <span className="block mt-2 bg-gradient-to-r from-white via-gold-200 to-gold-400 bg-clip-text text-transparent">
-              Perfect Package
-            </span>
+            <span className="block mt-2 text-gold-300">Perfect Package</span>
           </h1>
-          
+
           <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
             Explore our service categories and find the perfect package that fits your needs and budget
           </p>
@@ -104,10 +100,8 @@ export default function PricingPageClient({ initialCategories }: { initialCatego
                               }}
                             />
                           ) : (
-                            <div className="absolute inset-0 bg-gradient-to-br from-gold-500 to-coral-500 flex items-center justify-center">
-                              <span className="text-6xl font-bold text-white opacity-20">
-                                {category.name.charAt(0)}
-                              </span>
+                            <div className="absolute inset-0 bg-navy-900 flex items-center justify-center">
+                              <Camera className="h-10 w-10 text-gold-400/50" strokeWidth={1.5} />
                             </div>
                           )}
                           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />

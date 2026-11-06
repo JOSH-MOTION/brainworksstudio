@@ -5,11 +5,11 @@ import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, ArrowUpRight, Star, Award, Play, Check } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, Star, Play, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import VideoPlayer from '@/components/VideoPlayer';
-import { SERVICE_PILLARS, VERIFIED_STATS, GOOGLE_QUOTES, HOW_IT_WORKS, SITE } from '@/lib/site-config';
+import { SERVICE_PILLARS, VERIFIED_STATS, GOOGLE_QUOTES, HOW_IT_WORKS } from '@/lib/site-config';
 import { PortfolioItem } from '@/types';
 import MotionCard from '@/components/MotionCard';
 import ImageCard from '@/components/ImageCard';
@@ -110,18 +110,6 @@ export default function HomePageClient({
           className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-28 text-center"
         >
           <div className="max-w-5xl mx-auto">
-            {SITE.availableForBookings && (
-              <motion.div
-                variants={fadeInUp}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-medium text-white/80 backdrop-blur-sm"
-              >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
-                </span>
-                Available for bookings
-              </motion.div>
-            )}
             <motion.p variants={fadeInUp} className="mb-6 text-xs sm:text-sm font-semibold uppercase tracking-[0.3em] text-gold-300">
               African Creative Production Company · Accra, Ghana
             </motion.p>
@@ -130,13 +118,13 @@ export default function HomePageClient({
               variants={fadeInUp}
               className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white mb-10 sm:mb-12 leading-[1.1] tracking-tight"
             >
-              We Create Visual Stories
+              One team for the whole shoot
               <span className="block mt-1 sm:mt-2 text-gold-300">
-                That{' '}
+                camera to{' '}
                 <em className="bg-gradient-to-r from-gold-200 via-gold-400 to-gold-200 bg-clip-text font-serif italic text-transparent">
-                  Move
-                </em>{' '}
-                People.
+                  final cut
+                </em>
+                .
               </span>
             </motion.h1>
 
@@ -202,7 +190,7 @@ export default function HomePageClient({
               What We Do
             </motion.span>
             <motion.h2 variants={fadeInUp} className="font-serif text-3xl sm:text-5xl font-bold text-navy-900 tracking-tight">
-              The right creative and technical team for every project.
+              What we shoot, edit and stream.
             </motion.h2>
           </motion.div>
 
@@ -308,7 +296,7 @@ export default function HomePageClient({
           <div className="lg:col-span-4">
             <span className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">Why BWSA</span>
             <h2 className="font-serif text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight">
-              Built to deliver, from brief to final cut.
+              What you get when you book us.
             </h2>
           </div>
           <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -473,11 +461,7 @@ export default function HomePageClient({
               variants={staggerContainer}
               className="text-center mb-16"
             >
-              <motion.span
-                variants={fadeInUp}
-                className="px-5 py-2.5 bg-gold-50 text-gold-600 rounded-full text-sm font-bold inline-flex items-center gap-2 uppercase tracking-wider mb-6"
-              >
-                <Award className="w-4 h-4" />
+              <motion.span variants={fadeInUp} className="text-xs uppercase tracking-[0.25em] text-gold-600 font-semibold block mb-4">
                 Client Reviews
               </motion.span>
               <motion.h2 variants={fadeInUp} className="font-serif text-3xl sm:text-5xl font-bold text-navy-900 tracking-tight">
@@ -613,8 +597,8 @@ export default function HomePageClient({
           className="relative z-10 max-w-4xl mx-auto text-center px-6 lg:px-8"
         >
           <motion.h2 variants={fadeInUp} className="font-serif text-4xl sm:text-6xl font-bold text-white mb-6 tracking-tight">
-            Have a project in mind?
-            <span className="block mt-2 text-gold-300">Let&rsquo;s build it.</span>
+            Tell us what
+            <span className="block mt-2 text-gold-300">you&rsquo;re shooting.</span>
           </motion.h2>
           <motion.p variants={fadeInUp} className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto font-light leading-relaxed">
             Tell us what you need and we&rsquo;ll come back with ideas, availability and a quote within one business day.

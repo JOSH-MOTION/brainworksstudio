@@ -62,6 +62,8 @@ export interface PortfolioItem {
   imageUrls: string[];
   videoUrl: string | null;
   caption: string | null;
+  location: string | null;
+  brief: string | null;
   clientName: string | null;
   featured: boolean;
   createdAt: string;

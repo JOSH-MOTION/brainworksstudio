@@ -58,6 +58,8 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
     category: '',
     tags: '',
     caption: '',
+    location: '',
+    brief: '',
     clientName: '',
     featured: false,
     clientId: '',
@@ -125,6 +127,8 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
           category: data.category || '',
           tags: data.tags?.join(', ') || '',
           caption: data.caption || '',
+          location: data.location || '',
+          brief: data.brief || '',
           clientName: data.clientName || '',
           featured: data.featured || false,
           clientId: data.clientId || '',
@@ -201,6 +205,8 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
       body.append('category', formData.category);
       body.append('tags', formData.tags);
       body.append('caption', formData.caption);
+      body.append('location', formData.location);
+      body.append('brief', formData.brief);
       body.append('clientName', formData.clientName);
       body.append('featured', String(formData.featured));
       body.append('clientId', formData.clientId);
@@ -371,6 +377,29 @@ export default function EditPortfolio({ params }: { params: { id: string } }) {
                     id="caption"
                     value={formData.caption}
                     onChange={(e) => setFormData({ ...formData, caption: e.target.value })}
+                    rows={4}
+                    className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="location" className="text-navy-900 text-sm">Location</Label>
+                  <Input
+                    id="location"
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    placeholder="e.g., East Legon, Accra"
+                    className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="brief" className="text-navy-900 text-sm">Brief</Label>
+                  <Textarea
+                    id="brief"
+                    value={formData.brief}
+                    onChange={(e) => setFormData({ ...formData, brief: e.target.value })}
+                    placeholder="What was the assignment? A short case-study paragraph for the project page."
                     rows={4}
                     className="border-coral-100 focus:ring-coral-500 text-sm rounded-lg"
                   />

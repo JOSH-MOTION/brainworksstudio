@@ -197,12 +197,8 @@ export default function ServiceLandingClient({ slug }: { slug: string }) {
 
       {/* CTA */}
       <section className="relative overflow-hidden bg-navy-900 py-16 text-white sm:py-20">
-        <div
-          className="absolute inset-0 opacity-[0.07]"
-          style={{ backgroundImage: 'radial-gradient(circle at 1.5px 1.5px, white 1px, transparent 0)', backgroundSize: '28px 28px' }}
-        />
         <div className="relative mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl font-bold sm:text-4xl">Have a project in mind? Let&rsquo;s build it.</h2>
+          <h2 className="font-serif text-3xl font-bold sm:text-4xl">Tell us what you&rsquo;re shooting.</h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/80">Tell us what you need, your date and location, and we&rsquo;ll come back with availability and a quote.</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
             <Link href={`/contact?service=${service.slug}`}>

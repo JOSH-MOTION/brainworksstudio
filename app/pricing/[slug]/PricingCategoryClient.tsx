@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
-import { Check, Star, ArrowLeft, Sparkles } from 'lucide-react';
+import { Check, Star, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatCategoryName, formatPrice } from '@/lib/pricing-format';
@@ -70,18 +70,6 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                 </Button>
               </Link>
 
-              <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-4"
-              >
-                <Sparkles className="w-4 h-4 text-gold-400" />
-                <span className="text-sm text-white font-medium">
-                  {category.packages.length} {category.packages.length === 1 ? 'Package' : 'Packages'} Available
-                </span>
-              </motion.div>
-
               <h1 className="font-serif text-5xl sm:text-6xl font-bold text-white mb-4">
                 {formatCategoryName(category.name)}
               </h1>
@@ -137,7 +125,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
               <p className="text-xl text-gray-600 mb-2">No packages available yet</p>
               <p className="text-gray-500 mb-6">We&apos;re working on adding packages to this category.</p>
               <Link href="/contact">
-                <Button className="bg-coral-500 hover:bg-coral-600">
+                <Button className="bg-gold-600 hover:bg-gold-700">
                   Contact Us for Custom Quote
                 </Button>
               </Link>
@@ -154,13 +142,13 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                   <Card
                     className={`h-full relative ${
                       pkg.featured
-                        ? 'border-2 border-coral-500 shadow-xl scale-105'
+                        ? 'border-2 border-gold-500 shadow-xl scale-105'
                         : 'border border-gray-200 shadow-lg'
                     }`}
                   >
                     {pkg.featured && (
                       <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                        <Badge className="bg-coral-500 text-white flex items-center gap-1 px-4 py-1.5 shadow-lg">
+                        <Badge className="bg-gold-500 text-white flex items-center gap-1 px-4 py-1.5 shadow-lg">
                           <Star className="h-4 w-4" />
                           Most Popular
                         </Badge>
@@ -175,7 +163,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                         {pkg.description}
                       </CardDescription>
                       <div className="mt-4">
-                        <span className="text-4xl font-bold text-coral-600">
+                        <span className="text-4xl font-bold text-gold-600">
                           {formatPrice(pkg.price)}
                         </span>
                         {pkg.duration && (
@@ -188,7 +176,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                       <ul className="mb-8 divide-y divide-gray-100">
                         {pkg.includes.map((item, i) => (
                           <li key={i} className="flex items-center gap-3 py-2.5">
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-coral-500/10 text-coral-600">
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-gold-500/10 text-gold-600">
                               <Check className="h-3.5 w-3.5" strokeWidth={3} />
                             </span>
                             <span className="text-sm text-gray-700">{formatPrice(item)}</span>
@@ -197,13 +185,7 @@ export default function PricingCategoryClient({ category }: { category: PricingC
                       </ul>
 
                       <Link href={`/booking?category=${encodeURIComponent(category.slug)}&package=${encodeURIComponent(pkg.name)}`}>
-                        <Button
-                          className={`w-full ${
-                            pkg.featured
-                              ? 'bg-coral-500 hover:bg-coral-600 text-white shadow-lg'
-                              : 'bg-gold-600 hover:bg-gold-700 text-white'
-                          }`}
-                        >
+                        <Button className="w-full bg-gold-600 text-white hover:bg-gold-700">
                           Book {formatCategoryName(pkg.name)}
                         </Button>
                       </Link>

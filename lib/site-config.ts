@@ -20,8 +20,6 @@ export const SITE = {
   googleReviewUrl: 'https://share.google/gWSVlK9LwY2XtZFQi',
   googleRating: 4.8,
   googleReviewCount: 16,
-  // Flip to false by hand when fully booked — shown as a status pill in the hero.
-  availableForBookings: true,
 };
 
 // Hand-picked from the real Google Business listing — excludes reviews left
@@ -90,6 +88,10 @@ export interface ServicePillar {
   href: string; // dedicated landing page when one exists, otherwise the enquiry form pre-filled
   image: string; // card photo in /public — swap for a stronger project shot any time
   forBusiness?: boolean;
+  // Other real SEO landing pages (lib/services-config.ts) that fall under this
+  // department but aren't the primary href — surfaced as links on the chapter
+  // so every landing page is reachable from exactly one place in the taxonomy.
+  relatedServices?: { label: string; href: string }[];
 }
 
 export const SERVICE_PILLARS: ServicePillar[] = [
@@ -136,6 +138,10 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     includes: ['Event photography', 'Event videography', 'Wedding films', 'Private events'],
     href: '/services/wedding-photography-accra',
     image: '/image.jpg',
+    relatedServices: [
+      { label: 'Event Photography', href: '/services/event-photography-accra' },
+      { label: 'Videography', href: '/services/videography-accra' },
+    ],
   },
   {
     slug: 'photography',
@@ -145,6 +151,10 @@ export const SERVICE_PILLARS: ServicePillar[] = [
     href: '/services/corporate-photography-ghana',
     image: '/Abigail%20Graduation-image-4.jpg',
     forBusiness: true,
+    relatedServices: [
+      { label: 'Wedding Photography', href: '/services/wedding-photography-accra' },
+      { label: 'Product Photography', href: '/services/product-photography-ghana' },
+    ],
   },
   {
     slug: 'post',

@@ -62,6 +62,21 @@ export default function ServiceChapterRow({ pillar, index }: ServiceChapterRowPr
                 <ArrowUpRight className="h-4 w-4" />
               </span>
             </Link>
+
+            {pillar.relatedServices && pillar.relatedServices.length > 0 && (
+              <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+                <span className={`text-xs uppercase tracking-wider ${dark ? 'text-white/40' : 'text-navy-900/40'}`}>Also in this department:</span>
+                {pillar.relatedServices.map((related) => (
+                  <Link
+                    key={related.href}
+                    href={related.href}
+                    className={`text-sm font-medium underline-offset-4 hover:underline ${dark ? 'text-gold-300' : 'text-gold-600'}`}
+                  >
+                    {related.label}
+                  </Link>
+                ))}
+              </div>
+            )}
           </motion.div>
 
           <motion.div

@@ -4,7 +4,7 @@ import { motion, Variants } from 'framer-motion';
 import Layout from '@/components/Layout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Camera, Award, Users, MapPin, ShieldCheck, Sparkles, Clock, InstagramIcon, Twitter, Linkedin, LucideIcon } from 'lucide-react';
+import { Camera, Award, Users, MapPin, ShieldCheck, Lightbulb, Clock, InstagramIcon, Twitter, Linkedin, LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SITE, VERIFIED_STATS } from '@/lib/site-config';
@@ -115,7 +115,7 @@ const teamMembers: TeamMember[] = [
     name: 'Joshua Doe',
     position: 'CEO - Photographer',
     years: '4+',
-    description: 'With over 4 years of experience, Joshua Doe is a visionary leader dedicated to driving creative excellence and innovation. As the CEO of Brain Works Studio Africa , he leads with passion, turning ideas into impactful visual stories that inspire and connect audiences.',
+    description: "As CEO, Joshua Doe leads Brain Works Studio Africa's day-to-day production. Four years in, he's still on set for shoots alongside the rest of the crew.",
     profileImageUrl: '/me.jpg',
     socials: [
     ],
@@ -132,7 +132,7 @@ const teamMembers: TeamMember[] = [
   },
   {
     name: 'Emmanuel Atta',
-    position: 'Public Relation',
+    position: 'Public Relations',
     years: '3+',
     description: 'With over 3 years of experience, Emmanuel Atta brings strong teamwork, discipline, and strategic thinking to every role. With a background in client relations, he keeps communication clear and makes sure every client feels looked after from first enquiry to final delivery.',
     profileImageUrl: '/cor.jpg',
@@ -144,7 +144,7 @@ const teamMembers: TeamMember[] = [
     name: 'Johnson Courage Yao',
     position: 'Photographer',
     years: '5+',
-    description: 'Experienced in the art of photography for over 5 years, this professional specializes in creating captivating visuals that inspire and connect. Their unique approach combines technical skill with a creative vision, producing images that truly stand out.',
+    description: "Five years of photography experience at Brain Works Studio Africa, working across the studio's shoots in Accra.",
     profileImageUrl: '/jon.jpg',
     socials: [
       { platform: 'Instagram', url: 'https://www.instagram.com/mania.studios1?igsh=azc3cW93MmN1dWRy&utm_source=qr', icon: InstagramIcon },
@@ -169,16 +169,11 @@ const teamMembers: TeamMember[] = [
 const clients: Client[] = [
   { name: 'Modulo', logo: '/modulo.png', category: 'Corporate' },
   { name: 'Codetrain Africa', logo: '/code.png', category: 'Fashion' },
-  { name: 'StairCase Restruarant', logo: '/stair.jpg', category: 'Events' },
+  { name: 'StairCase Restaurant', logo: '/stair.jpg', category: 'Events' },
   { name: 'Mahogany', logo: '/Maho.jpg', category: 'Product' },
   { name: 'gcba', logo: '/gcba.jpg', category: 'Corporate' },
   { name: 'cfa', logo: '/Cfa.jpg', category: 'Events' },
   { name: 'ESC', logo: '/ESC.jpg', category: 'Fashion' },
-  { name: 'pay', logo: '/pay.jpg', category: 'Product' },
-  { name: 'we', logo: '/we.jpg', category: 'Product' },
-  { name: 're', logo: '/re.jpg', category: 'Product' },
-  { name: 'ag', logo: '/ag.jpg', category: 'Product' },
-  { name: 'blue', logo: '/blue.jpg', category: 'Product' }
 ];
 
 export default function AboutPageClient() {
@@ -188,7 +183,7 @@ export default function AboutPageClient() {
     { icon: Camera, title: 'Creativity', description: 'Ideas that make the work worth watching.' },
     { icon: Award, title: 'Excellence', description: 'High standards in every frame, cut and delivery.' },
     { icon: ShieldCheck, title: 'Integrity', description: 'Honest advice, clear pricing and promises we keep.' },
-    { icon: Sparkles, title: 'Innovation', description: 'New tools and formats when they serve the story.' },
+    { icon: Lightbulb, title: 'Innovation', description: 'New tools and formats when they serve the story.' },
     { icon: Users, title: 'Collaboration', description: 'We work as one team with our clients.' },
     { icon: Clock, title: 'Reliability', description: 'On time, prepared and accountable on every project.' },
   ];
@@ -596,7 +591,7 @@ export default function AboutPageClient() {
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <h2 className="font-serif text-3xl font-bold mb-4">Have a project in mind? Let&rsquo;s build it.</h2>
+            <h2 className="font-serif text-3xl font-bold mb-4">Tell us what you&rsquo;re shooting.</h2>
             <p className="text-lg mb-6 max-w-2xl mx-auto">
               Tell us what you&rsquo;re building and we&rsquo;ll assemble the right team for it.
             </p>

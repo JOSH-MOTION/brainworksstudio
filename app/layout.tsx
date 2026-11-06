@@ -1,15 +1,21 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { DM_Sans, Cormorant_Garamond } from 'next/font/google';
 import { Suspense } from 'react';
 import { AuthProvider } from '@/hooks/useAuth';
 import VercelAnalytics from "@/components/VercelAnalytics";
 import { getApprovedReviews } from '@/lib/reviews-server';
 
-const inter = Inter({ subsets: ['latin'] });
-const playfair = Playfair_Display({
+const dmSans = DM_Sans({
   subsets: ['latin'],
-  variable: '--font-playfair',
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-dm-sans',
+  display: 'swap',
+});
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-cormorant',
   display: 'swap',
 });
 
@@ -332,7 +338,7 @@ export default async function RootLayout({
           content="ca-pub-3845871149646341"
         />
       </head>
-      <body className={`${inter.className} ${playfair.variable}`}>
+      <body className={`${dmSans.className} ${dmSans.variable} ${cormorant.variable}`}>
         <AuthProvider>{children}</AuthProvider>
         
             <VercelAnalytics />

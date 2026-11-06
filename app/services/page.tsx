@@ -3,9 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowUpRight } from 'lucide-react';
 import Layout from '@/components/Layout';
-import { SERVICES } from '@/lib/services-config';
 import { SERVICE_PILLARS } from '@/lib/site-config';
-import ImageCard from '@/components/ImageCard';
 import ServiceChapterRow from '@/components/ServiceChapterRow';
 
 const BASE_URL = 'https://brainworksstudioafrica.com';
@@ -95,32 +93,13 @@ export default function ServicesHubPage() {
         </div>
       </section>
 
-      {/* Service pillars — one full-bleed, alternating-tone chapter per service */}
+      {/* Service pillars — one full-bleed, alternating-tone chapter per department.
+          Each chapter links to its primary SEO landing page, with related pages
+          (lib/services-config.ts) surfaced inline — a single taxonomy instead of
+          a second, differently-named grid underneath. */}
       {SERVICE_PILLARS.map((pillar, index) => (
         <ServiceChapterRow key={pillar.slug} pillar={pillar} index={index} />
       ))}
-
-      {/* Detailed service pages */}
-      <section className="bg-gray-50 py-16 sm:py-24">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-          <h2 className="mb-10 font-serif text-2xl font-bold text-navy-900 sm:text-3xl">Service Details</h2>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {SERVICES.map((service, index) => (
-              <ImageCard
-                key={service.slug}
-                index={index}
-                href={`/services/${service.slug}`}
-                image={service.image}
-                imageAlt={`${service.name} in Ghana by Brain Works Studio Africa`}
-                kicker={service.heroKicker.split('·').pop()?.trim()}
-                title={service.name}
-                summary={service.intro}
-                cta="Learn more"
-              />
-            ))}
-          </div>
-        </div>
-      </section>
     </Layout>
   );
 }
