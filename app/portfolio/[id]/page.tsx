@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getPortfolioItemById } from '@/lib/portfolio-server';
+import { getPortfolioItemById, getPortfolioItems } from '@/lib/portfolio-server';
 import PortfolioDetailClient from './PortfolioDetailClient';
 
 export const dynamic = 'force-dynamic';
@@ -54,6 +54,13 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPag
     notFound();
   }
 
+  // Real related work only — same category first, falling back to same type,
+  // so a project never sits with nothing to suggest next.
+  const allItems = await getPortfolioItems();
+  const sameCategory = allItems.filter((i) => i.id !== item.id && i.category === item.category);
+  const sameType = allItems.filter((i) => i.id !== item.id && i.type === item.type && i.category !== item.category);
+  const relatedItems = [...sameCategory, ...sameType].slice(0, 4);
+
   const breadcrumbJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
@@ -71,7 +78,7 @@ export default async function PortfolioDetailPage({ params }: PortfolioDetailPag
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       {/* Pass the item so the project renders server-side (item has hasPin, never the PIN). */}
-      <PortfolioDetailClient id={params.id} initialItem={item} />
+      <PortfolioDetailClient id={params.id} initialItem={item} relatedItems={relatedItems} />
     </>
   );
 }

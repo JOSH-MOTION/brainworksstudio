@@ -52,6 +52,9 @@ interface PortfolioPageClientProps {
 export default function PortfolioPageClient({ initialItems }: PortfolioPageClientProps) {
   const [portfolioItems] = useState<PortfolioItem[]>(initialItems);
   const [filteredItems, setFilteredItems] = useState<PortfolioItem[]>(initialItems);
+  // getPortfolioItems() already sorts featured-first, so the first item with
+  // a photo is the strongest real image to use as the hero backdrop.
+  const heroImage = portfolioItems.find((item) => item.imageUrls.length > 0)?.imageUrls[0];
   const [selectedType, setSelectedType] = useState<'all' | 'photography' | 'videography'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
@@ -98,32 +101,56 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
 
   return (
     <Layout>
+      {/* Editorial hero — real featured work as the backdrop, not stock photography */}
+      <section className="relative overflow-hidden bg-navy-950 text-white">
+        {heroImage && (
+          <div className="absolute inset-0">
+            <Image
+              src={heroImage}
+              alt="Brain Works Studio Africa — selected work"
+              fill
+              sizes="100vw"
+              priority
+              className="object-cover opacity-50"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/70 to-navy-950/40" />
+          </div>
+        )}
+        <div className="relative mx-auto max-w-5xl px-6 py-20 text-center sm:py-24">
+          <motion.p
+            className="mb-5 text-xs font-semibold uppercase tracking-[0.3em] text-gold-300"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            Our Selected Work · 2019–{new Date().getFullYear()}
+          </motion.p>
+          <motion.h1
+            className="font-serif text-4xl font-bold leading-[1.1] tracking-tight sm:text-6xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            Stories told through the lens.
+          </motion.h1>
+          <motion.p
+            className="mx-auto mt-5 max-w-xl text-base text-white/70 sm:text-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+          >
+            Photography, film and live production for weddings, brands and events across Ghana.
+          </motion.p>
+        </div>
+      </section>
+
       <motion.section
         initial="hidden"
         animate="visible"
         variants={sectionVariants}
-        className="w-full bg-white py-16"
+        className="w-full bg-white py-12"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <motion.h1
-            className="font-serif text-4xl md:text-5xl font-bold text-navy-900 mb-4 tracking-tight"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            Our Portfolio
-          </motion.h1>
-          <motion.p
-            className="text-lg text-gray-600 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
-          >
-            Discover our collection of stunning photography and videography work from weddings, events, portraits, and commercial shoots across Accra and Ghana.
-          </motion.p>
-        </div>
 
         {/* Type Tabs */}
         <motion.div
@@ -248,7 +275,11 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         <motion.div className="columns-2 gap-3 sm:gap-6 lg:columns-3 lg:gap-8" variants={sectionVariants}>
           <AnimatePresence mode="wait">
             {filteredItems.map((item, index) => {
-              const aspect = ['aspect-[3/4]', 'aspect-[4/5]', 'aspect-square', 'aspect-[4/5]'][index % 4];
+              // Featured work gets a taller frame so it reads as visually larger
+              // within the masonry, instead of just a corner badge.
+              const aspect = item.featured
+                ? 'aspect-[3/5]'
+                : ['aspect-[3/4]', 'aspect-[4/5]', 'aspect-square', 'aspect-[4/5]'][index % 4];
               const year = new Date(item.createdAt).getFullYear();
               return (
                 <motion.div
@@ -378,6 +409,34 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         )}
         </div>
       </motion.section>
+
+      {/* Closing CTA */}
+      <section className="bg-navy-950 py-20 text-center text-white sm:py-24">
+        <div className="mx-auto max-w-2xl px-6">
+          <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-5xl">
+            Let&rsquo;s create something worth remembering.
+          </h2>
+          <p className="mt-5 text-base text-white/70 sm:text-lg">
+            From photography to full-scale productions, we&rsquo;d love to hear what you&rsquo;re planning.
+          </p>
+          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link href="/contact" className="w-full sm:w-auto">
+              <Button size="lg" className="w-full sm:w-auto bg-gold-500 text-white hover:bg-gold-400 rounded-full px-8 py-6 font-bold">
+                Start a Project
+              </Button>
+            </Link>
+            <Link href="/booking" className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full sm:w-auto rounded-full border-2 border-white/30 bg-transparent px-8 py-6 font-bold text-white hover:bg-white/10"
+              >
+                Book a Photoshoot
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
 }

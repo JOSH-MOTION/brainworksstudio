@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { PortfolioItem } from '@/types';
 import Image from 'next/image';
+import Link from 'next/link';
 import { X, Play, ArrowDown, Eye, EyeOff, Lock, Download, Heart, Share2, Loader2, MapPin, Calendar, Briefcase } from 'lucide-react';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
@@ -57,7 +58,15 @@ function buildMediaList(data: PortfolioItem): MediaItem[] {
   return media;
 }
 
-export default function PortfolioDetailClient({ id, initialItem }: { id: string; initialItem?: PortfolioItem | null }) {
+export default function PortfolioDetailClient({
+  id,
+  initialItem,
+  relatedItems = [],
+}: {
+  id: string;
+  initialItem?: PortfolioItem | null;
+  relatedItems?: PortfolioItem[];
+}) {
   const router = useRouter();
   // The server page passes the item in so the project renders in the initial HTML
   // (headline, images) instead of a loading spinner — important for SEO.
@@ -363,10 +372,10 @@ export default function PortfolioDetailClient({ id, initialItem }: { id: string;
               {/* Badges */}
               <div className="flex flex-wrap gap-2 justify-center mb-6">
                 {item.featured && (
-                  <Badge className="bg-amber-400 text-black">Featured</Badge>
+                  <Badge className="bg-gold-500 text-navy-900">Featured</Badge>
                 )}
                 {item.hasPin && (
-                  <Badge className="bg-blue-500 text-white">
+                  <Badge className="bg-navy-800 text-white">
                     <Lock className="h-3 w-3 mr-1" />
                     PIN Protected
                   </Badge>
@@ -376,6 +385,9 @@ export default function PortfolioDetailClient({ id, initialItem }: { id: string;
                 </Badge>
                 <Badge className="bg-white/10 backdrop-blur-sm border border-white text-white">
                   {item.type}
+                </Badge>
+                <Badge className="bg-white/10 backdrop-blur-sm border border-white text-white">
+                  {new Date(item.createdAt).getFullYear()}
                 </Badge>
               </div>
 
@@ -537,111 +549,169 @@ export default function PortfolioDetailClient({ id, initialItem }: { id: string;
             )}
           </div>
 
-          {/* Gallery Grid */}
+          {/* Gallery — editorial layout: images keep their natural portrait/landscape
+              proportions in a masonry flow instead of being cropped to squares. */}
           <div className="max-w-7xl mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-              {item.videoUrl ? (
-                <motion.div
-                  variants={mediaVariants}
-                  initial="hidden"
-                  animate="visible"
-                  whileHover="hover"
-                  className="relative aspect-square overflow-hidden cursor-pointer group col-span-2 row-span-2"
-                  onClick={() => openLightbox(0)}
-                >
-                  <iframe
-                    src={item.videoUrl}
-                    className="w-full h-full"
-                    allow="autoplay; encrypted-media"
-                    allowFullScreen
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Play className="h-10 w-10 text-white" />
-                  </div>
-                </motion.div>
-              ) : (
-                mediaList.map((media, index) => (
+            {item.videoUrl ? (
+              <motion.div
+                variants={mediaVariants}
+                initial="hidden"
+                animate="visible"
+                whileHover="hover"
+                className="relative aspect-video w-full overflow-hidden rounded-lg cursor-pointer group"
+                onClick={() => openLightbox(0)}
+              >
+                <iframe
+                  src={item.videoUrl}
+                  className="w-full h-full"
+                  allow="autoplay; encrypted-media"
+                  allowFullScreen
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <Play className="h-10 w-10 text-white" />
+                </div>
+              </motion.div>
+            ) : (
+              <>
+                {/* Lead image — full width, sets the editorial tone for the gallery */}
+                {mediaList[0] && (
                   <motion.div
-                    key={index}
                     variants={mediaVariants}
                     initial="hidden"
                     animate="visible"
                     whileHover="hover"
-                    className="relative aspect-square overflow-hidden cursor-pointer group"
-                    onClick={() => openLightbox(index)}
+                    className="relative mb-3 aspect-[16/9] w-full overflow-hidden rounded-lg cursor-pointer group sm:mb-4"
+                    onClick={() => openLightbox(0)}
                   >
-                    {media.type === 'video' ? (
-                      <video
-                        src={media.url}
-                        className="w-full h-full object-cover"
-                        muted
-                        loop
-                        playsInline
-                      />
+                    {mediaList[0].type === 'video' ? (
+                      <video src={mediaList[0].url} className="w-full h-full object-cover" muted loop playsInline />
                     ) : (
                       <img
-                        src={media.url}
-                        alt={`${item.title} - ${index + 1}`}
-                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        src={mediaList[0].url}
+                        alt={`${item.title} - 1`}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                         onError={(e) => {
                           e.currentTarget.src = '/placeholder-image.jpg';
                         }}
                       />
                     )}
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
-
-                    {/* Overlay buttons */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            openLightbox(index);
-                          }}
-                          className="p-2 bg-white/90 rounded-full shadow-lg hover:bg-white transition"
-                          title="View"
-                        >
-                          <Eye className="h-4 w-4 text-gray-900" />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            requestDownload(media);
-                          }}
-                          className="p-2 bg-white/90 rounded-full shadow-lg hover:bg-white transition"
-                          title="Download"
-                        >
-                          <Download className="h-4 w-4 text-gray-900" />
-                        </button>
-                      </div>
-                    </div>
                   </motion.div>
-                ))
-              )}
-            </div>
+                )}
+
+                <div className="columns-2 gap-3 sm:columns-3 sm:gap-4 md:columns-4 lg:columns-5">
+                  {mediaList.slice(1).map((media, offsetIndex) => {
+                    const index = offsetIndex + 1;
+                    return (
+                      <motion.div
+                        key={index}
+                        variants={mediaVariants}
+                        initial="hidden"
+                        animate="visible"
+                        whileHover="hover"
+                        className="relative mb-3 overflow-hidden rounded-lg cursor-pointer group break-inside-avoid sm:mb-4"
+                        onClick={() => openLightbox(index)}
+                      >
+                        {media.type === 'video' ? (
+                          <video src={media.url} className="w-full h-auto" muted loop playsInline />
+                        ) : (
+                          <img
+                            src={media.url}
+                            alt={`${item.title} - ${index + 1}`}
+                            className="block w-full h-auto transition-transform duration-500 group-hover:scale-[1.03]"
+                            onError={(e) => {
+                              e.currentTarget.src = '/placeholder-image.jpg';
+                            }}
+                          />
+                        )}
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300" />
+
+                        {/* Overlay buttons */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openLightbox(index);
+                              }}
+                              className="p-2 bg-white/90 rounded-full shadow-lg hover:bg-white transition"
+                              title="View"
+                            >
+                              <Eye className="h-4 w-4 text-gray-900" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                requestDownload(media);
+                              }}
+                              className="p-2 bg-white/90 rounded-full shadow-lg hover:bg-white transition"
+                              title="Download"
+                            >
+                              <Download className="h-4 w-4 text-gray-900" />
+                            </button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
 
-          {/* Studio Footer */}
-          <div className="max-w-7xl mx-auto px-4 mt-16 pt-8 border-t border-gray-200 text-center">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <Image
-                src="/logo.png"
-                alt="Brain Works Studio"
-                width={32}
-                height={32}
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
-              />
-              <span className="text-gray-900 font-semibold tracking-wide">
-                BRAIN WORKS STUDIO
-              </span>
-            </div>
-            <p className="text-gray-600 text-sm">
-              Professional Photography & Videography
-            </p>
-          </div>
         </div>
+
+        {/* Related Projects — real work only, same category first then same type */}
+        {relatedItems.length > 0 && (
+          <div className="max-w-7xl mx-auto px-4 mt-20">
+            <h2 className="font-serif text-2xl font-bold text-navy-900 mb-6 sm:text-3xl">Related Projects</h2>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-6">
+              {relatedItems.map((related) => (
+                <Link key={related.id} href={`/portfolio/${related.id}`} className="group block">
+                  <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-slate-100">
+                    <Image
+                      src={related.imageUrls[0] || '/placeholder-image.jpg'}
+                      alt={`${related.title} — ${related.category} by Brain Works Studio Africa`}
+                      fill
+                      sizes="(max-width: 640px) 50vw, 25vw"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  </div>
+                  <p className="mt-2 text-xs font-semibold uppercase tracking-wider text-gold-600">{related.category}</p>
+                  <h3 className="font-serif text-base font-bold leading-snug text-navy-900">{related.title}</h3>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Closing CTA */}
+        <section className="mt-20 bg-navy-950 py-20 text-center text-white sm:py-24">
+          <div className="mx-auto max-w-2xl px-6">
+            <h2 className="font-serif text-3xl font-bold tracking-tight sm:text-5xl">
+              Let&rsquo;s create something worth remembering.
+            </h2>
+            <p className="mt-5 text-base text-white/70 sm:text-lg">
+              From photography to full-scale productions, we&rsquo;d love to hear what you&rsquo;re planning.
+            </p>
+            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <Link href="/contact" className="w-full sm:w-auto">
+                <Button size="lg" className="w-full sm:w-auto bg-gold-500 text-white hover:bg-gold-400 rounded-full px-8 py-6 font-bold">
+                  Start a Project
+                </Button>
+              </Link>
+              <Link href="/booking" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto rounded-full border-2 border-white/30 bg-transparent px-8 py-6 font-bold text-white hover:bg-white/10"
+                >
+                  Book a Photoshoot
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </section>
 
         {/* Lightbox */}
         <AnimatePresence>
@@ -668,6 +738,7 @@ export default function PortfolioDetailClient({ id, initialItem }: { id: string;
                       <Button
                         variant="ghost"
                         size="icon"
+                        aria-label="Previous image"
                         className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-gray-900/50 text-white hover:bg-gray-900"
                         onClick={goToPrev}
                       >
@@ -676,6 +747,7 @@ export default function PortfolioDetailClient({ id, initialItem }: { id: string;
                       <Button
                         variant="ghost"
                         size="icon"
+                        aria-label="Next image"
                         className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-gray-900/50 text-white hover:bg-gray-900"
                         onClick={goToNext}
                       >
