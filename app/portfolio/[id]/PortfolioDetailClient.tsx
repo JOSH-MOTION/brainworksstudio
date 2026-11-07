@@ -16,6 +16,7 @@ import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import logo from "../../../public/newlogo1.png";
 import { SITE } from '@/lib/site-config';
+import { getYouTubeThumbnail } from '@/lib/youtube-helper';
 
 // ---------------------------------------------------
 //  Animation Variants
@@ -349,10 +350,15 @@ export default function PortfolioDetailClient({
           animate="visible"
           className="relative h-screen w-full overflow-hidden"
         >
-          {/* Hero Image */}
+          {/* Hero Image — a video's raw url is a YouTube embed link, not an
+              image, so it needs its real thumbnail instead. */}
           <div className="absolute inset-0">
             <Image
-              src={mediaList[0]?.url || '/placeholder-image.jpg'}
+              src={
+                mediaList[0]?.type === 'video'
+                  ? getYouTubeThumbnail(mediaList[0].url, 'hq') || '/placeholder-image.jpg'
+                  : mediaList[0]?.url || '/placeholder-image.jpg'
+              }
               alt={item.title}
               fill
               className="object-cover"
@@ -416,9 +422,9 @@ export default function PortfolioDetailClient({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1, duration: 1 }}
-              className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+              className="absolute bottom-6 left-1/2 transform -translate-x-1/2"
             >
-              <ArrowDown className="h-8 w-8 text-white animate-bounce" />
+              <ArrowDown className="h-6 w-6 text-white animate-bounce" />
             </motion.div>
           </div>
 
@@ -427,15 +433,15 @@ export default function PortfolioDetailClient({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-center"
+            className="absolute bottom-24 left-1/2 transform -translate-x-1/2 text-center sm:bottom-28"
           >
-            <div className="bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 mb-2">
+            <div className="mx-auto mb-2 flex h-14 w-14 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm">
               <Image
                 src={logo}
                 alt="Brain Works Studio"
-                width={40}
-                height={40}
-                className="mx-auto"
+                width={32}
+                height={32}
+                className="object-contain"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}

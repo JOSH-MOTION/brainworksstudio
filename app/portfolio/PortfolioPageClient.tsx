@@ -6,7 +6,7 @@ import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { PortfolioItem } from '@/types';
-import { Filter, Play, Camera, Video, Star, ArrowUpRight } from 'lucide-react';
+import { Filter, Play, Camera, Video, Star, ArrowUpRight, X } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -58,6 +58,8 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
   const [selectedType, setSelectedType] = useState<'all' | 'photography' | 'videography'>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedTag, setSelectedTag] = useState<string>('all');
+  // Which card (if any) is playing its video inline, right in the grid.
+  const [playingItemId, setPlayingItemId] = useState<string | null>(null);
 
   useEffect(() => {
     filterItems();
@@ -272,7 +274,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
         </div>
 
         {/* Portfolio Grid — mixed aspect ratios in a masonry layout, editorial pacing instead of a uniform grid */}
-        <motion.div className="columns-2 gap-3 sm:gap-6 lg:columns-3 lg:gap-8" variants={sectionVariants}>
+        <motion.div className="columns-2 gap-3 sm:columns-3 sm:gap-6 lg:columns-4 lg:gap-8" variants={sectionVariants}>
           <AnimatePresence mode="wait">
             {filteredItems.map((item, index) => {
               // Featured work gets a taller frame so it reads as visually larger
@@ -281,6 +283,7 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
                 ? 'aspect-[3/5]'
                 : ['aspect-[3/4]', 'aspect-[4/5]', 'aspect-square', 'aspect-[4/5]'][index % 4];
               const year = new Date(item.createdAt).getFullYear();
+              const isPlaying = playingItemId === item.id && !!item.videoUrl;
               return (
                 <motion.div
                   key={item.id}
@@ -300,71 +303,104 @@ export default function PortfolioPageClient({ initialItems }: PortfolioPageClien
                       variants={cardShadowVariants}
                       className={`relative ${aspect} w-full overflow-hidden rounded-xl bg-slate-100 sm:rounded-2xl`}
                     >
-                      <motion.div variants={cardImageVariants} className="absolute inset-0">
-                        <Image
-                          src={
-                            item.imageUrls && item.imageUrls.length > 0
-                              ? item.imageUrls[0]
-                              : item.videoUrl
-                                ? '/video-placeholder.jpg'
-                                : '/placeholder-image.jpg'
-                          }
-                          alt={`${item.title} — ${item.category} ${item.type === 'photography' ? 'photography' : 'videography'} by Brain Works Studio Africa, Accra, Ghana`}
-                          fill
-                          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover"
-                          onError={(e) => {
-                            e.currentTarget.src = '/placeholder-image.jpg';
-                          }}
+                      {isPlaying ? (
+                        <iframe
+                          src={`${item.videoUrl}?autoplay=1`}
+                          title={item.title}
+                          className="absolute inset-0 h-full w-full"
+                          allow="autoplay; encrypted-media"
+                          allowFullScreen
                         />
-                      </motion.div>
-
-                      {/* Top-left: featured marker */}
-                      {item.featured && (
-                        <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-navy-900 shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
-                          <Star className="h-2.5 w-2.5 fill-[#CB9D06] text-[#CB9D06] sm:h-3 sm:w-3" />
-                          Featured
-                        </div>
-                      )}
-
-                      {/* Top-right: media type indicator */}
-                      <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-navy-900 shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
-                        {item.type === 'photography' ? (
-                          <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
-                        ) : (
-                          <Video className="h-3 w-3 sm:h-4 sm:w-4" />
-                        )}
-                      </div>
-
-                      {/* Video play affordance */}
-                      {item.videoUrl && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.div
-                            variants={cardPlayVariants}
-                            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg sm:h-16 sm:w-16"
-                          >
-                            <Play className="ml-0.5 h-4 w-4 fill-navy-900 text-navy-900 sm:h-6 sm:w-6" />
-                          </motion.div>
-                        </div>
-                      )}
-
-                      {/* Bottom scrim + metadata — category/year always visible, not hover-only */}
-                      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-900/95 via-navy-900/55 to-transparent px-2.5 pb-2.5 pt-10 sm:px-5 sm:pb-5 sm:pt-16">
-                        <div className="mb-0.5 flex items-center justify-between sm:mb-1">
-                          <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-white/75 sm:text-xs sm:tracking-[0.12em]">
-                            {item.category}
-                          </p>
-                          <p className="text-[9px] font-semibold text-white/60 sm:text-xs">{year}</p>
-                        </div>
-                        <h3 className="font-serif text-xs leading-snug text-white sm:text-xl">{item.title}</h3>
-                        <motion.div
-                          variants={cardRevealVariants}
-                          className="mt-1.5 hidden items-center gap-1.5 text-sm font-medium text-white sm:mt-3 sm:flex"
-                        >
-                          View project
-                          <ArrowUpRight className="h-4 w-4" />
+                      ) : (
+                        <motion.div variants={cardImageVariants} className="absolute inset-0">
+                          <Image
+                            src={
+                              item.imageUrls && item.imageUrls.length > 0
+                                ? item.imageUrls[0]
+                                : item.videoUrl
+                                  ? '/video-placeholder.jpg'
+                                  : '/placeholder-image.jpg'
+                            }
+                            alt={`${item.title} — ${item.category} ${item.type === 'photography' ? 'photography' : 'videography'} by Brain Works Studio Africa, Accra, Ghana`}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            className="object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = '/placeholder-image.jpg';
+                            }}
+                          />
                         </motion.div>
-                      </div>
+                      )}
+
+                      {isPlaying ? (
+                        <button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setPlayingItemId(null);
+                          }}
+                          aria-label="Close video"
+                          className="absolute right-2 top-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-navy-950/80 text-white shadow-sm hover:bg-navy-950 sm:right-4 sm:top-4 sm:h-9 sm:w-9"
+                        >
+                          <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                        </button>
+                      ) : (
+                        <>
+                          {/* Top-left: featured marker */}
+                          {item.featured && (
+                            <div className="absolute left-2 top-2 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold tracking-wide text-navy-900 shadow-sm sm:left-4 sm:top-4 sm:gap-1.5 sm:px-3 sm:py-1 sm:text-xs">
+                              <Star className="h-2.5 w-2.5 fill-[#CB9D06] text-[#CB9D06] sm:h-3 sm:w-3" />
+                              Featured
+                            </div>
+                          )}
+
+                          {/* Top-right: media type indicator */}
+                          <div className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-navy-900 shadow-sm sm:right-4 sm:top-4 sm:h-9 sm:w-9">
+                            {item.type === 'photography' ? (
+                              <Camera className="h-3 w-3 sm:h-4 sm:w-4" />
+                            ) : (
+                              <Video className="h-3 w-3 sm:h-4 sm:w-4" />
+                            )}
+                          </div>
+
+                          {/* Video play affordance — only the circle itself is clickable, so the
+                              rest of the card still links through to the project detail page. */}
+                          {item.videoUrl && (
+                            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                              <motion.button
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                  setPlayingItemId(item.id);
+                                }}
+                                aria-label={`Play ${item.title}`}
+                                variants={cardPlayVariants}
+                                className="pointer-events-auto flex h-10 w-10 items-center justify-center rounded-full bg-white/95 shadow-lg sm:h-16 sm:w-16"
+                              >
+                                <Play className="ml-0.5 h-4 w-4 fill-navy-900 text-navy-900 sm:h-6 sm:w-6" />
+                              </motion.button>
+                            </div>
+                          )}
+
+                          {/* Bottom scrim + metadata — category/year always visible, not hover-only */}
+                          <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-navy-900/95 via-navy-900/55 to-transparent px-2.5 pb-2.5 pt-10 sm:px-5 sm:pb-5 sm:pt-16">
+                            <div className="mb-0.5 flex items-center justify-between sm:mb-1">
+                              <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-white/75 sm:text-xs sm:tracking-[0.12em]">
+                                {item.category}
+                              </p>
+                              <p className="text-[9px] font-semibold text-white/60 sm:text-xs">{year}</p>
+                            </div>
+                            <h3 className="font-serif text-xs leading-snug text-white sm:text-xl">{item.title}</h3>
+                            <motion.div
+                              variants={cardRevealVariants}
+                              className="mt-1.5 hidden items-center gap-1.5 text-sm font-medium text-white sm:mt-3 sm:flex"
+                            >
+                              View project
+                              <ArrowUpRight className="h-4 w-4" />
+                            </motion.div>
+                          </div>
+                        </>
+                      )}
                     </motion.div>
                   </Link>
                 </motion.div>
