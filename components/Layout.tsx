@@ -475,6 +475,29 @@ export default function RootLayout({ children }: LayoutProps) {
                     </motion.li>
                   ))}
                 </ul>
+
+                <h3 className="text-base font-bold text-white mb-4 mt-8 uppercase tracking-wider">Our Ecosystem</h3>
+                <ul className="space-y-2 text-sm">
+                  {[
+                    { href: 'https://reveal.brainworksstudioafrica.com', label: 'Reveal — client galleries' },
+                    { href: 'https://gear.brainworksstudioafrica.com', label: 'Brain Works Gear — buy & sell equipment' },
+                  ].map((link, index) => (
+                    <motion.li
+                      key={index}
+                      whileHover={{ x: 5 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-gold-300 transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    </motion.li>
+                  ))}
+                </ul>
               </motion.div>
 
               {/* Newsletter */}
