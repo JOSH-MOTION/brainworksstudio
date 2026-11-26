@@ -45,7 +45,7 @@ export default function ImageCard({
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
         />
         {/* Gradient keeps the text readable on any photo */}
-        <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/55 to-navy-950/5 transition-all duration-500 group-hover:via-navy-950/75" />
+        <div className="absolute inset-0 bg-gradient-to-t from-navy-950 via-navy-950/55 to-navy-950/5 transition-[background] duration-500 group-hover:via-navy-950/75" />
 
         {kicker && (
           <span className="absolute left-5 top-5 rounded-full bg-navy-950/50 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-gold-200 backdrop-blur-sm">
@@ -54,7 +54,7 @@ export default function ImageCard({
         )}
 
         <div className="absolute inset-x-0 bottom-0 p-6 text-white">
-          <span className="mb-3 block h-[2px] w-10 bg-gold-400 transition-all duration-500 group-hover:w-16" />
+          <span className="mb-3 block h-[2px] w-10 bg-gold-400 transition-[width] duration-500 group-hover:w-16" />
           <Heading className="font-serif text-xl font-bold leading-snug">{title}</Heading>
           <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/80">{summary}</p>
           {children && (

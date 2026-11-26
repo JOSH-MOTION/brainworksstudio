@@ -194,7 +194,7 @@ export default function RootLayout({ children }: LayoutProps) {
                     <Link
                       href={item.href}
                       aria-current={isActive(pathname, item.href) ? 'page' : undefined}
-                      className={`text-xs font-medium uppercase tracking-wider transition-all duration-300 ${
+                      className={`text-xs font-medium uppercase tracking-wider transition-colors duration-300 ${
                         isActive(pathname, item.href)
                           ? 'text-gold-300'
                           : 'text-white/80 hover:text-white'

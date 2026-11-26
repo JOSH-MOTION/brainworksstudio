@@ -295,7 +295,7 @@ export default function HomePageClient({
             {WHY_BWSA.map((item, index) => (
               <MotionCard key={item.title} index={index} lift={4} className="rounded-xl border border-gray-100 bg-slate-50 p-6 hover:bg-white">
                 <div className="flex gap-4">
-                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-gold-100 text-gold-600 transition-all duration-500 group-hover:rotate-[360deg] group-hover:bg-gold-500 group-hover:text-white">
+                  <span className="flex h-8 w-8 flex-none items-center justify-center rounded-full bg-gold-100 text-gold-600 transition-[transform,background-color,color] duration-500 group-hover:rotate-[360deg] group-hover:bg-gold-500 group-hover:text-white">
                     <Check className="h-4 w-4" />
                   </span>
                   <div>
@@ -468,7 +468,7 @@ export default function HomePageClient({
               {reviews.slice(0, 6).map((review, index) => (
                 <MotionCard key={review.id} index={index} className="rounded-2xl">
                   <Card className="relative h-full border border-gray-100 shadow-sm bg-white rounded-2xl">
-                    <span aria-hidden="true" className="pointer-events-none absolute right-5 top-2 font-serif text-7xl leading-none text-gold-100 transition-all duration-500 group-hover:-translate-y-1 group-hover:text-gold-200">
+                    <span aria-hidden="true" className="pointer-events-none absolute right-5 top-2 font-serif text-7xl leading-none text-gold-100 transition-[transform,color] duration-500 group-hover:-translate-y-1 group-hover:text-gold-200">
                       &rdquo;
                     </span>
                     <CardHeader className="pb-4">
